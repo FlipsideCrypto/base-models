@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: ethereum 
+    database: ethereum
+    schema: core 
+    tables: 
+      - name: fact_hourly_token_prices
