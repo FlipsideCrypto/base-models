@@ -1,7 +1,7 @@
 {{ config (
     materialized = "view",
     post_hook = if_data_call_function(
-        func = "{{this.schema}}.udf_bulk_json_rpc(object_construct('sql_source', '{{this.identifier}}', 'external_table', 'blocks', 'sql_limit', {{var('sql_limit','900')}}, 'producer_batch_size', {{var('producer_batch_size','300')}}, 'worker_batch_size', {{var('worker_batch_size','300')}}, 'batch_call_limit', {{var('batch_call_limit','30')}}))",
+        func = "{{this.schema}}.udf_bulk_json_rpc(object_construct('sql_source', '{{this.identifier}}', 'external_table', 'blocks', 'sql_limit', {{var('sql_limit','100000')}}, 'producer_batch_size', {{var('producer_batch_size','100000')}}, 'worker_batch_size', {{var('worker_batch_size','50000')}}, 'batch_call_limit', {{var('batch_call_limit','1000')}}))",
         target = "{{this.schema}}.{{this.identifier}}"
     )
 ) }}
@@ -9,7 +9,8 @@
 SELECT
     PARSE_JSON(
         CONCAT(
-            '{"method": "eth_getBlockByNumber", "params":[',
+            '{"jsonrpc": "2.0",',
+            '"method": "eth_getBlockByNumber", "params":[',
             block_number :: STRING,
             ',',
             FALSE :: BOOLEAN,
