@@ -10,7 +10,7 @@
         {% do run_query(sql) %}
         {% if target.database != "BASE_COMMUNITY_DEV" %}
             {% set sql %}
-            {# {{ create_udf_get_chainhead() }} #}
+            {{ create_udf_get_chainhead() }}
             {{ create_udf_bulk_json_rpc() }}
 
             {% endset %}
