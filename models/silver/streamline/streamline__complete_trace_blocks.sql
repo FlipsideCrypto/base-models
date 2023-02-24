@@ -20,7 +20,7 @@ WITH max_date AS (
             FROM
                 TABLE(
                     information_schema.external_table_files(
-                        table_name => '{{ source( "bronze_streamline", "blocks") }}'
+                        table_name => '{{ source( "bronze_streamline", "trace_blocks") }}'
                     )
                 ) A
 
@@ -52,7 +52,7 @@ FROM
 FROM
     {{ source(
         "bronze_streamline",
-        "blocks"
+        "trace_blocks"
     ) }}
     t
     JOIN meta b
