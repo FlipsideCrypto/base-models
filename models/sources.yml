@@ -15,3 +15,8 @@ sources:
       - name: transactions
       - name: debug_traceBlockByNumber
       - name: qn_getBlockWithReceipts
+  - name: udfs_streamline
+    database: udfs
+    schema: streamline
+    tables: 
+      - name: node_mapping

@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: silver_testnet__tx_method
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - TX_HASH
+    columns:
+      - name: BLOCK_NUMBER
+        tests:
+          - not_null  
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - NUMBER    
+                - FLOAT    
+      - name: _INSERTED_TIMESTAMP
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - TIMESTAMP_LTZ
+
+
+
