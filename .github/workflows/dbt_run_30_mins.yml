@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m models/silver/goerli models/bronze/goerli/bronze__goerli_contract_logs.sql
+          dbt run -m models/silver/eth_goerli models/bronze/eth_goerli/bronze__eth_goerli_contract_logs.sql

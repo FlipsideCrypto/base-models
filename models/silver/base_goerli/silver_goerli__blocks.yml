@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_testnet__blocks
+  - name: silver_goerli__blocks
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:

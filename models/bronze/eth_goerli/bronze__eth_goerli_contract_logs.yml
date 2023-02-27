@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: bronze__goerli_contract_logs
+  - name: bronze__eth_goerli_contract_logs
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:

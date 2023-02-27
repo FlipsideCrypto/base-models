@@ -11,7 +11,7 @@ WITH base AS (
         resp :data [0] :result AS RESULT,
         _inserted_timestamp
     FROM
-        {{ ref('bronze__goerli_contract_logs') }}
+        {{ ref('bronze__eth_goerli_contract_logs') }}
     WHERE
         resp :data [0] :result :: STRING <> '[]'
 

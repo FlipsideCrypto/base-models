@@ -83,7 +83,7 @@ SELECT
     ) AS tx_json,
     _INSERTED_TIMESTAMP
 FROM
-    {{ ref('silver_testnet__tx_method') }}
+    {{ ref('silver_goerli__tx_method') }}
 
 {% if is_incremental() %}
 WHERE

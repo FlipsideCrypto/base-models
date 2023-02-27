@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: testnet__fact_transactions
+  - name: goerli__fact_transactions
     description: This table contains transaction level data for the Base Blockchain Goerli Testnet. Each transaction will have a unique transaction hash, along with transactions fees and an ETH value transferred when applicable. Transactions may be native ETH transfers or interactions with contract addresses. For more information on Base, please see [Base Documentation](https://docs.base.org/). For more information on EVM transactions, please see [The Ethereum Organization - Transactions](https://ethereum.org/en/developers/docs/transactions/)
 
     columns:

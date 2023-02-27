@@ -23,4 +23,4 @@ SELECT
     is_system_tx,
     tx_json
 FROM
-    {{ ref('silver_testnet__transactions') }} A
+    {{ ref('silver_goerli__transactions') }} A
