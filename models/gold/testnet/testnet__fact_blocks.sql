@@ -23,5 +23,5 @@ SELECT
     uncle_blocks,
     block_header_json
 FROM
-    {{ ref('silver__blocks') }} A
+    {{ ref('silver_testnet__blocks') }} A
 
