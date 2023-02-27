@@ -1,7 +1,7 @@
 {{ config (
     materialized = "view",
     post_hook = if_data_call_function(
-        func = "{{this.schema}}.udf_bulk_json_rpc(object_construct('sql_source', '{{this.identifier}}', 'external_table', 'eth_getBlockReceipts', 'sql_limit', {{var('sql_limit','100000')}}, 'producer_batch_size', {{var('producer_batch_size','50000')}}, 'worker_batch_size', {{var('worker_batch_size','25000')}}, 'batch_call_limit', {{var('batch_call_limit','500')}}))",
+        func = "{{this.schema}}.udf_bulk_json_rpc(object_construct('sql_source', '{{this.identifier}}', 'external_table', 'debug_traceBlockByNumber', 'sql_limit', {{var('sql_limit','50000')}}, 'producer_batch_size', {{var('producer_batch_size','10000')}}, 'worker_batch_size', {{var('worker_batch_size','5000')}}, 'batch_call_limit', {{var('batch_call_limit','24')}}))",
         target = "{{this.schema}}.{{this.identifier}}"
     )
 ) }}
@@ -10,7 +10,7 @@ SELECT
     PARSE_JSON(
         CONCAT(
             '{"jsonrpc": "2.0",',
-            '"method": "eth_getBlockReceipts", "params":[',
+            '"method": "debug_traceBlockByNumber", "params":[',
             block_number :: STRING,
             '],"id":',
             block_number :: STRING,
@@ -26,6 +26,6 @@ EXCEPT
 SELECT
     block_number
 FROM
-    {{ ref("streamline__complete_eth_getBlockReceipts") }}
+    {{ ref("streamline__complete_debug_traceBlockByNumber") }}
 WHERE
     block_number > 1000000

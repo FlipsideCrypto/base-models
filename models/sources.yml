@@ -20,3 +20,5 @@ sources:
     schema: streamline
     tables: 
       - name: node_mapping
+      - name: debug_traceBlockByNumber
+      - name: qn_getBlockWithReceipts

@@ -1,11 +1,11 @@
-name: dbt_run_streamline_receipts_realtime
-run-name: dbt_run_streamline_receipts_realtime
+name: dbt_run_dev_refresh
+run-name: dbt_run_dev_refresh
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 3 hours" (see https://crontab.guru)
-    - cron: '0 1-23/3 * * *'
+    # Runs "at 9:00 UTC" (see https://crontab.guru)
+    - cron: '0 9 * * *'
 
 env:
   DBT_PROFILES_DIR: ./
@@ -37,8 +37,8 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip3 install dbt-snowflake~=${{ vars.DBT_VERSION }} cli_passthrough requests click
+          pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/streamline__qn_getBlockWithReceipts_realtime.sql
+          dbt run-operation run_sp_create_prod_clone
