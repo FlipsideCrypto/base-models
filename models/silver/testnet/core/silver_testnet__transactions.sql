@@ -50,6 +50,7 @@ SELECT
     ethereum.public.udf_hex_to_int(
         tx_type :: STRING
     ) :: INTEGER AS tx_type,
+    is_system_tx,
     object_construct_keep_null(
         'chain_ID',
         ethereum.public.udf_hex_to_int(
