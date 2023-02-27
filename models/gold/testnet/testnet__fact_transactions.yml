@@ -1,0 +1,38 @@
+version: 2
+models:
+  - name: testnet__fact_transactions
+    description: This table contains transaction level data for the Base Blockchain Goerli Testnet. Each transaction will have a unique transaction hash, along with transactions fees and an ETH value transferred when applicable. Transactions may be native ETH transfers or interactions with contract addresses. For more information on Base, please see [Base Documentation](https://docs.base.org/). For more information on EVM transactions, please see [The Ethereum Organization - Transactions](https://ethereum.org/en/developers/docs/transactions/)
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: Also known as block height. The block number, which indicates the length of the blockchain, increases after the addition of each new block.
+      - name: BLOCK_TIMESTAMP
+        description: The date and time at which the block was produced.
+      - name: TX_HASH
+        description: Transaction hash is a unique 66-character identifier that is generated when a transaction is executed.
+      - name: NONCE
+        description: The number of transactions sent from a given address.
+      - name: POSITION
+        description: The position of the transaction within the block.
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: The function signature of the contract call.
+      - name: FROM_ADDRESS
+        description: The sending address of this transaction.
+      - name: TO_ADDRESS
+        description: The receiving address of this transaction. This can be a contract address.
+      - name: ETH_VALUE
+        description: The value transacted in ETH.
+      - name: BLOCK_HASH
+        description: Block hash is a unique 66-character identifier that is generated when a block is produced.
+      - name: GAS_PRICE
+        description: Cost per unit of gas in Gwei.
+      - name: GAS_LIMIT
+        description: Maximum amount of gas allocated for the transaction.
+      - name: INPUT_DATA
+        description: This column contains additional data for this transaction, and is commonly used as part of a contract interaction or as a message to the recipient.
+      - name: TX_TYPE
+        description: This column indicates the transaction type.
+      - name: IS_SYSTEM_TX
+        description: This column indicates system transactions.
+      - name: TX_JSON
+        description: This JSON column contains the transaction details, including event logs.
