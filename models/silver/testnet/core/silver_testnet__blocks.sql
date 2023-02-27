@@ -12,7 +12,7 @@ SELECT
             TIMESTAMP :: STRING
         )
     ) AS block_timestamp,
-    'testnet' AS network,
+    'goerli' AS network,
     'base' AS blockchain,
     tx_count,
     ethereum.public.udf_hex_to_int(
