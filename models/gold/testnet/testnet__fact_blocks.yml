@@ -1,0 +1,40 @@
+version: 2
+sources:
+  - name: testnet__fact_blocks
+    description: This table contains block level data for the Base Blockchain Goerli Testnet. This table can be used to analyze trends at a block level, for example gas fees vs. total transactions over time. For more information on Base, please see [Base Documentation](https://docs.base.org/). For more information on EVM transactions, please see [Etherscan Resources](https://etherscan.io/directory/Learning_Resources/Ethereum) or [The Ethereum Organization](https://ethereum.org/en/developers/docs/blocks/).
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: Also known as block height. The block number, which indicates the length of the blockchain, increases after the addition of each new block.
+      - name: BLOCK_TIMESTAMP
+        description: The date and time at which the block was produced.
+      - name: NETWORK
+        description: The network of the blockchain used by a transaction.
+      - name: BLOCKCHAIN
+        description: The blockchain on which transactions are being confirmed.
+      - name: TX_COUNT
+        description: Total number of transactions within a block.
+      - name: DIFFICULTY
+        description: The effort required to mine the block.
+      - name: TOTAL_DIFFICULTY
+        description: Total difficulty of the chain at a given block.
+      - name: EXTRA_DATA
+        description: Any data included by the validator for a given block.
+      - name: GAS_LIMIT
+        description: Total gas limit provided by all transactions in the block.
+      - name: GAS_USED
+        description: Total gas used in the block.
+      - name: HASH
+        description: The hash of the block header for a given block.
+      - name: PARENT_HASH
+        description: The hash of the block from which a given block is generated. Also known as the parent block.
+      - name: RECEIPTS_ROOT
+        description: The root of the state trie.
+      - name: SHA3_UNCLES
+        description: The mechanism which Ethereum Javascript RLP encodes an empty string.
+      - name: SIZE
+        description: Block size, which is determined by a given block's gas limit.
+      - name: UNCLE_BLOCKS
+        description: Uncle blocks occur when two blocks are mined and broadcasted at the same time, with the same block number. The block validated across the most nodes will be added to the primary chain, and the other one becomes an uncle block. Miners do receive rewards for uncle blocks.
+      - name: BLOCK_HEADER_JSON
+        description: This JSON column contains the block header details.
