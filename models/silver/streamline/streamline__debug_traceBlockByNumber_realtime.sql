@@ -28,9 +28,8 @@ SELECT
             '{"jsonrpc": "2.0",',
             '"method": "debug_traceBlockByNumber", "params":[',
             block_number :: STRING,
-            '{',
-            '"tracer": "callTracer"',
-            '}],"id":',
+            ',{"tracer": "callTracer"}',
+            '],"id":',
             block_number :: STRING,
             '}'
         )
