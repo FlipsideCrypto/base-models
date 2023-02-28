@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    A.block_number AS block_number,
+    block_number,
     block_timestamp,
     tx_hash,
     nonce,
@@ -23,4 +23,4 @@ SELECT
     is_system_tx,
     tx_json
 FROM
-    {{ ref('silver_goerli__transactions') }} A
+    {{ ref('silver_goerli__transactions') }}

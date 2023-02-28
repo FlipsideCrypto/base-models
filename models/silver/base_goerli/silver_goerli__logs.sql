@@ -17,11 +17,11 @@ SELECT
     	gasUsed) :: INTEGER AS gas_used,
     contract_address,
     data,
-    log_index,
+    event_index,
     CASE
         WHEN removed = 'true' THEN TRUE
         ELSE FALSE
-    END AS removed,
+    END AS event_removed,
     topics,
     tx_hash,
     ethereum.public.udf_hex_to_int(

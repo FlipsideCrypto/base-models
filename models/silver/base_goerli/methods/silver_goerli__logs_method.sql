@@ -104,7 +104,7 @@ SELECT
     VALUE :address :: STRING AS contract_address,
     VALUE :data :: STRING AS data,
     ethereum.public.udf_hex_to_int(
-    	VALUE :logIndex :: STRING) :: INTEGER AS log_index,
+    	VALUE :logIndex :: STRING) :: INTEGER AS event_index,
     VALUE :removed :: STRING AS removed,
     VALUE :topics AS topics,
     VALUE :transactionHash :: STRING AS tx_hash,
@@ -116,7 +116,7 @@ SELECT
     CONCAT(
         tx_hash,
         '-',
-        log_index
+        event_index
     ) AS _log_id,
     response,
     _inserted_timestamp
