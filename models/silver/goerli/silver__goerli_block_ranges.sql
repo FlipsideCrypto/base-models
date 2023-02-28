@@ -60,7 +60,7 @@ batched AS (
                 block_number
         ) AS id,
         FLOOR(
-            id / 750
+            id / 200
         ) AS batch_id
     FROM
         blocks
