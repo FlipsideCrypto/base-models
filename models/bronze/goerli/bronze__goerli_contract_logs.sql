@@ -30,7 +30,7 @@ WHERE
 ORDER BY
     batch_id ASC
 LIMIT
-    10
+    20
 ), ready_requests AS (
     SELECT
         CONCAT(
@@ -48,7 +48,7 @@ LIMIT
     FROM
         request_details
 ),
-batched AS ({% for item in range(10) %}
+batched AS ({% for item in range(20) %}
 SELECT
     udfs.streamline.udf_call_node(secret_name, node_url, headers, PARSE_JSON(json_request)) AS resp, batch_id, SYSDATE() AS _inserted_timestamp
 FROM
