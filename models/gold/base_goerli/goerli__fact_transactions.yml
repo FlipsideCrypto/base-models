@@ -15,7 +15,7 @@ models:
       - name: POSITION
         description: The position of the transaction within the block.
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: The function signature of the contract call.
+        description: The function signature of the transaction.
       - name: FROM_ADDRESS
         description: The sending address of this transaction.
       - name: TO_ADDRESS

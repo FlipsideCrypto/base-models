@@ -6,18 +6,28 @@
 
 SELECT
     _log_id,
-    A.block_number AS block_number,
-    tx_hash,
-    event_index,
+	l.block_number,
+    l.block_hash,
+    b.block_timestamp,
+    l.tx_hash,
+    origin_function_signature,
     origin_from_address,
     origin_to_address,
+    event_index,
     contract_address,
     topics,
     data,
-    gas_used,
-    cumulative_gas_used,
     event_removed,
-    tx_status
+    tx_status,
+    tx_index,
+    l.gas_used,
+    cumulative_gas_used,
+    effective_gas_price,
+    type
 FROM
-    {{ ref('silver_goerli__logs') }} A
+    {{ ref('silver_goerli__logs') }} l
+LEFT JOIN {{ ref('silver_goerli__blocks') }} b
+        ON l.block_number = b.block_number
+LEFT JOIN {{ ref('silver_goerli__transactions') }} t
+        ON l.tx_hash = t.tx_hash
 
