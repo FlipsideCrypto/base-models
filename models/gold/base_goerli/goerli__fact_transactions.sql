@@ -5,10 +5,10 @@
 ) }}
 
 SELECT
-    t.block_number,
-    t.block_hash,
+    block_number,
+    block_hash,
     block_timestamp,
-    t.tx_hash,
+    tx_hash,
     nonce,
     POSITION,
     origin_function_signature,
@@ -25,6 +25,4 @@ SELECT
     is_system_tx,
     tx_json
 FROM
-    {{ ref('silver_goerli__transactions') }} t
-LEFT JOIN {{ ref('silver_goerli__logs') }} l
-    ON t.tx_hash = l.tx_hash
+    {{ ref('silver_goerli__transactions') }} 

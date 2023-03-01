@@ -40,6 +40,7 @@ SELECT
     _inserted_timestamp
 FROM
     {{ ref('silver_goerli__logs_method') }}
+WHERE tx_hash IS NOT NULL
 
 {% if is_incremental() %}
 WHERE

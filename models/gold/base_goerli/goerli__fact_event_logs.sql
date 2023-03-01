@@ -18,7 +18,7 @@ SELECT
     topics,
     data,
     event_removed,
-    tx_status,
+    l.tx_status,
     tx_index,
     l.gas_used,
     cumulative_gas_used,

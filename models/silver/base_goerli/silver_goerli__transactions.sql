@@ -6,13 +6,13 @@
 ) }}
 
 SELECT
-    block_number,
+    t.block_number,
     TO_TIMESTAMP_NTZ(
         ethereum.public.udf_hex_to_int(
             block_timestamp :: STRING
         )
     ) AS block_timestamp,
-    tx_hash,
+    t.tx_hash,
     ethereum.public.udf_hex_to_int(
         nonce :: STRING
     ) :: INTEGER AS nonce,
@@ -81,9 +81,20 @@ SELECT
         'source_hash',
         sourcehash
     ) AS tx_json,
-    _INSERTED_TIMESTAMP
+    CASE
+        WHEN status = '0x1' THEN 'SUCCESS'
+        ELSE 'FAIL'
+    END AS tx_status,
+    ethereum.public.udf_hex_to_int(
+    	gasUsed) :: INTEGER AS gas_used,
+    t._INSERTED_TIMESTAMP
 FROM
-    {{ ref('silver_goerli__tx_method') }}
+    {{ ref('silver_goerli__tx_method') }} t
+LEFT JOIN {{ ref('silver_goerli__logs_method') }} l
+    ON t.tx_hash = l.parent_transactionHash
+qualify row_number() over (partition by t.tx_hash
+    order by t._inserted_timestamp
+        ) = 1
 
 {% if is_incremental() %}
 WHERE

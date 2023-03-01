@@ -77,6 +77,9 @@ flat_response AS (
 SELECT
     block_number,
     VALUE :blockHash :: STRING AS blockHash,
+    VALUE :transactionHash :: STRING AS parent_transactionHash,
+    ethereum.public.udf_hex_to_int(
+    	VALUE :transactionIndex :: STRING) :: INTEGER AS parent_transactionIndex,
 	VALUE :cumulativeGasUsed :: STRING AS cumulativeGasUsed,
     VALUE :effectiveGasPrice :: STRING AS effectiveGasPrice,
     VALUE :from :: STRING AS origin_from_address,
@@ -91,17 +94,16 @@ SELECT
 FROM
     base,
     LATERAL FLATTEN(input => response)
-)
+),
+
+logs_response AS (
 
 SELECT
 	block_number,
-    blockHash,
-    cumulativeGasUsed,
-    effectiveGasPrice,
-    origin_from_address,
-    gasUsed,
+    parent_transactionHash,
+    parent_transactionIndex,
     logs_array,
-    VALUE :address :: STRING AS contract_address,
+	VALUE :address :: STRING AS contract_address,
     VALUE :data :: STRING AS data,
     ethereum.public.udf_hex_to_int(
     	VALUE :logIndex :: STRING) :: INTEGER AS event_index,
@@ -109,16 +111,41 @@ SELECT
     VALUE :topics AS topics,
     VALUE :transactionHash :: STRING AS tx_hash,
     VALUE :transactionIndex :: STRING AS transactionIndex,
+    _inserted_timestamp
+FROM flat_response,
+    LATERAL FLATTEN(input => logs_array)
+)
+
+SELECT
+    block_number,
+    blockHash,
+    parent_transactionHash,
+    parent_transactionIndex,
+    cumulativeGasUsed,
+    effectiveGasPrice,
+    origin_from_address,
+    gasUsed,
+    l.logs_array,
+    contract_address,
+    data,
+    event_index,
+    removed,
+    topics,
+    tx_hash,
+    transactionIndex,
     logsBloom,
     status,
     origin_to_address,
     type,
     CONCAT(
-        tx_hash,
+        COALESCE(tx_hash,parent_transactionHash),
         '-',
-        event_index
+        COALESCE(event_index,parent_transactionIndex)
     ) AS _log_id,
     response,
     _inserted_timestamp
-FROM flat_response,
-    LATERAL FLATTEN(input => logs_array)
+FROM flat_response f
+LEFT JOIN logs_response l USING(parent_transactionHash)
+qualify(ROW_NUMBER() over (PARTITION BY _log_id 
+    ORDER BY
+        block_number DESC)) = 1
