@@ -6,7 +6,7 @@
 
 SELECT
     _log_id,
-	l.block_number,
+    l.block_number,
     l.block_hash,
     b.block_timestamp,
     l.tx_hash,

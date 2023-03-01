@@ -1,11 +1,11 @@
-name: dbt_run_scheduled
-run-name: dbt_run_scheduled
+name: dbt_test
+run-name: dbt_test
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 2 hours" (see https://crontab.guru)
-    - cron: '0 */2 * * *'
+    # Runs "at 9:00 UTC" (see https://crontab.guru)
+    - cron: '0 9 * * *'
     
 env:
   DBT_PROFILES_DIR: ./
@@ -21,7 +21,7 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}
-
+  
 jobs:
   run_dbt_jobs:
     runs-on: ubuntu-latest
@@ -41,4 +41,7 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --exclude models/silver/eth_goerli models/bronze/eth_goerli/bronze__eth_goerli_contract_logs.sql models/silver/streamline
+          dbt test
+  
+
+
