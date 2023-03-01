@@ -12,6 +12,7 @@
             {% set sql %}
             {{ create_udf_get_chainhead() }}
             {{ create_udf_bulk_json_rpc() }}
+            {{ create_udf_bulk_json_rpc_block_id() }}
 
             {% endset %}
             {% do run_query(sql) %}
