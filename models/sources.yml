@@ -13,10 +13,10 @@ sources:
     tables:
       - name: blocks
       - name: transactions
-      - name: debug_traceBlockByNumber
-      - name: qn_getBlockWithReceipts
+      - name: debug_traceTransaction
+      - name: eth_getTransactionReceipt
   - name: udfs_streamline
     database: udfs
     schema: streamline
-    tables: 
+    tables:
       - name: node_mapping

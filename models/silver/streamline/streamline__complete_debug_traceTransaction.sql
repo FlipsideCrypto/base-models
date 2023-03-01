@@ -15,7 +15,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline", "debug_traceBlockByNumber") }}'
+                table_name => '{{ source( "bronze_streamline", "debug_traceTransaction") }}'
             )
         ) A
 
@@ -39,17 +39,19 @@ WHERE
             meta
     )
 {% else %}
+)
 {% endif %}
 SELECT
-    MD5(
-        CAST(COALESCE(CAST(block_number AS text), '') AS text)
-    ) AS id,
+	split(data:id :: STRING, '-')[1] :: STRING as tx_hash,
     block_number,
+    MD5(
+        CAST(COALESCE(CAST(block_number AS text), '') AS text) || CAST(COALESCE(CAST(tx_hash AS text), '') AS text)
+    ) AS id,
     registered_on AS _inserted_timestamp
 FROM
     {{ source(
         "bronze_streamline",
-        "debug_traceBlockByNumber"
+        "debug_traceTransaction"
     ) }}
     t
     JOIN meta b
@@ -60,22 +62,19 @@ JOIN partitions p
 ON p._partition_by_block_number = t._partition_by_block_id
 {% endif %}
 WHERE
-    DATA IS NOT NULL
-    AND (
-        DATA :error :code IS NULL
-        OR DATA :error :code NOT IN (
-            '-32000',
-            '-32001',
-            '-32002',
-            '-32003',
-            '-32004',
-            '-32005',
-            '-32006',
-            '-32007',
-            '-32008',
-            '-32009',
-            '-32010'
-        )
+    DATA :error :code IS NULL
+    OR DATA :error :code NOT IN (
+        '-32000',
+        '-32001',
+        '-32002',
+        '-32003',
+        '-32004',
+        '-32005',
+        '-32006',
+        '-32007',
+        '-32008',
+        '-32009',
+        '-32010'
     ) qualify(ROW_NUMBER() over (PARTITION BY id
 ORDER BY
     _inserted_timestamp DESC)) = 1
