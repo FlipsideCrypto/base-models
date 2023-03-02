@@ -88,6 +88,10 @@ SELECT
     END AS tx_status,
     ethereum.public.udf_hex_to_int(
     	gasUsed) :: INTEGER AS gas_used,
+    ethereum.public.udf_hex_to_int(
+    	cumulativeGasUsed) :: INTEGER AS cumulative_gas_used,
+    ethereum.public.udf_hex_to_int(
+    	effectiveGasPrice) :: INTEGER AS effective_gas_price,
     COALESCE(ethereum.public.udf_hex_to_int(
     	l1FeeScalar) :: FLOAT,0) AS l1_fee_scalar,
     COALESCE(ethereum.public.udf_hex_to_int(
@@ -135,6 +139,8 @@ SELECT
     tx_json,
     tx_status,
     gas_used,
+    cumulative_gas_used,
+    effective_gas_price,
     l1_fee_scalar,
     l1_gas_used,
     l1_gas_price,

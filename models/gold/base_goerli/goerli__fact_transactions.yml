@@ -30,10 +30,12 @@ models:
         description: Maximum amount of gas allocated for the transaction.
       - name: INPUT_DATA
         description: This column contains additional data for this transaction, and is commonly used as part of a contract interaction or as a message to the recipient.
-      - name: TX_STATUS
+      - name: STATUS
         description: Status of the transaction. 
       - name: GAS_USED
         description: Gas used by the transaction.
+      - name: CUMULATIVE_GAS_USED
+        description: The total amount of gas used when this transaction was executed in the block. 
       - name: L1_FEE_SCALAR
         description: This value covers the change in L1 gas price between the time the transaction is submitted and when it is published.
       - name: L1_GAS_USED
