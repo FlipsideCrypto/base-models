@@ -20,7 +20,10 @@ SELECT
     input_data,
     tx_status,
     gas_used,
-    -- L1 gas prices
+    l1_fee_scalar,
+    l1_gas_used,
+    l1_gas_price,
+    tx_fee,
     tx_type,
     is_system_tx,
     tx_json

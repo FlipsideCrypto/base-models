@@ -34,6 +34,14 @@ models:
         description: Status of the transaction. 
       - name: GAS_USED
         description: Gas used by the transaction.
+      - name: L1_FEE_SCALAR
+        description: This value covers the change in L1 gas price between the time the transaction is submitted and when it is published.
+      - name: L1_GAS_USED
+        description: The gas used on L1 to publish the transaction.
+      - name: L1_GAS_PRICE
+        description: The gas price for L1 transactions when the transaction was processed.
+      - name: TX_FEE
+        description: Amount paid to validate the transaction in ETH.
       - name: TX_TYPE
         description: This column indicates the transaction type.
       - name: IS_SYSTEM_TX

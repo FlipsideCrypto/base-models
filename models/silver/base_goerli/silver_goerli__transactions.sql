@@ -5,6 +5,8 @@
     merge_update_columns = ["tx_hash"]
 ) }}
 
+WITH base AS (
+
 SELECT
     t.block_number,
     TO_TIMESTAMP_NTZ(
@@ -38,7 +40,7 @@ SELECT
             gas_price :: STRING
         ) / pow(
             10,
-            9
+            18
         ),
         0
     ) AS gas_price,
@@ -46,7 +48,6 @@ SELECT
         gas_limit :: STRING
     ) :: INTEGER AS gas_limit,
     input AS input_data,
-    -- need receipts for tx status, gas used, L1 gas prices
     ethereum.public.udf_hex_to_int(
         tx_type :: STRING
     ) :: INTEGER AS tx_type,
@@ -87,6 +88,12 @@ SELECT
     END AS tx_status,
     ethereum.public.udf_hex_to_int(
     	gasUsed) :: INTEGER AS gas_used,
+    COALESCE(ethereum.public.udf_hex_to_int(
+    	l1FeeScalar) :: FLOAT,0) AS l1_fee_scalar,
+    COALESCE(ethereum.public.udf_hex_to_int(
+    	l1GasUsed) :: FLOAT,0) AS l1_gas_used,
+    COALESCE(ethereum.public.udf_hex_to_int(
+    	l1GasPrice) :: FLOAT,0) / pow(10,18) AS l1_gas_price,
     t._INSERTED_TIMESTAMP
 FROM
     {{ ref('silver_goerli__tx_method') }} t
@@ -107,3 +114,30 @@ WHERE
             {{ this }}
     )
 {% endif %}
+)
+
+SELECT 
+    block_number,
+    block_timestamp,
+    tx_hash,
+    nonce,
+    POSITION,
+    origin_function_signature,
+    from_address,
+    to_address,
+    eth_value,
+    block_hash,
+    gas_price,
+    gas_limit,
+    input_data,
+    tx_type,
+    is_system_tx,
+    tx_json,
+    tx_status,
+    gas_used,
+    l1_fee_scalar,
+    l1_gas_used,
+    l1_gas_price,
+    (gas_used * gas_price) + (l1_gas_price * l1_gas_used * l1_fee_scalar) AS tx_fee,
+    _inserted_timestamp
+FROM base
