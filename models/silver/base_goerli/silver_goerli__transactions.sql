@@ -86,12 +86,12 @@ SELECT
         WHEN status = '0x1' THEN 'SUCCESS'
         ELSE 'FAIL'
     END AS tx_status,
-    ethereum.public.udf_hex_to_int(
-    	gasUsed) :: INTEGER AS gas_used,
-    ethereum.public.udf_hex_to_int(
-    	cumulativeGasUsed) :: INTEGER AS cumulative_gas_used,
-    ethereum.public.udf_hex_to_int(
-    	effectiveGasPrice) :: INTEGER AS effective_gas_price,
+    COALESCE(ethereum.public.udf_hex_to_int(
+    	gasUsed) :: INTEGER,0) AS gas_used,
+    COALESCE(ethereum.public.udf_hex_to_int(
+    	cumulativeGasUsed) :: INTEGER,0) AS cumulative_gas_used,
+    COALESCE(ethereum.public.udf_hex_to_int(
+    	effectiveGasPrice) :: INTEGER,0) AS effective_gas_price,
     COALESCE(ethereum.public.udf_hex_to_int(
     	l1FeeScalar) :: FLOAT,0) AS l1_fee_scalar,
     COALESCE(ethereum.public.udf_hex_to_int(
@@ -144,6 +144,6 @@ SELECT
     l1_fee_scalar,
     l1_gas_used,
     l1_gas_price,
-    (gas_used * gas_price) + (l1_gas_price * l1_gas_used * l1_fee_scalar) AS tx_fee,
+    COALESCE((gas_used * gas_price) + (l1_gas_price * l1_gas_used * l1_fee_scalar),0) AS tx_fee,
     _inserted_timestamp
 FROM base
