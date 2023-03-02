@@ -16,15 +16,17 @@ SELECT
     event_index,
     contract_address,
     topics,
-    data,
+    DATA,
     event_removed,
     l.tx_status,
     tx_index,
-    type
+    TYPE
 FROM
-    {{ ref('silver_goerli__logs') }} l
-LEFT JOIN {{ ref('silver_goerli__blocks') }} b
-        ON l.block_number = b.block_number
-LEFT JOIN {{ ref('silver_goerli__transactions') }} t
-        ON l.tx_hash = t.tx_hash
-
+    {{ ref('silver_goerli__logs') }}
+    l
+    LEFT JOIN {{ ref('silver_goerli__blocks') }}
+    b
+    ON l.block_number = b.block_number
+    LEFT JOIN {{ ref('silver_goerli__transactions') }}
+    t
+    ON l.tx_hash = t.tx_hash
