@@ -14,9 +14,7 @@ sources:
       - name: blocks
       - name: transactions
       - name: debug_tracetransaction
-      - name: qn_getBlockWithReceipts
       - name: eth_getTransactionReceipt
-      - name: debug_traceBlockByNumber
   - name: udfs_streamline
     database: udfs
     schema: streamline
