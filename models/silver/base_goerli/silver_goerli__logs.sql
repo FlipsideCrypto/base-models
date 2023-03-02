@@ -30,12 +30,6 @@ SELECT
     ethereum.public.udf_hex_to_int(
     	transactionIndex) :: INTEGER AS tx_index,
     ethereum.public.udf_hex_to_int(
-    	gasUsed) :: INTEGER AS gas_used,
-    ethereum.public.udf_hex_to_int(
-    	cumulativeGasUsed) :: INTEGER AS cumulative_gas_used,
-    ethereum.public.udf_hex_to_int(
-    	effectiveGasPrice) :: INTEGER AS effective_gas_price,
-    ethereum.public.udf_hex_to_int(
     	type) :: INTEGER AS type,
     _inserted_timestamp
 FROM

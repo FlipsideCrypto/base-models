@@ -20,9 +20,6 @@ SELECT
     event_removed,
     l.tx_status,
     tx_index,
-    l.gas_used,
-    cumulative_gas_used,
-    effective_gas_price,
     type
 FROM
     {{ ref('silver_goerli__logs') }} l

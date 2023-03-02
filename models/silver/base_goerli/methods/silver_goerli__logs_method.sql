@@ -14,7 +14,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline", "qn_getBlockWithReceipts") }}'
+                table_name => '{{ source( "bronze_streamline", "eth_getTransactionReceipt") }}'
             )
         ) A
 
@@ -43,12 +43,12 @@ WHERE
 base AS (
     SELECT
         block_number,
-        DATA :result :receipts AS response,
+        DATA :result AS response,
         registered_on AS _inserted_timestamp
     FROM
         {{ source(
             "bronze_streamline",
-            "qn_getBlockWithReceipts"
+            "eth_getTransactionReceipt"
         ) }}
         t
         JOIN meta b
@@ -76,24 +76,27 @@ flat_response AS (
 
 SELECT
     block_number,
-    VALUE :blockHash :: STRING AS blockHash,
-    VALUE :transactionHash :: STRING AS parent_transactionHash,
+    response :blockHash :: STRING AS blockHash,
+    response :transactionHash :: STRING AS parent_transactionHash,
     ethereum.public.udf_hex_to_int(
-    	VALUE :transactionIndex :: STRING) :: INTEGER AS parent_transactionIndex,
-	VALUE :cumulativeGasUsed :: STRING AS cumulativeGasUsed,
-    VALUE :effectiveGasPrice :: STRING AS effectiveGasPrice,
-    VALUE :from :: STRING AS origin_from_address,
-    VALUE :gasUsed :: STRING AS gasUsed,
-    VALUE :logs AS logs_array,
-    VALUE :logsBloom :: STRING AS logsBloom,
-    VALUE :status :: STRING AS status,
-    VALUE :to :: STRING AS origin_to_address,
-    VALUE :type :: STRING AS type,
+    	response :transactionIndex :: STRING) :: INTEGER AS parent_transactionIndex,
+	response :cumulativeGasUsed :: STRING AS cumulativeGasUsed,
+    response :effectiveGasPrice :: STRING AS effectiveGasPrice,
+    response :gasUsed :: STRING AS gasUsed,
+    response :l1Fee :: STRING AS l1Fee,
+    response :l1FeeScalar :: STRING AS l1FeeScalar,
+    response :l1GasUsed :: STRING AS l1GasUsed,
+    response :l1GasPrice :: STRING AS l1GasPrice,
+    response :logs AS logs_array,
+    response :logsBloom :: STRING AS logsBloom,
+    response :status :: STRING AS status,
+    response :from :: STRING AS origin_from_address,
+    response :to :: STRING AS origin_to_address,
+    response :type :: STRING AS type,
     response,
     _inserted_timestamp
 FROM
-    base,
-    LATERAL FLATTEN(input => response)
+    base
 ),
 
 logs_response AS (
@@ -123,8 +126,11 @@ SELECT
     parent_transactionIndex,
     cumulativeGasUsed,
     effectiveGasPrice,
-    origin_from_address,
     gasUsed,
+    l1Fee,
+    l1FeeScalar,
+    l1GasUsed,
+    l1GasPrice,
     l.logs_array,
     contract_address,
     data,
@@ -135,6 +141,7 @@ SELECT
     transactionIndex,
     logsBloom,
     status,
+    origin_from_address,
     origin_to_address,
     type,
     CONCAT(
@@ -146,6 +153,3 @@ SELECT
     _inserted_timestamp
 FROM flat_response f
 LEFT JOIN logs_response l USING(parent_transactionHash)
-qualify(ROW_NUMBER() over (PARTITION BY _log_id 
-    ORDER BY
-        block_number DESC)) = 1
