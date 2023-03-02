@@ -20,5 +20,5 @@ sources:
   - name: udfs_streamline
     database: udfs
     schema: streamline
-    tables: 
+    tables:
       - name: node_mapping

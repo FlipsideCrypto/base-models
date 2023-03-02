@@ -15,7 +15,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline", "blocks") }}'
+                table_name => '{{ source( "bronze_streamline", "debug_traceTransaction") }}'
             )
         ) A
 
@@ -42,15 +42,16 @@ WHERE
 )
 {% endif %}
 SELECT
-    MD5(
-        CAST(COALESCE(CAST(block_number AS text), '') AS text)
-    ) AS id,
+	split(data:id :: STRING, '-')[1] :: STRING as tx_hash,
     block_number,
+    MD5(
+        CAST(COALESCE(CAST(block_number AS text), '') AS text) || CAST(COALESCE(CAST(tx_hash AS text), '') AS text)
+    ) AS id,
     registered_on AS _inserted_timestamp
 FROM
     {{ source(
         "bronze_streamline",
-        "blocks"
+        "debug_traceTransaction"
     ) }}
     t
     JOIN meta b

@@ -6,6 +6,22 @@
     )
 ) }}
 
+WITH blocks AS (
+
+    SELECT
+        block_number :: STRING AS block_number
+    FROM
+        {{ ref("streamline__blocks") }}
+    WHERE
+        block_number > 1000000
+    EXCEPT
+    SELECT
+        block_number :: STRING
+    FROM
+        {{ ref("streamline__complete_blocks") }}
+    WHERE
+        block_number > 1000000
+)
 SELECT
     PARSE_JSON(
         CONCAT(
@@ -20,14 +36,4 @@ SELECT
         )
     ) AS request
 FROM
-    {{ ref("streamline__blocks") }}
-WHERE
-    block_number > 1000000
-    AND block_number IS NOT NULL
-EXCEPT
-SELECT
-    block_number
-FROM
-    {{ ref("streamline__complete_blocks") }}
-WHERE
-    block_number > 1000000
+    blocks
