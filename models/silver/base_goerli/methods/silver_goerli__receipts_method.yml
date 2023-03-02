@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_goerli__logs_method
+  - name: silver_goerli__receipts_method
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:

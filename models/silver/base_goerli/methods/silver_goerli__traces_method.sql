@@ -61,7 +61,7 @@ FROM
 
 {% if is_incremental() %}
 JOIN partitions p
-ON p._partition_by_block_number = t._partition_by_block_number
+ON p._partition_by_block_number = t._partition_by_block_id
 {% endif %}
 WHERE
     DATA :error :code IS NULL
@@ -80,9 +80,11 @@ WHERE
     )
 
 {% if is_incremental() %}
-AND m._inserted_timestamp >= (
+AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE - 1
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 1
     FROM
         {{ this }}
 )

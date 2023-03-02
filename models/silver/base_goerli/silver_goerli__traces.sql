@@ -200,7 +200,9 @@ WHERE
 {% if is_incremental() %}
 AND t._inserted_timestamp >= (
     SELECT
-        MAX(_INSERTED_TIMESTAMP) - 1
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 1
     FROM
         {{ this }}
 )
