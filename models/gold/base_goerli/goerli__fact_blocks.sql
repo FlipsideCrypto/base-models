@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    A.block_number AS block_number,
+    block_number,
     block_timestamp,
     network,
     blockchain,
@@ -23,5 +23,5 @@ SELECT
     uncle_blocks,
     block_header_json
 FROM
-    {{ ref('silver_testnet__blocks') }} A
+    {{ ref('silver_goerli__blocks') }}
 

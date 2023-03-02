@@ -16,7 +16,7 @@ WITH request_details AS (
                 batch_id
         ) AS batch_no
     FROM
-        {{ ref('silver__goerli_contract_reads') }}
+        {{ ref('silver__eth_goerli_contract_reads') }}
 
 {% if is_incremental() %}
 WHERE

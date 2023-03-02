@@ -5,7 +5,8 @@
 ) }}
 
 SELECT
-    A.block_number AS block_number,
+    block_number,
+    block_hash,
     block_timestamp,
     tx_hash,
     nonce,
@@ -14,13 +15,18 @@ SELECT
     from_address,
     to_address,
     eth_value,
-    block_hash,
     gas_price,
     gas_limit,
     input_data,
-    -- need receipts for tx status, gas used, L1 gas prices
+    tx_status AS status,
+    gas_used,
+    cumulative_gas_used,
+    l1_fee_scalar,
+    l1_gas_used,
+    l1_gas_price,
+    tx_fee,
     tx_type,
     is_system_tx,
     tx_json
 FROM
-    {{ ref('silver_testnet__transactions') }} A
+    {{ ref('silver_goerli__transactions') }} 

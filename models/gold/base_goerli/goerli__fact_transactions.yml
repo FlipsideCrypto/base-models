@@ -1,7 +1,7 @@
 version: 2
 models:
-  - name: testnet__fact_transactions
-    description: This table contains transaction level data for the Base Blockchain Goerli Testnet. Each transaction will have a unique transaction hash, along with transactions fees and an ETH value transferred when applicable. Transactions may be native ETH transfers or interactions with contract addresses. For more information on Base, please see [Base Documentation](https://docs.base.org/). For more information on EVM transactions, please see [The Ethereum Organization - Transactions](https://ethereum.org/en/developers/docs/transactions/)
+  - name: goerli__fact_transactions
+    description: This table contains transaction level data for the Base Blockchain, Goerli Testnet. Each transaction will have a unique transaction hash, along with transactions fees and an ETH value transferred when applicable. Transactions may be native ETH transfers or interactions with contract addresses. For more information on Base, please see [Base Documentation](https://docs.base.org/). For more information on EVM transactions, please see [The Ethereum Organization - Transactions](https://ethereum.org/en/developers/docs/transactions/)
 
     columns:
       - name: BLOCK_NUMBER
@@ -15,7 +15,7 @@ models:
       - name: POSITION
         description: The position of the transaction within the block.
       - name: ORIGIN_FUNCTION_SIGNATURE
-        description: The function signature of the contract call.
+        description: The function signature of the transaction.
       - name: FROM_ADDRESS
         description: The sending address of this transaction.
       - name: TO_ADDRESS
@@ -30,6 +30,20 @@ models:
         description: Maximum amount of gas allocated for the transaction.
       - name: INPUT_DATA
         description: This column contains additional data for this transaction, and is commonly used as part of a contract interaction or as a message to the recipient.
+      - name: STATUS
+        description: Status of the transaction. 
+      - name: GAS_USED
+        description: Gas used by the transaction.
+      - name: CUMULATIVE_GAS_USED
+        description: The total amount of gas used when this transaction was executed in the block. 
+      - name: L1_FEE_SCALAR
+        description: This value covers the change in L1 gas price between the time the transaction is submitted and when it is published.
+      - name: L1_GAS_USED
+        description: The gas used on L1 to publish the transaction.
+      - name: L1_GAS_PRICE
+        description: The gas price for L1 transactions when the transaction was processed.
+      - name: TX_FEE
+        description: Amount paid to validate the transaction in ETH.
       - name: TX_TYPE
         description: This column indicates the transaction type.
       - name: IS_SYSTEM_TX

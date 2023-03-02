@@ -1,10 +1,10 @@
 version: 2
 models:
-  - name: silver_testnet__tx_method
+  - name: silver_goerli__blocks_method
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - TX_HASH
+            - BLOCK_NUMBER
     columns:
       - name: BLOCK_NUMBER
         tests:

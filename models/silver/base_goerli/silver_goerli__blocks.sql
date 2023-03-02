@@ -54,7 +54,7 @@ SELECT
     ) AS block_header_json,
     _inserted_timestamp
 FROM
-    {{ ref('silver_testnet__blocks_method') }}
+    {{ ref('silver_goerli__blocks_method') }}
 
 {% if is_incremental() %}
 WHERE

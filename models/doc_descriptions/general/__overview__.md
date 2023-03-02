@@ -16,11 +16,13 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Click on the links below to jump to the documentation for each schema.**
 
-### Core Tables (base.core)
+### Core Tables
 
 **Fact Tables:**
-- [testnet.fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.testnet__fact_blocks)
-- [testnet.fact_transactions](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.testnet__fact_transactions)
+- [goerli.fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_blocks)
+- [goerli.fact_transactions](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_transactions)
+- [goerli.fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_event_logs)
+- [goerli.fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_traces)
 
 ## **Data Model Overview**
 

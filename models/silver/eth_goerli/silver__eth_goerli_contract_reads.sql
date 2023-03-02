@@ -11,8 +11,8 @@ WITH ranges AS (
         toBlock,
         contract_address
     FROM
-        {{ ref('silver__goerli_block_ranges') }}
-        JOIN {{ ref('silver__goerli_contracts') }}
+        {{ ref('silver__eth_goerli_block_ranges') }}
+        JOIN {{ ref('silver__eth_goerli_contracts') }}
         ON 1 = 1
 )
 SELECT

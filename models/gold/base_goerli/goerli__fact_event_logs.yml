@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: goerli__fact_event_logs
+    description: This table contains flattened event logs from transactions on the Base Blockchain, Goerli Testnet. Transactions may have multiple events, which are denoted by the event index for a transaction hash. Therefore, this table is unique on the combination of transaction hash and event index. For more information on Base, please see [Base Documentation](https://docs.base.org/).
+
+    columns:
+      - name: _LOG_ID
+        description: This is the primary key for this table. This is a concatenation of the transaction hash and the event index at which the event occurred. 
+      - name: BLOCK_NUMBER
+        description: Also known as block height. The block number, which indicates the length of the blockchain, increases after the addition of each new block.
+      - name: BLOCK_HASH
+        description: Block hash is a unique 66-character identifier that is generate when a block is produced. 
+      - name: BLOCK_TIMESTAMP
+        description: The date and time at which the block was produced.
+      - name: TX_HASH
+        description: Transaction hash is a unique 66-character identifier that is generated when a transaction is executed. This field will not be unique in this table, as a given transaction can include multiple events.
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: The function signature of the contract call. 
+      - name: ORIGIN_FROM_ADDRESS
+        description: The from address of this transaction.
+      - name: ORIGIN_TO_ADDRESS
+        description: The to address of this transaction. 
+      - name: EVENT_INDEX
+        description: Event number within a transaction.
+      - name: CONTRACT_ADDRESS
+        description: The address interacted with for a given event.
+      - name: TOPICS
+        description: The un-decoded event input topics.
+      - name: DATA
+        description: The un-decoded event data.
+      - name: EVENT_REMOVED
+        description: Whether the event has been removed from the transaction.
+      - name: TX_STATUS
+        description: Status of the transaction. 
+      - name: TX_INDEX
+        description: The transactions index position from which this log was created from.
+      - name: GAS_USED
+        description: Gas used by this event.
+      - name: CUMULATIVE_GAS_USED
+        description: The total amount of gas used when this transaction was executed in the block. 
+      - name: EFFECTIVE_GAS_PRICE
+        description: The total base charge plus tip paid for each unit of gas.
+      - name: TYPE
+        description: The type of value.

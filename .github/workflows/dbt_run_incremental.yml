@@ -1,12 +1,12 @@
-name: dbt_run_scheduled_30_mins
-run-name: dbt_run_scheduled_30_mins
+name: dbt_run_scheduled
+run-name: dbt_run_scheduled
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 30 mins" (see https://crontab.guru)
-    - cron: '*/30 * * * *'
-
+    # Runs "every 2 hours" (see https://crontab.guru)
+    - cron: '0 */2 * * *'
+    
 env:
   DBT_PROFILES_DIR: ./
 
@@ -25,7 +25,7 @@ concurrency:
 jobs:
   run_dbt_jobs:
     runs-on: ubuntu-latest
-    environment:
+    environment: 
       name: workflow_prod
 
     steps:
@@ -37,8 +37,8 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip3 install dbt-snowflake~=${{ vars.DBT_VERSION }} cli_passthrough requests click
+          pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m models/silver/eth_goerli models/bronze/eth_goerli/bronze__eth_goerli_contract_logs.sql
+          dbt run --exclude models/silver/eth_goerli models/bronze/eth_goerli/bronze__eth_goerli_contract_logs.sql models/silver/streamline
