@@ -13,7 +13,7 @@ sources:
     tables:
       - name: blocks
       - name: transactions
-      - name: debug_traceBlockByNumber
+      - name: debug_tracetransaction
       - name: qn_getBlockWithReceipts
       - name: eth_getTransactionReceipt
   - name: udfs_streamline
