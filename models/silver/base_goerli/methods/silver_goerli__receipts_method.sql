@@ -153,3 +153,4 @@ SELECT
     _inserted_timestamp
 FROM flat_response f
 LEFT JOIN logs_response l USING(parent_transactionHash)
+WHERE _log_id IS NOT NULL
