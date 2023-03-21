@@ -109,7 +109,7 @@ missing_data AS (
             t._inserted_timestamp,
             b._inserted_timestamp,
             txs._inserted_timestamp
-        ) AS _inserted_timestamp,
+        ) AS _inserted_timestamp
     FROM {{ this }} t
     INNER JOIN {{ ref('silver_goerli__transactions') }} txs
         ON t.tx_hash = txs.tx_hash AND t.block_number = txs.block_number

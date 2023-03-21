@@ -157,48 +157,47 @@ WHERE
         {{ this }}
     )
 {% endif %}
-
-)
+),
 
 new_records AS (
 
 SELECT
-    block_number,
+    f.block_number,
     b.block_timestamp,
-    tx_hash,
-    nonce,
-    POSITION,
-    from_address,
-    to_address,
-    eth_value,
-    block_hash,
-    gas_price1 / pow(
+    f.tx_hash,
+    f.nonce,
+    f.POSITION,
+    f.from_address,
+    f.to_address,
+    f.eth_value,
+    f.block_hash,
+    f.gas_price1 / pow(
         10,
         9
     ) AS gas_price,
-    gas_limit,
-    input_data,
-    tx_type,
-    is_system_tx,
-    tx_json,
-    tx_status,
-    gas_used,
-    cumulative_gas_used,
-    effective_gas_price,
-    l1_fee_scalar,
-    l1_gas_used,
-    l1_gas_price / pow(
+    f.gas_limit,
+    f.input_data,
+    f.tx_type,
+    f.is_system_tx,
+    f.tx_json,
+    f.tx_status,
+    f.gas_used,
+    f.cumulative_gas_used,
+    f.effective_gas_price,
+    f.l1_fee_scalar,
+    f.l1_gas_used,
+    f.l1_gas_price / pow(
         10,
         9
     ) AS l1_gas_price,
-    tx_fee,
-    origin_function_signature,
+    f.tx_fee,
+    f.origin_function_signature,
     CASE
-        WHEN origin_function_signature IS NULL
+        WHEN f.origin_function_signature IS NULL
         OR b.block_timestamp IS NULL THEN TRUE
         ELSE FALSE
     END AS is_pending,
-    _inserted_timestamp
+    f._inserted_timestamp
 FROM
     flat_base f
 LEFT OUTER JOIN {{ ref('silver_goerli__blocks') }} b 
@@ -236,7 +235,7 @@ missing_data AS (
         GREATEST(
             t._inserted_timestamp,
             b._inserted_timestamp
-        ) AS _inserted_timestamp,
+        ) AS _inserted_timestamp
     FROM {{ this }} t 
     INNER JOIN {{ ref('silver_goerli__blocks') }} b 
         ON t.block_number = b.block_number
