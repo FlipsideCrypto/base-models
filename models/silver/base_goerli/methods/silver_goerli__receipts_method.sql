@@ -67,9 +67,7 @@ base AS (
             '-32008',
             '-32009',
             '-32010'
-        ) qualify(ROW_NUMBER() over (PARTITION BY block_number
-    ORDER BY
-        _inserted_timestamp DESC)) = 1
+        ) 
 ),
 
 flat_response AS (
@@ -154,3 +152,5 @@ SELECT
 FROM flat_response f
 LEFT JOIN logs_response l USING(parent_transactionHash)
 WHERE _log_id IS NOT NULL
+QUALIFY ROW_NUMBER() OVER (PARTITION BY _log_id 
+    ORDER BY _inserted_timestamp DESC) = 1
