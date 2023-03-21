@@ -1,8 +1,7 @@
 {{ config (
     materialized = "incremental",
     unique_key = "_log_id",
-    cluster_by = "ROUND(block_number, -3)",
-    merge_update_columns = ["_log_id"]
+    cluster_by = "ROUND(block_number, -3)"
 ) }}
 
 WITH flat_base AS (

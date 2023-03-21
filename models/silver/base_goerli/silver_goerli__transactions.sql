@@ -1,8 +1,7 @@
 {{ config (
     materialized = "incremental",
     unique_key = "tx_hash",
-    cluster_by = "BLOCK_TIMESTAMP::DATE",
-    merge_update_columns = ["tx_hash"]
+    cluster_by = "BLOCK_TIMESTAMP::DATE"
 ) }}
 
 WITH flat_base AS (
