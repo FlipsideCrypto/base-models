@@ -5,7 +5,7 @@
     merge_update_columns = ["tx_hash"]
 ) }}
 
-WITH base AS (
+WITH flat_base AS (
 
     SELECT
         t.block_number,
@@ -158,19 +158,16 @@ WHERE
     )
 {% endif %}
 
-qualify ROW_NUMBER() over (
-    PARTITION BY t.tx_hash
-    ORDER BY
-        t._inserted_timestamp
-) = 1
 )
+
+new_records AS (
+
 SELECT
     block_number,
-    block_timestamp,
+    b.block_timestamp,
     tx_hash,
     nonce,
     POSITION,
-    origin_function_signature,
     from_address,
     to_address,
     eth_value,
@@ -195,6 +192,93 @@ SELECT
         9
     ) AS l1_gas_price,
     tx_fee,
+    origin_function_signature,
+    CASE
+        WHEN origin_function_signature IS NULL
+        OR b.block_timestamp IS NULL THEN TRUE
+        ELSE FALSE
+    END AS is_pending,
     _inserted_timestamp
 FROM
-    base
+    flat_base f
+LEFT OUTER JOIN {{ ref('silver_goerli__blocks') }} b 
+    ON f.block_number = b.block_number
+)
+
+{% if is_incremental() %},
+missing_data AS (
+    SELECT
+        t.block_number,
+        b.block_timestamp,
+        t.tx_hash,
+        t.nonce,
+        t.POSITION,
+        t.from_address,
+        t.to_address,
+        t.eth_value,
+        block_hash,
+        t.gas_price,
+        t.gas_limit,
+        t.input_data,
+        t.tx_type,
+        t.is_system_tx,
+        t.tx_json,
+        t.tx_status,
+        t.gas_used,
+        t.cumulative_gas_used,
+        t.effective_gas_price,
+        t.l1_fee_scalar,
+        t.l1_gas_used,
+        t.l1_gas_price,
+        t.tx_fee,
+        t.origin_function_signature,
+        FALSE AS is_pending,
+        GREATEST(
+            t._inserted_timestamp,
+            b._inserted_timestamp
+        ) AS _inserted_timestamp,
+    FROM {{ this }} t 
+    INNER JOIN {{ ref('silver_goerli__blocks') }} b 
+        ON t.block_number = b.block_number
+    WHERE
+        t.is_pending
+)
+{% endif %}
+
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    nonce,
+    POSITION,
+    from_address,
+    to_address,
+    eth_value,
+    block_hash,
+    gas_price,
+    gas_limit,
+    input_data,
+    tx_type,
+    is_system_tx,
+    tx_json,
+    tx_status,
+    gas_used,
+    cumulative_gas_used,
+    effective_gas_price,
+    l1_fee_scalar,
+    l1_gas_used,
+    l1_gas_price,
+    tx_fee,
+    origin_function_signature,
+    is_pending,
+    _inserted_timestamp
+FROM new_records
+qualify(ROW_NUMBER() over (PARTITION BY tx_hash
+    ORDER BY _inserted_timestamp)) = 1
+
+{% if is_incremental() %}
+UNION
+SELECT
+    *
+FROM missing_data
+{% endif %}
