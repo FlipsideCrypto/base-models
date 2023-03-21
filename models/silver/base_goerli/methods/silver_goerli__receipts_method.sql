@@ -67,9 +67,7 @@ base AS (
             '-32008',
             '-32009',
             '-32010'
-        ) qualify(ROW_NUMBER() over (PARTITION BY block_number, response
-    ORDER BY
-        _inserted_timestamp DESC)) = 1
+        ) 
 ),
 
 flat_response AS (
