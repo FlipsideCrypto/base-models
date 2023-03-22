@@ -135,7 +135,7 @@ WITH flat_base AS (
         t
         JOIN {{ ref('silver_goerli__receipts_method') }}
         l
-        ON t.tx_hash = l.parent_transactionHash
+        ON t.tx_hash = l.tx_hash
 
 {% if is_incremental() %}
 WHERE
@@ -262,8 +262,6 @@ SELECT
     is_pending,
     _inserted_timestamp
 FROM new_records
-qualify(ROW_NUMBER() over (PARTITION BY tx_hash
-    ORDER BY _inserted_timestamp)) = 1
 
 {% if is_incremental() %}
 UNION

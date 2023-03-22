@@ -1,8 +1,8 @@
  {{ config (
     materialized = "incremental",
-    unique_key = "_log_id",
+    unique_key = "tx_hash",
     cluster_by = "ROUND(block_number, -3)",
-    merge_update_columns = ["_log_id"]
+    merge_update_columns = ["tx_hash"]
 ) }}
 
 WITH meta AS (
@@ -68,16 +68,14 @@ base AS (
             '-32009',
             '-32010'
         ) 
-),
-
-flat_response AS (
+)
 
 SELECT
     block_number,
     response :blockHash :: STRING AS blockHash,
-    response :transactionHash :: STRING AS parent_transactionHash,
+    response :transactionHash :: STRING AS tx_hash,
     ethereum.public.udf_hex_to_int(
-    	response :transactionIndex :: STRING) :: INTEGER AS parent_transactionIndex,
+    	response :transactionIndex :: STRING) :: INTEGER AS tx_index,
 	response :cumulativeGasUsed :: STRING AS cumulativeGasUsed,
     response :effectiveGasPrice :: STRING AS effectiveGasPrice,
     response :gasUsed :: STRING AS gasUsed,
@@ -95,62 +93,5 @@ SELECT
     _inserted_timestamp
 FROM
     base
-),
-
-logs_response AS (
-
-SELECT
-	block_number,
-    parent_transactionHash,
-    parent_transactionIndex,
-    logs_array,
-	VALUE :address :: STRING AS contract_address,
-    VALUE :data :: STRING AS data,
-    ethereum.public.udf_hex_to_int(
-    	VALUE :logIndex :: STRING) :: INTEGER AS event_index,
-    VALUE :removed :: STRING AS removed,
-    VALUE :topics AS topics,
-    VALUE :transactionHash :: STRING AS tx_hash,
-    VALUE :transactionIndex :: STRING AS transactionIndex,
-    _inserted_timestamp
-FROM flat_response,
-    LATERAL FLATTEN(input => logs_array)
-)
-
-SELECT
-    block_number,
-    blockHash,
-    parent_transactionHash,
-    parent_transactionIndex,
-    cumulativeGasUsed,
-    effectiveGasPrice,
-    gasUsed,
-    l1Fee,
-    l1FeeScalar,
-    l1GasUsed,
-    l1GasPrice,
-    l.logs_array,
-    contract_address,
-    data,
-    event_index,
-    removed,
-    topics,
-    tx_hash,
-    transactionIndex,
-    logsBloom,
-    status,
-    origin_from_address,
-    origin_to_address,
-    type,
-    CONCAT(
-        COALESCE(tx_hash,parent_transactionHash),
-        '-',
-        COALESCE(event_index,parent_transactionIndex)
-    ) AS _log_id,
-    response,
-    _inserted_timestamp
-FROM flat_response f
-LEFT JOIN logs_response l USING(parent_transactionHash)
-WHERE _log_id IS NOT NULL
-QUALIFY ROW_NUMBER() OVER (PARTITION BY _log_id 
+QUALIFY ROW_NUMBER() OVER (PARTITION BY tx_hash 
     ORDER BY _inserted_timestamp DESC) = 1
