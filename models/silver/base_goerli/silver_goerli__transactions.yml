@@ -6,6 +6,9 @@ models:
           combination_of_columns:
             - TX_HASH
       - sequence_gaps:
+          config:
+            severity: warn
+            warn_if: ">10"
           partition_by:
             - BLOCK_NUMBER
           column_name: POSITION

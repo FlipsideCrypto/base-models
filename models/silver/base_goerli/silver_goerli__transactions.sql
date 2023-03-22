@@ -1,11 +1,10 @@
 {{ config (
     materialized = "incremental",
     unique_key = "tx_hash",
-    cluster_by = "BLOCK_TIMESTAMP::DATE",
-    merge_update_columns = ["tx_hash"]
+    cluster_by = "BLOCK_TIMESTAMP::DATE"
 ) }}
 
-WITH base AS (
+WITH flat_base AS (
 
     SELECT
         t.block_number,
@@ -144,41 +143,108 @@ WHERE
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1
-    FROM
-        {{ this }}
-    )
-    AND l._inserted_timestamp >= (
-    SELECT
-        MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+        ) :: DATE
     FROM
         {{ this }}
     )
 {% endif %}
+),
 
-qualify ROW_NUMBER() over (
-    PARTITION BY t.tx_hash
-    ORDER BY
-        t._inserted_timestamp
-) = 1
+new_records AS (
+
+SELECT
+    f.block_number,
+    b.block_timestamp,
+    f.tx_hash,
+    f.nonce,
+    f.POSITION,
+    f.from_address,
+    f.to_address,
+    f.eth_value,
+    f.block_hash,
+    f.gas_price1 / pow(
+        10,
+        9
+    ) AS gas_price,
+    f.gas_limit,
+    f.input_data,
+    f.tx_type,
+    f.is_system_tx,
+    f.tx_json,
+    f.tx_status,
+    f.gas_used,
+    f.cumulative_gas_used,
+    f.effective_gas_price,
+    f.l1_fee_scalar,
+    f.l1_gas_used,
+    f.l1_gas_price / pow(
+        10,
+        9
+    ) AS l1_gas_price,
+    f.tx_fee,
+    f.origin_function_signature,
+    CASE
+        WHEN b.block_timestamp IS NULL THEN TRUE
+        ELSE FALSE
+    END AS is_pending,
+    f._inserted_timestamp
+FROM
+    flat_base f
+LEFT OUTER JOIN {{ ref('silver_goerli__blocks') }} b 
+    ON f.block_number = b.block_number
 )
+
+{% if is_incremental() %},
+missing_data AS (
+    SELECT
+        t.block_number,
+        b.block_timestamp,
+        t.tx_hash,
+        t.nonce,
+        t.POSITION,
+        t.from_address,
+        t.to_address,
+        t.eth_value,
+        block_hash,
+        t.gas_price,
+        t.gas_limit,
+        t.input_data,
+        t.tx_type,
+        t.is_system_tx,
+        t.tx_json,
+        t.tx_status,
+        t.gas_used,
+        t.cumulative_gas_used,
+        t.effective_gas_price,
+        t.l1_fee_scalar,
+        t.l1_gas_used,
+        t.l1_gas_price,
+        t.tx_fee,
+        t.origin_function_signature,
+        FALSE AS is_pending,
+        GREATEST(
+            t._inserted_timestamp,
+            b._inserted_timestamp
+        ) AS _inserted_timestamp
+    FROM {{ this }} t 
+    INNER JOIN {{ ref('silver_goerli__blocks') }} b 
+        ON t.block_number = b.block_number
+    WHERE
+        t.is_pending
+)
+{% endif %}
+
 SELECT
     block_number,
     block_timestamp,
     tx_hash,
     nonce,
     POSITION,
-    origin_function_signature,
     from_address,
     to_address,
     eth_value,
     block_hash,
-    gas_price1 / pow(
-        10,
-        9
-    ) AS gas_price,
+    gas_price,
     gas_limit,
     input_data,
     tx_type,
@@ -190,11 +256,18 @@ SELECT
     effective_gas_price,
     l1_fee_scalar,
     l1_gas_used,
-    l1_gas_price / pow(
-        10,
-        9
-    ) AS l1_gas_price,
+    l1_gas_price,
     tx_fee,
+    origin_function_signature,
+    is_pending,
     _inserted_timestamp
-FROM
-    base
+FROM new_records
+qualify(ROW_NUMBER() over (PARTITION BY tx_hash
+    ORDER BY _inserted_timestamp)) = 1
+
+{% if is_incremental() %}
+UNION
+SELECT
+    *
+FROM missing_data
+{% endif %}
