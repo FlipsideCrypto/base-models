@@ -1,8 +1,7 @@
 {{ config (
     materialized = "incremental",
     unique_key = "_call_id",
-    cluster_by = "ROUND(block_number, -3)",
-    merge_update_columns = ["_call_id"]
+    cluster_by = "ROUND(block_number, -3)"
 ) }}
 
 WITH new_txs AS (
@@ -170,44 +169,119 @@ WHERE
                     LEFT OUTER JOIN group_sub_traces
                     ON flattened_traces.tx_hash = group_sub_traces.tx_hash
                     AND flattened_traces.level = group_sub_traces.parent_level
+            ),
+            new_records AS (
+                SELECT
+                    f.tx_hash,
+                    f.block_number,
+                    t.block_timestamp,
+                    f.from_address,
+                    f.to_address,
+                    f.eth_value,
+                    f.gas,
+                    f.gas_used,
+                    f.input,
+                    f.output,
+                    f.type,
+                    f.identifier,
+                    f._call_id,
+                    f.data,
+                    t.tx_status,
+                    f.sub_traces,
+                    f._inserted_timestamp,
+                    CASE
+                        WHEN t.block_timestamp IS NULL
+                        OR t.tx_status IS NULL THEN TRUE
+                        ELSE FALSE
+                    END AS is_pending
+                FROM
+                    FINAL f
+                    LEFT OUTER JOIN {{ ref('silver_goerli__transactions') }}
+                    t
+                    ON f.tx_hash = t.tx_hash
+                WHERE
+                    identifier IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY _call_id
+                ORDER BY
+                    f._inserted_timestamp DESC)) = 1
             )
-        SELECT
-            f.tx_hash,
-            f.block_number,
-            t.block_timestamp,
-            f.from_address,
-            f.to_address,
-            f.eth_value,
-            f.gas,
-            f.gas_used,
-            f.input,
-            f.output,
-            f.type,
-            f.identifier,
-            f._call_id,
-            f.data,
-            t.tx_status,
-            f.sub_traces,
-            f._inserted_timestamp
-        FROM
-            FINAL f
-            JOIN {{ ref('silver_goerli__transactions') }}
-            t
-            ON f.tx_hash = t.tx_hash
-        WHERE
-            identifier IS NOT NULL
 
-{% if is_incremental() %}
-AND t._inserted_timestamp >= (
+{% if is_incremental() %},
+missing_data AS (
     SELECT
-        MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+        t.tx_hash,
+        t.block_number,
+        txs.block_timestamp,
+        t.from_address,
+        t.to_address,
+        t.eth_value,
+        t.gas,
+        t.gas_used,
+        t.input,
+        t.output,
+        t.type,
+        t.identifier,
+        t._call_id,
+        t.data,
+        txs.tx_status,
+        t.sub_traces,
+        GREATEST(
+            t._inserted_timestamp,
+            txs._inserted_timestamp
+        ) AS _inserted_timestamp,
+        t.is_pending
     FROM
         {{ this }}
+        t
+        LEFT OUTER JOIN {{ ref('silver_goerli__transactions') }}
+        txs
+        ON txs.tx_hash = t.tx_hash
+    WHERE
+        t.is_pending
 )
 {% endif %}
+SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    from_address,
+    to_address,
+    eth_value,
+    gas,
+    gas_used,
+    input,
+    output,
+    TYPE,
+    identifier,
+    _call_id,
+    DATA,
+    tx_status,
+    sub_traces,
+    _inserted_timestamp,
+    is_pending
+FROM
+    new_records
 
-qualify(ROW_NUMBER() over(PARTITION BY _call_id
-ORDER BY
-    f._inserted_timestamp DESC)) = 1
+{% if is_incremental() %}
+UNION
+SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    from_address,
+    to_address,
+    eth_value,
+    gas,
+    gas_used,
+    input,
+    output,
+    TYPE,
+    identifier,
+    _call_id,
+    DATA,
+    tx_status,
+    sub_traces,
+    _inserted_timestamp,
+    is_pending
+FROM
+    missing_data
+{% endif %}
