@@ -4,12 +4,50 @@
     cluster_by = "ROUND(block_number, -3)"
 ) }}
 
-WITH flat_base AS (
+WITH logs_response AS (
+
+SELECT
+	block_number,
+    blockHash AS block_hash,
+    logs_array,
+	VALUE :address :: STRING AS contract_address,
+    VALUE :data :: STRING AS data,
+    ethereum.public.udf_hex_to_int(
+    	VALUE :logIndex :: STRING) :: INTEGER AS event_index,
+    VALUE :removed :: STRING AS removed,
+    VALUE :topics AS topics,
+    VALUE :transactionHash :: STRING AS tx_hash,
+    VALUE :transactionIndex :: STRING AS transactionIndex,
+    origin_from_address,
+    origin_to_address,
+    status,
+    type,
+    CONCAT(
+        tx_hash,
+        '-',
+        event_index
+    ) AS _log_id,
+    _inserted_timestamp
+FROM {{ ref('silver_goerli__receipts_method') }},
+    LATERAL FLATTEN(input => logs_array)
+{% if is_incremental() %}
+WHERE _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        )
+    FROM
+        {{ this }}
+)
+{% endif %}
+),
+
+flat_base AS (
 
     SELECT
         _log_id,
         block_number,
-        blockHash AS block_hash,
+        block_hash,
         tx_hash,
         origin_from_address,
         CASE
@@ -36,20 +74,7 @@ WITH flat_base AS (
         ) :: INTEGER AS TYPE,
         _inserted_timestamp
     FROM
-        {{ ref('silver_goerli__receipts_method') }}
-    WHERE
-        tx_hash IS NOT NULL
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(
-            _inserted_timestamp
-        )
-    FROM
-        {{ this }}
-)
-{% endif %}
+        logs_response
 ),
 new_records AS (
     SELECT
