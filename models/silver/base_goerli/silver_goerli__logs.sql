@@ -30,6 +30,16 @@ SELECT
     _inserted_timestamp
 FROM {{ ref('silver_goerli__receipts_method') }},
     LATERAL FLATTEN(input => logs_array)
+{% if is_incremental() %}
+WHERE _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        )
+    FROM
+        {{ this }}
+)
+{% endif %}
 ),
 
 flat_base AS (
@@ -65,17 +75,6 @@ flat_base AS (
         _inserted_timestamp
     FROM
         logs_response
-
-{% if is_incremental() %}
-WHERE _inserted_timestamp >= (
-    SELECT
-        MAX(
-            _inserted_timestamp
-        )
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 new_records AS (
     SELECT

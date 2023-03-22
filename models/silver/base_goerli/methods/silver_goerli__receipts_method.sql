@@ -1,8 +1,7 @@
  {{ config (
     materialized = "incremental",
     unique_key = "tx_hash",
-    cluster_by = "ROUND(block_number, -3)",
-    merge_update_columns = ["tx_hash"]
+    cluster_by = "ROUND(block_number, -3)"
 ) }}
 
 WITH meta AS (
