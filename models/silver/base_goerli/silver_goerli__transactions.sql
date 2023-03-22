@@ -143,15 +143,7 @@ WHERE
     SELECT
         MAX(
             _inserted_timestamp
-        ) :: DATE - 1
-    FROM
-        {{ this }}
-    )
-    AND l._inserted_timestamp >= (
-    SELECT
-        MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+        ) :: DATE
     FROM
         {{ this }}
     )
@@ -192,8 +184,7 @@ SELECT
     f.tx_fee,
     f.origin_function_signature,
     CASE
-        WHEN f.origin_function_signature IS NULL
-        OR b.block_timestamp IS NULL THEN TRUE
+        WHEN b.block_timestamp IS NULL THEN TRUE
         ELSE FALSE
     END AS is_pending,
     f._inserted_timestamp
