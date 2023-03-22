@@ -232,7 +232,7 @@ missing_data AS (
     FROM
         {{ this }}
         t
-        LEFT OUTER JOIN {{ ref('silver_goerli__transactions') }}
+        INNER JOIN {{ ref('silver_goerli__transactions') }}
         txs
         ON txs.tx_hash = t.tx_hash
     WHERE
