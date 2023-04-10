@@ -104,8 +104,7 @@ WITH flat_base AS (
             ) :: INTEGER,
             0
         ) AS effective_gas_price,
-        COALESCE(
-            ethereum.public.udf_hex_to_int(
+        COALESCE((
                 l1FeeScalar :: STRING
             ) :: FLOAT,
             0
