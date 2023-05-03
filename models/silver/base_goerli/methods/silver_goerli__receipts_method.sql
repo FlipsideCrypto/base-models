@@ -67,6 +67,7 @@ base AS (
             '-32009',
             '-32010'
         ) 
+        OR response :: STRING IS NOT NULL
 )
 
 SELECT
