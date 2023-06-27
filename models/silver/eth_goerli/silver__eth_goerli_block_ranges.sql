@@ -28,7 +28,7 @@ chainhead AS (
 ),
 ranges AS (
     SELECT
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             resp :data [0] :result :: STRING
         ) :: INTEGER AS chainhead,
         min_block

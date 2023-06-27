@@ -74,7 +74,7 @@ SELECT
     block_number,
     response :blockHash :: STRING AS blockHash,
     response :transactionHash :: STRING AS tx_hash,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
     	response :transactionIndex :: STRING) :: INTEGER AS tx_index,
 	response :cumulativeGasUsed :: STRING AS cumulativeGasUsed,
     response :effectiveGasPrice :: STRING AS effectiveGasPrice,

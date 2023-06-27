@@ -8,31 +8,31 @@
 SELECT
     block_number,
     TO_TIMESTAMP_NTZ(
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             TIMESTAMP :: STRING
         )
     ) AS block_timestamp,
     'goerli' AS network,
     'base' AS blockchain,
     tx_count,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         difficulty :: STRING
     ) :: INTEGER AS difficulty,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         totalDifficulty :: STRING
     ) :: INTEGER AS total_difficulty,
     extraData AS extra_data,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         gasLimit :: STRING
     ) :: INTEGER AS gas_limit,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         gasUsed :: STRING
     ) :: INTEGER AS gas_used,
     block_hash AS HASH,
     parentHash AS parent_hash,
     receiptsRoot AS receipts_root,
     sha3Uncles AS sha3_uncles,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         SIZE :: STRING
     ) :: INTEGER AS SIZE,
     uncles AS uncle_blocks,
@@ -48,7 +48,7 @@ SELECT
         'mix_hash',
         mixHash,
         'nonce',
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             nonce :: STRING
         ) :: INTEGER
     ) AS block_header_json,

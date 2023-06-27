@@ -12,7 +12,7 @@ SELECT
     logs_array,
 	VALUE :address :: STRING AS contract_address,
     VALUE :data :: STRING AS data,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
     	VALUE :logIndex :: STRING) :: INTEGER AS event_index,
     VALUE :removed :: STRING AS removed,
     VALUE :topics AS topics,
@@ -66,10 +66,10 @@ flat_base AS (
             WHEN status = '0x1' THEN 'SUCCESS'
             ELSE 'FAIL'
         END AS tx_status,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             transactionIndex
         ) :: INTEGER AS tx_index,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             TYPE
         ) :: INTEGER AS TYPE,
         _inserted_timestamp
