@@ -29,11 +29,11 @@ AND _inserted_timestamp >= (
 SELECT
     VALUE :address :: STRING AS contract_address,
     VALUE :blockHash :: STRING AS block_hash,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         VALUE :blockNumber :: STRING
     ) :: INTEGER AS block_number,
     VALUE :data :: STRING AS DATA,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         VALUE :logIndex :: STRING
     ) :: INTEGER AS log_index,
     CASE
@@ -42,7 +42,7 @@ SELECT
     END AS removed,
     VALUE :topics AS topics,
     VALUE :transactionHash :: STRING AS tx_hash,
-    ethereum.public.udf_hex_to_int(
+    utils.udf_hex_to_int(
         VALUE :transactionIndex :: STRING
     ) :: INTEGER AS tx_index,
     CONCAT(

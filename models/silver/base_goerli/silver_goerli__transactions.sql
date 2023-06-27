@@ -9,15 +9,15 @@ WITH flat_base AS (
     SELECT
         t.block_number,
         TO_TIMESTAMP_NTZ(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 block_timestamp :: STRING
             )
         ) AS block_timestamp,
         t.tx_hash,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             nonce :: STRING
         ) :: INTEGER AS nonce,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             POSITION :: STRING
         ) :: INTEGER AS POSITION,
         SUBSTR(
@@ -28,7 +28,7 @@ WITH flat_base AS (
         from_address,
         to_address,
         COALESCE(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 eth_value :: STRING
             ) :: INTEGER / pow(
                 10,
@@ -38,22 +38,22 @@ WITH flat_base AS (
         ) AS eth_value,
         block_hash,
         COALESCE(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 gas_price :: STRING
             ) :: INTEGER,
             0
         ) AS gas_price1,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             gas_limit :: STRING
         ) :: INTEGER AS gas_limit,
         input AS input_data,
-        ethereum.public.udf_hex_to_int(
+        utils.udf_hex_to_int(
             tx_type :: STRING
         ) :: INTEGER AS tx_type,
         is_system_tx,
         object_construct_keep_null(
             'chain_ID',
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 chainID :: STRING
             ) :: INTEGER,
             'r',
@@ -61,27 +61,27 @@ WITH flat_base AS (
             's',
             s,
             'v',
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 v :: STRING
             ) :: INTEGER,
             'access_list',
             accesslist,
             'max_priority_fee_per_gas',
             COALESCE(
-                ethereum.public.udf_hex_to_int(
+                utils.udf_hex_to_int(
                     max_priority_fee_per_gas :: STRING
                 ) :: INTEGER,
                 0
             ),
             'max_fee_per_gas',
             COALESCE(
-                ethereum.public.udf_hex_to_int(
+                utils.udf_hex_to_int(
                     max_fee_per_gas :: STRING
                 ) :: INTEGER,
                 0
             ),
             'mint',
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 mint :: STRING
             ),
             'source_hash',
@@ -91,15 +91,15 @@ WITH flat_base AS (
             WHEN status = '0x1' THEN 'SUCCESS'
             ELSE 'FAIL'
         END AS tx_status,
-        COALESCE(ethereum.public.udf_hex_to_int(gasUsed :: STRING) :: INTEGER, 0) AS gas_used,
+        COALESCE(utils.udf_hex_to_int(gasUsed :: STRING) :: INTEGER, 0) AS gas_used,
         COALESCE(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 cumulativeGasUsed :: STRING
             ) :: INTEGER,
             0
         ) AS cumulative_gas_used,
         COALESCE(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 effectiveGasPrice
             ) :: INTEGER,
             0
@@ -110,13 +110,13 @@ WITH flat_base AS (
             0
         ) AS l1_fee_scalar,
         COALESCE(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l1GasUsed :: STRING
             ) :: FLOAT,
             0
         ) AS l1_gas_used,
         COALESCE(
-            ethereum.public.udf_hex_to_int(
+            utils.udf_hex_to_int(
                 l1GasPrice :: STRING
             ) :: FLOAT,
             0
