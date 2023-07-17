@@ -6,7 +6,7 @@ sources:
     schema: core
     tables:
       - name: fact_hourly_token_prices
-  - name: bronze_streamline
+  - name: bronze_streamline_goerli_goerli
     database: streamline
     schema: |
       {{ "BASE_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "BASE" }}

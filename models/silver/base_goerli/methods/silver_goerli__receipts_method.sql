@@ -13,7 +13,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline", "eth_getTransactionReceipt") }}'
+                table_name => '{{ source( "bronze_streamline_goerli", "eth_getTransactionReceipt") }}'
             )
         ) A
 
@@ -46,7 +46,7 @@ base AS (
         registered_on AS _inserted_timestamp
     FROM
         {{ source(
-            "bronze_streamline",
+            "bronze_streamline_goerli",
             "eth_getTransactionReceipt"
         ) }}
         t

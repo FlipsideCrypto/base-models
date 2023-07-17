@@ -12,7 +12,7 @@ WITH transactions AS (
         tx_hash :: STRING as tx_hash,
         block_number :: STRING AS block_number
     FROM
-        {{ ref("streamline__transactions") }}
+        {{ ref("streamline__goerli_transactions") }}
     WHERE
         block_number > 1000000
     EXCEPT
@@ -20,7 +20,7 @@ WITH transactions AS (
         tx_hash :: STRING,
         block_number :: STRING
     FROM
-        {{ ref("streamline__complete_debug_traceTransaction") }}
+        {{ ref("streamline__complete_goerli_debug_traceTransaction") }}
     WHERE
         block_number > 1000000
 )

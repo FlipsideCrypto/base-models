@@ -11,14 +11,14 @@ WITH blocks AS (
     SELECT
         block_number :: STRING AS block_number
     FROM
-        {{ ref("streamline__blocks") }}
+        {{ ref("streamline__goerli_blocks") }}
     WHERE
         block_number > 1000000
     EXCEPT
     SELECT
         block_number :: STRING
     FROM
-        {{ ref("streamline__complete_transactions") }}
+        {{ ref("streamline__complete_goerli_transactions") }}
     WHERE
         block_number > 1000000
 )
