@@ -24,6 +24,12 @@ There is more information on how to use dbt docs in the last section of this doc
 - [goerli.fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_event_logs)
 - [goerli.fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_traces)
 
+## **Helpful User-Defined Functions (UDFs)**
+
+UDFs are custom functions built by the Flipside team that can be used in your queries to make your life easier. 
+
+Please visit [LiveQuery Functions Overview](https://flipsidecrypto.github.io/livequery-models/#!/overview) for a full list of helpful UDFs.
+
 ## **Data Model Overview**
 
 The Base models are built a few different ways, but the core fact tables are built using three layers of sql models: **bronze, silver, and gold (or core).**
