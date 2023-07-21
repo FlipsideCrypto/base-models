@@ -13,7 +13,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline_goerli", "eth_getTransactionReceipt") }}'
+                table_name => '{{ source( "bronze_streamline", "goerli_eth_getTransactionReceipt") }}'
             )
         ) A
 
@@ -46,8 +46,8 @@ base AS (
         registered_on AS _inserted_timestamp
     FROM
         {{ source(
-            "bronze_streamline_goerli",
-            "eth_getTransactionReceipt"
+            "bronze_streamline",
+            "goerli_eth_getTransactionReceipt"
         ) }}
         t
         JOIN meta b
@@ -66,7 +66,7 @@ base AS (
             '-32008',
             '-32009',
             '-32010'
-        ) 
+        )
         OR response :: STRING IS NOT NULL
 )
 
@@ -93,5 +93,5 @@ SELECT
     _inserted_timestamp
 FROM
     base
-QUALIFY ROW_NUMBER() OVER (PARTITION BY tx_hash 
+QUALIFY ROW_NUMBER() OVER (PARTITION BY tx_hash
     ORDER BY _inserted_timestamp DESC) = 1

@@ -14,7 +14,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline_goerli", "debug_traceTransaction") }}'
+                table_name => '{{ source( "bronze_streamline", "goerli_debug_traceTransaction") }}'
             )
         ) A
 
@@ -52,8 +52,8 @@ SELECT
     _inserted_timestamp
 FROM
     {{ source(
-        "bronze_streamline_goerli",
-        "debug_traceTransaction"
+        "bronze_streamline",
+        "goerli_debug_traceTransaction"
     ) }}
     t
     JOIN meta b

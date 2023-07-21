@@ -14,7 +14,7 @@ WITH meta AS (
     FROM
         TABLE(
             information_schema.external_table_files(
-                table_name => '{{ source( "bronze_streamline_goerli", "blocks") }}'
+                table_name => '{{ source( "bronze_streamline", "goerli_blocks") }}'
             )
         ) A
 
@@ -47,8 +47,8 @@ base AS (
         registered_on AS _inserted_timestamp
     FROM
         {{ source(
-            "bronze_streamline_goerli",
-            "blocks"
+            "bronze_streamline",
+            "goerli_blocks"
         ) }}
         t
         JOIN meta b
