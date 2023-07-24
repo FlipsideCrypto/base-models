@@ -1,11 +1,11 @@
-name: dbt_run_streamline_receipts_realtime
-run-name: dbt_run_streamline_receipts_realtime
+name: dbt_run_streamline_realtime
+run-name: dbt_run_streamline_realtime
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 3 hours" (see https://crontab.guru)
-    - cron: '0 1-23/3 * * *'
+    # Runs "at minute 5 and 35, every hour" (see https://crontab.guru)
+    - cron: '5,35 * * * *'
 
 env:
   DBT_PROFILES_DIR: ./
@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/streamline__eth_getTransactionReceipt_realtime.sql
+          dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m 1+models/silver/streamline/core/realtime

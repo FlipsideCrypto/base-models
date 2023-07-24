@@ -11,10 +11,16 @@ sources:
     schema: |
       {{ "BASE_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "BASE" }}
     tables:
+      - name: receipts
       - name: blocks
       - name: transactions
-      - name: debug_traceTransaction
-      - name: eth_getTransactionReceipt
+      - name: debug_traceBlockByNumber
+      - name: decoded_logs
+      - name: confirm_blocks
+      - name: goerli_blocks
+      - name: goerli_transactions
+      - name: goerli_debug_traceTransaction
+      - name: goerli_eth_getTransactionReceipt
   - name: udfs_streamline
     database: udfs
     schema: streamline
