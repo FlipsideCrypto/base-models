@@ -1,5 +1,5 @@
 {% docs base_max_block %}
 
-The max block on Optimism this batch relates to.
+The max block on Base this batch relates to.
 
 {% enddocs %}
