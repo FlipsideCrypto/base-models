@@ -26,3 +26,8 @@ sources:
     schema: streamline
     tables:
       - name: node_mapping
+  - name: silver_crosschain
+    database: crosschain
+    schema: silver
+    tables:
+      - name: number_sequence

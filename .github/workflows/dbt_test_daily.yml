@@ -1,12 +1,12 @@
-name: dbt_run_scheduled_30_mins
-run-name: dbt_run_scheduled_30_mins
+name: dbt_test_daily 
+run-name: dbt_test_daily
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 30 mins" (see https://crontab.guru)
-    - cron: '*/30 * * * *'
-
+    # Runs "at 9:00 UTC" (see https://crontab.guru)
+    - cron: '0 9 * * *'
+    
 env:
   DBT_PROFILES_DIR: ./
 
@@ -21,11 +21,11 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}
-
+  
 jobs:
   run_dbt_jobs:
     runs-on: ubuntu-latest
-    environment:
+    environment: 
       name: workflow_prod
 
     steps:
@@ -37,8 +37,11 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip3 install dbt-snowflake~=${{ vars.DBT_VERSION }} cli_passthrough requests click
+          pip3 install dbt-snowflake==${{ vars.DBT_VERSION }} cli_passthrough requests click
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m models/silver/eth_goerli models/bronze/eth_goerli/bronze__eth_goerli_contract_logs.sql
+          dbt test --exclude tag:full_test tag:recent_test
+  
+
+

@@ -1,0 +1,32 @@
+version: 2
+models:
+  - name: core__fact_event_logs
+    description: '{{ doc("base_logs_table_doc") }}'
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("base_block_number") }}'   
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("base_block_timestamp") }}'
+      - name: TX_HASH
+        description: '{{ doc("base_logs_tx_hash") }}'
+      - name: EVENT_INDEX
+        description: '{{ doc("base_event_index") }}'
+      - name: CONTRACT_ADDRESS
+        description: '{{ doc("base_logs_contract_address") }}'
+      - name: TOPICS
+        description: '{{ doc("base_topics") }}'
+      - name: DATA
+        description: '{{ doc("base_logs_data") }}'
+      - name: EVENT_REMOVED
+        description: '{{ doc("base_event_removed") }}'  
+      - name: _LOG_ID
+        description: '{{ doc("base_log_id_events") }}'  
+      - name: TX_STATUS
+        description: '{{ doc("base_tx_status") }}' 
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("base_origin_sig") }}'
+      - name: ORIGIN_FROM_ADDRESS
+        description: '{{ doc("base_origin_from") }}'
+      - name: ORIGIN_TO_ADDRESS
+        description: '{{ doc("base_origin_to") }}'
