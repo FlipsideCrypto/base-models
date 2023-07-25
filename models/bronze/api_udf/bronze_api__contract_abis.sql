@@ -32,7 +32,7 @@ WHERE
     abi_data :data :result :: STRING <> 'Max rate limit reached'
 {% endif %}
 LIMIT
-    10
+    5
 ), row_nos AS (
     SELECT
         contract_address,
@@ -49,7 +49,7 @@ LIMIT
         JOIN api_keys
         ON 1 = 1
 ),
-batched AS ({% for item in range(11) %}
+batched AS ({% for item in range(6) %}
 SELECT
     rn.contract_address, ethereum.streamline.udf_api('GET', CONCAT('https://api.basescan.org/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey=', api_key),{ 'User-Agent': 'FlipsideStreamline' },{}) AS abi_data, SYSDATE() AS _inserted_timestamp
 FROM
