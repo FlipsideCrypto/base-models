@@ -19,10 +19,11 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Core Tables
 
 **Fact Tables:**
-- [goerli.fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_blocks)
-- [goerli.fact_transactions](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_transactions)
-- [goerli.fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_event_logs)
-- [goerli.fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.goerli__fact_traces)
+- [fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_blocks)
+- [fact_transactions](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_transactions)
+- [fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_event_logs)
+- [fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_traces)
+- [fact_token_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_token_transfers)
 
 ## **Helpful User-Defined Functions (UDFs)**
 

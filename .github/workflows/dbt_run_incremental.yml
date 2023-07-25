@@ -4,8 +4,8 @@ run-name: dbt_run_scheduled
 on:
   workflow_dispatch:
   schedule:
-    # Runs "every 2 hours" (see https://crontab.guru)
-    - cron: '0 */2 * * *'
+    # Runs "At minute 40, every hour" (see https://crontab.guru)
+    - cron: '40 * * * *'
     
 env:
   DBT_PROFILES_DIR: ./
@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --exclude models/silver/eth_goerli models/bronze/eth_goerli/bronze__eth_goerli_contract_logs.sql models/silver/streamline
+          dbt run --exclude models/silver/goerli models/silver/streamline models/bronze/eth_goerli models/silver/_observability

@@ -6,7 +6,8 @@
     )
 ) }}
 
-with blocks AS (
+WITH blocks AS (
+
     SELECT
         block_number :: STRING AS block_number
     FROM
@@ -16,6 +17,32 @@ with blocks AS (
         block_number :: STRING
     FROM
         {{ ref("streamline__complete_qn_getBlockWithReceipts") }}
+),
+all_blocks AS (
+    SELECT
+        block_number
+    FROM
+        blocks
+    UNION
+    SELECT
+        block_number
+    FROM
+        (
+            SELECT
+                block_number
+            FROM
+                {{ ref("_missing_receipts") }}
+            UNION
+            SELECT
+                block_number
+            FROM
+                {{ ref("_missing_txs") }}
+            UNION
+            SELECT
+                block_number
+            FROM
+                {{ ref("_unconfirmed_blocks") }}
+        )
 )
 SELECT
     PARSE_JSON(
@@ -40,6 +67,6 @@ SELECT
         )
     ) AS request
 FROM
-    blocks
+    all_blocks
 ORDER BY
     block_number ASC
