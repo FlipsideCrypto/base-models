@@ -40,6 +40,8 @@ models:
         description: '{{ doc("base_l1_fee_scalar") }}'
       - name: L1_FEE
         description: The L1 portion of fees paid.
+      - name: L1_SUBMISSION_DETAILS
+        description: Variant column that includes details regarding state root, index and tx_hash information for when the block is submitted to Ethereum Mainnet.
       - name: CUMULATIVE_GAS_USED
         description: '{{ doc("base_cumulative_gas_used") }}' 
       - name: MAX_FEE_PER_GAS
