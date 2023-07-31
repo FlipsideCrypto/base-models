@@ -4,7 +4,8 @@
     unique_key = ['block_number', 'event_index'],
     cluster_by = "block_timestamp::date",
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
-    full_refresh = false
+    full_refresh = false,
+    tags = ['decoded_logs']
 ) }}
 
 WITH base_data AS (

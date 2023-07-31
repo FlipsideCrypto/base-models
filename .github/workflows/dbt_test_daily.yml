@@ -41,7 +41,7 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt test --exclude tag:full_test tag:recent_test models/silver/goerli
+          dbt test --exclude tag:full_test tag:recent_test tag:base_goerli
   
 
 
