@@ -1,11 +1,11 @@
-name: dbt_run_scheduled
-run-name: dbt_run_scheduled
+name: dbt_run_streamline_decoder
+run-name: dbt_run_streamline_decoder
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs "At minute 40, every hour" (see https://crontab.guru)
-    - cron: '40 * * * *'
+    # Runs “At minute 55, every hour.” (see https://crontab.guru)
+    - cron: '55 * * * *'
     
 env:
   DBT_PROFILES_DIR: ./
@@ -41,5 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run --exclude models/silver/abis models/silver/goerli models/silver/streamline models/bronze/eth_goerli models/silver/_observability models/silver/API_udf models/silver/core/silver__decoded_logs.sql
-          dbt run --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -m models/silver/streamline/decoder/streamline__complete_decode_logs.sql models/silver/streamline/decoder/streamline__decode_logs_realtime.sql
+          dbt run -m models/silver/core/silver__decoded_logs.sql
