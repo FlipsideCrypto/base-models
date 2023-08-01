@@ -24,6 +24,10 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_event_logs)
 - [fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_traces)
 - [fact_token_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_token_transfers)
+- [fact_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_decoded_event_logs)
+
+**Convenience Tables:**
+- [ez_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_decoded_event_logs)
 
 ## **Helpful User-Defined Functions (UDFs)**
 
