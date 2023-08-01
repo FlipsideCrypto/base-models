@@ -31,3 +31,8 @@ sources:
     schema: silver
     tables:
       - name: number_sequence
+  - name: ethereum_silver
+    database: ethereum
+    schema: silver
+    tables:
+      - name: base_state_hashes
