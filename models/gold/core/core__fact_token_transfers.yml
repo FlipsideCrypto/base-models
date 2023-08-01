@@ -18,6 +18,8 @@ models:
         description: '{{ doc("base_transfer_to_address") }}'
       - name: RAW_AMOUNT
         description: '{{ doc("base_transfer_raw_amount") }}'
+      - name: RAW_AMOUNT_PRECISE
+        description: '{{ doc("precise_amount_unadjusted") }}'
       - name: _LOG_ID
         description: '{{ doc("base_log_id_transfers") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
@@ -26,5 +28,3 @@ models:
         description: '{{ doc("base_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
         description: '{{ doc("base_origin_to") }}'
-      - name: RAW_AMOUNT_PRECISE
-        description: '{{ doc("precise_amount_unadjusted") }}'

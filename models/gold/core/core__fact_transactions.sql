@@ -15,6 +15,8 @@ SELECT
     from_address,
     to_address,
     value_adjusted :: FLOAT AS eth_value,
+    VALUE AS eth_value_precise_raw,
+    value_adjusted AS eth_value_precise,
     tx_fee,
     gas_price,
     effective_gas_price,
@@ -31,8 +33,6 @@ SELECT
     tx_status AS status,
     r,
     s,
-    v,
-    VALUE AS eth_value_precise_raw,
-    value_adjusted AS eth_value_precise
+    v
 FROM
     {{ ref('silver__transactions') }}
