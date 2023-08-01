@@ -40,9 +40,9 @@ models:
         description: The reason for the trace failure, if any.
       - name: TRACE_INDEX
         description: The index of the trace within the transaction. 
-      - name: PRECISE_AMOUNT_UNADJUSTED
+      - name: ETH_VALUE_PRECISE_RAW
         description: '{{ doc("precise_amount_unadjusted") }}'
-      - name: PRECISE_AMOUNT_ADJUSTED
+      - name: ETH_VALUE_PRECISE
         description: '{{ doc("precise_amount_adjusted") }}'
 
 

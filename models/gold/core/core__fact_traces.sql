@@ -25,10 +25,10 @@ SELECT
     trace_index,
     utils.udf_hex_to_int(
         DATA :value :: STRING
-    ) AS precise_amount_unadjusted,
+    ) AS eth_value_precise_raw,
     utils.udf_decimal_adjust(
-        precise_amount_unadjusted,
+        eth_value_precise_raw,
         18
-    ) AS precise_amount_adjusted
+    ) AS eth_value_precise
 FROM
     {{ ref('silver__traces') }}

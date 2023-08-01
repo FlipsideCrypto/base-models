@@ -32,7 +32,7 @@ SELECT
     r,
     s,
     v,
-    VALUE AS precise_amount_unadjusted,
-    value_adjusted AS precise_amount_adjusted
+    VALUE AS eth_value_precise_raw,
+    value_adjusted AS eth_value_precise
 FROM
     {{ ref('silver__transactions') }}

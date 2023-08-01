@@ -16,6 +16,6 @@ SELECT
     to_address,
     raw_amount,
     _log_id,
-    precise_amount_unadjusted
+    raw_amount_precise
 FROM
     {{ ref('silver__transfers') }}

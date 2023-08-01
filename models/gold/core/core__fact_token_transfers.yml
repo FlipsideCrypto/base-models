@@ -26,5 +26,5 @@ models:
         description: '{{ doc("base_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
         description: '{{ doc("base_origin_to") }}'
-      - name: PRECISE_AMOUNT_UNADJUSTED
+      - name: RAW_AMOUNT_PRECISE
         description: '{{ doc("precise_amount_unadjusted") }}'
