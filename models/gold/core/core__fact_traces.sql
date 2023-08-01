@@ -22,6 +22,13 @@ SELECT
     sub_traces,
     trace_status,
     error_reason,
-    trace_index
+    trace_index,
+    utils.udf_hex_to_int(
+        DATA :value :: STRING
+    ) AS precise_amount_unadjusted,
+    utils.udf_decimal_adjust(
+        precise_amount_unadjusted,
+        18
+    ) AS precise_amount_adjusted
 FROM
     {{ ref('silver__traces') }}
