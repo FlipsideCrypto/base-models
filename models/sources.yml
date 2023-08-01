@@ -32,6 +32,11 @@ sources:
     tables:
       - name: number_sequence
       - name: apis_keys
+  - name: ethereum_silver
+    database: ethereum
+    schema: silver
+    tables:
+      - name: base_state_hashes
   - name: crosschain_public
     database: crosschain
     schema: bronze_public
