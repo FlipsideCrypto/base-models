@@ -27,6 +27,7 @@ SELECT
     l1_gas_used,
     l1_fee_scalar,
     l1_fee,
+    l1_fee_precise,
     OBJECT_CONSTRUCT(
         'l1_state_batch_index',
         state_batch_index,
@@ -44,7 +45,7 @@ SELECT
     s,
     v
 FROM
-    <<<<<<< head {{ ref('silver__transactions') }} ======= {{ ref('silver__transactions') }} A
+    {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
     b
-    ON A.block_number = b.block_number >>>>>>> e5214d86a4dc32d88cb548a7f4d0545b79b536e6
+    ON A.block_number = b.block_number
