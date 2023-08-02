@@ -57,6 +57,9 @@ base_tx AS (
                 utils.udf_hex_to_int(
                     A.data :gasPrice :: STRING
                 )
+            ) / pow(
+                10,
+                9
             ),
             0
         ) AS gas_price,
@@ -104,7 +107,12 @@ base_tx AS (
         A.data :v :: STRING AS v,
         utils.udf_hex_to_int(
             A.data :value :: STRING
-        ) AS VALUE,
+        ) AS eth_value_precise_raw,
+        utils.udf_decimal_adjust(
+            eth_value_precise_raw,
+            18
+        ) AS eth_value_precise,
+        eth_value_precise :: FLOAT AS VALUE,
         A._INSERTED_TIMESTAMP,
         A.data AS DATA
     FROM
@@ -117,11 +125,7 @@ new_records AS (
         t.chain_id,
         t.from_address,
         t.gas,
-        t.gas_price / pow(
-            10,
-            9
-        ) AS gas_price,
-        t.gas_price AS gas_price1,
+        t.gas_price,
         t.tx_hash,
         t.input_data,
         t.origin_function_signature,
@@ -134,6 +138,8 @@ new_records AS (
         t.position,
         t.type,
         t.v,
+        t.eth_value_precise_raw,
+        t.eth_value_precise,
         t.value,
         block_timestamp,
         CASE
@@ -142,22 +148,13 @@ new_records AS (
             ELSE FALSE
         END AS is_pending,
         r.gas_used,
-        r.l1_fee / pow(
-            10,
-            18
-        ) AS l1_fee,
+        r.l1_fee,
         r.l1_fee_scalar,
         r.l1_gas_used,
-        r.l1_gas_price / pow(
-            10,
-            9
-        ) AS l1_gas_price,
-        r.l1_gas_price AS l1_gas_price1,
+        r.l1_gas_price,
+        utils.udf_decimal_adjust((r.gas_used * t.gas_price) + ((r.l1_gas_price / pow(10, 9)) * r.l1_gas_used * r.l1_fee_scalar), 9) AS tx_fee_precise,
         COALESCE(
-            ((r.gas_used * gas_price1) + (l1_gas_price1 * r.l1_gas_used * r.l1_fee_scalar)) / pow(
-                10,
-                18
-            ),
+            tx_fee_precise :: FLOAT,
             0
         ) AS tx_fee,
         tx_success,
@@ -208,6 +205,8 @@ missing_data AS (
         t.position,
         t.type,
         t.v,
+        t.eth_value_precise_raw,
+        t.eth_value_precise,
         t.value,
         b.block_timestamp,
         FALSE AS is_pending,
@@ -216,11 +215,15 @@ missing_data AS (
         r.tx_status,
         r.cumulative_gas_used,
         r.effective_gas_price,
-        t.l1_fee,
-        t.l1_fee_scalar,
-        t.l1_gas_used,
-        t.l1_gas_price,
-        t.tx_fee,
+        r.l1_fee,
+        r.l1_fee_scalar,
+        r.l1_gas_used,
+        r.l1_gas_price,
+        utils.udf_decimal_adjust((r.gas_used * t.gas_price) + ((r.l1_gas_price / pow(10, 9)) * r.l1_gas_used * r.l1_fee_scalar), 9) AS tx_fee_precise,
+        COALESCE(
+            tx_fee_precise :: FLOAT,
+            0
+        ) AS tx_fee,
         r.type AS tx_type,
         GREATEST(
             t._inserted_timestamp,
@@ -263,6 +266,8 @@ FINAL AS (
         TYPE,
         v,
         VALUE,
+        eth_value_precise_raw,
+        eth_value_precise,
         block_timestamp,
         is_pending,
         gas_used,
@@ -275,6 +280,7 @@ FINAL AS (
         l1_gas_used,
         l1_gas_price,
         tx_fee,
+        tx_fee_precise,
         tx_type,
         _inserted_timestamp,
         DATA
@@ -303,6 +309,8 @@ SELECT
     TYPE,
     v,
     VALUE,
+    eth_value_precise_raw,
+    eth_value_precise,
     block_timestamp,
     is_pending,
     gas_used,
@@ -315,6 +323,7 @@ SELECT
     l1_gas_used,
     l1_gas_price,
     tx_fee,
+    tx_fee_precise,
     tx_type,
     _inserted_timestamp,
     DATA
@@ -342,6 +351,8 @@ SELECT
     TYPE,
     v,
     VALUE,
+    eth_value_precise_raw,
+    eth_value_precise,
     block_timestamp,
     is_pending,
     gas_used,
@@ -349,19 +360,25 @@ SELECT
     tx_status,
     cumulative_gas_used,
     effective_gas_price,
-    l1_fee,
+    utils.udf_decimal_adjust(
+        l1_fee,
+        18
+    ) AS l1_fee_precise,
+    l1_fee_precise :: FLOAT AS l1_fee,
     l1_fee_scalar,
     l1_gas_used,
-    l1_gas_price,
+    l1_gas_price / pow(
+        10,
+        9
+    ) AS l1_gas_price,
     tx_fee,
+    tx_fee_precise,
     tx_type,
     _inserted_timestamp,
-    DATA,
-    utils.udf_decimal_adjust(
-        VALUE,
-        18
-    ) AS value_adjusted
+    DATA
 FROM
-    FINAL qualify(ROW_NUMBER() over (PARTITION BY block_number, POSITION
+    FINAL
+WHERE
+    block_hash IS NOT NULL qualify(ROW_NUMBER() over (PARTITION BY block_number, POSITION
 ORDER BY
     _inserted_timestamp DESC, is_pending ASC)) = 1
