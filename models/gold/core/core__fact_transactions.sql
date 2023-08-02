@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    block_number AS block_number,
+    A.block_number AS block_number,
     block_timestamp,
     block_hash,
     tx_hash,
@@ -27,7 +27,14 @@ SELECT
     l1_gas_used,
     l1_fee_scalar,
     l1_fee,
-    l1_fee_precise,
+    OBJECT_CONSTRUCT(
+        'l1_state_batch_index',
+        state_batch_index,
+        'l1_state_batch_root',
+        state_batch_root,
+        'l1_state_root_tx_hash',
+        state_tx_hash
+    ) AS l1_submission_details,
     cumulative_gas_used,
     max_fee_per_gas,
     max_priority_fee_per_gas,
@@ -37,4 +44,7 @@ SELECT
     s,
     v
 FROM
-    {{ ref('silver__transactions') }}
+    <<<<<<< head {{ ref('silver__transactions') }} ======= {{ ref('silver__transactions') }} A
+    LEFT JOIN {{ ref('silver__state_hashes') }}
+    b
+    ON A.block_number = b.block_number >>>>>>> e5214d86a4dc32d88cb548a7f4d0545b79b536e6
