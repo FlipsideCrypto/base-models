@@ -15,7 +15,10 @@ SELECT
     from_address,
     to_address,
     VALUE AS eth_value,
+    eth_value_precise_raw,
+    eth_value_precise,
     tx_fee,
+    tx_fee_precise,
     gas_price,
     effective_gas_price,
     gas AS gas_limit,
@@ -24,6 +27,7 @@ SELECT
     l1_gas_used,
     l1_fee_scalar,
     l1_fee,
+    l1_fee_precise,
     OBJECT_CONSTRUCT(
         'l1_state_batch_index',
         state_batch_index,
@@ -43,5 +47,5 @@ SELECT
 FROM
     {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
-    B
+    b
     ON A.block_number = b.block_number
