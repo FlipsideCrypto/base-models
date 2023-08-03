@@ -5,8 +5,7 @@
     unique_key = "block_number",
     cluster_by = "block_timestamp::date, _inserted_timestamp::date",
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
-    tags = ['core','non_realtime'],
-    full_refresh = false
+    tags = ['core','non_realtime']
 ) }}
 
 WITH traces_txs AS (
@@ -362,7 +361,38 @@ FROM
 {% endif %}
 )
 SELECT
-    *
+    block_number,
+    tx_hash,
+    block_timestamp,
+    tx_status,
+    tx_position,
+    trace_index,
+    from_address,
+    to_address,
+    eth_value,
+    gas,
+    gas_used,
+    input,
+    output,
+    TYPE,
+    identifier,
+    sub_traces,
+    error_reason,
+    trace_status,
+    DATA,
+    is_pending,
+    _call_id,
+    _inserted_timestamp,
+    IFNULL(
+        utils.udf_hex_to_int(
+            DATA :value :: STRING
+        ),
+        '0'
+    ) AS eth_value_precise_raw,
+    utils.udf_decimal_adjust(
+        eth_value_precise_raw,
+        18
+    ) AS eth_value_precise
 FROM
     FINAL qualify(ROW_NUMBER() over(PARTITION BY block_number, tx_position, trace_index
 ORDER BY
