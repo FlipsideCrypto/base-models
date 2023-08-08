@@ -84,9 +84,11 @@ transfer_singles AS (
         utils.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: STRING AS token_id,
-        utils.udf_hex_to_int(
-            segmented_data [1] :: STRING
-        ) :: STRING AS erc1155_value,
+        TRY_TO_NUMBER(
+            utils.udf_hex_to_int(
+                segmented_data [1] :: STRING
+            )
+        ) AS erc1155_value,
         TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp,
         event_index
     FROM
@@ -105,9 +107,11 @@ transfer_batch_raw AS (
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS from_address,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS to_address,
         contract_address,
-        utils.udf_hex_to_int(
-            segmented_data [2] :: STRING
-        ) :: STRING AS tokenid_length,
+        TRY_TO_NUMBER(
+            utils.udf_hex_to_int(
+                segmented_data [2] :: STRING
+            )
+        ) AS tokenid_length,
         tokenid_length AS quantity_length,
         _log_id,
         TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp
@@ -132,9 +136,9 @@ flattened AS (
         VALUE,
         tokenid_length,
         quantity_length,
-        '2' + tokenid_length AS tokenid_indextag,
-        '4' + tokenid_length AS quantity_indextag_start,
-        '4' + tokenid_length + tokenid_length AS quantity_indextag_end,
+        2 + tokenid_length AS tokenid_indextag,
+        4 + tokenid_length AS quantity_indextag_start,
+        4 + tokenid_length + tokenid_length AS quantity_indextag_end,
         CASE
             WHEN INDEX BETWEEN 3
             AND (
@@ -184,9 +188,11 @@ quantity_list AS (
     SELECT
         tx_hash,
         event_index,
-        utils.udf_hex_to_int(
-            VALUE :: STRING
-        ) :: STRING AS quantity,
+        TRY_TO_NUMBER (
+            utils.udf_hex_to_int(
+                VALUE :: STRING
+            )
+        ) AS quantity,
         ROW_NUMBER() over (
             PARTITION BY tx_hash,
             event_index
@@ -232,6 +238,7 @@ all_transfers AS (
         erc1155_value,
         _inserted_timestamp,
         event_index,
+        'erc721_Transfer' AS token_transfer_type,
         CONCAT(
             _log_id,
             '-',
@@ -253,6 +260,7 @@ all_transfers AS (
         erc1155_value,
         _inserted_timestamp,
         event_index,
+        'erc1155_TransferSingle' AS token_transfer_type,
         CONCAT(
             _log_id,
             '-',
@@ -262,6 +270,8 @@ all_transfers AS (
         ) AS _log_id
     FROM
         transfer_singles
+    WHERE
+        erc1155_value > 0
     UNION ALL
     SELECT
         block_number,
@@ -274,6 +284,7 @@ all_transfers AS (
         erc1155_value,
         _inserted_timestamp,
         event_index,
+        'erc1155_TransferBatch' AS token_transfer_type,
         CONCAT(
             _log_id,
             '-',
@@ -285,6 +296,103 @@ all_transfers AS (
         ) AS _log_id
     FROM
         transfer_batch_final
+    WHERE
+        erc1155_value > 0
+),
+transfer_base AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index,
+        contract_address,
+        C.token_name AS project_name,
+        from_address,
+        to_address,
+        A.token_id AS tokenId,
+        erc1155_value,
+        CASE
+            WHEN from_address = '0x0000000000000000000000000000000000000000' THEN 'mint'
+            ELSE 'other'
+        END AS event_type,
+        token_transfer_type,
+        A._log_id,
+        A._inserted_timestamp
+    FROM
+        all_transfers A
+        LEFT JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+    WHERE
+        to_address IS NOT NULL
+)
+
+{% if is_incremental() %},
+fill_transfers AS (
+    SELECT
+        t.block_number,
+        t.block_timestamp,
+        t.tx_hash,
+        t.event_index,
+        t.contract_address,
+        C.token_name AS project_name,
+        t.from_address,
+        t.to_address,
+        t.tokenId,
+        t.erc1155_value,
+        t.event_type,
+        t.token_transfer_type,
+        t._log_id,
+        GREATEST(
+            t._inserted_timestamp,
+            C._inserted_timestamp
+        ) AS _inserted_timestamp
+    FROM
+        {{ this }}
+        t
+        INNER JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+    WHERE
+        t.project_name IS NULL
+        AND C.token_name IS NOT NULL
+)
+{% endif %},
+final_base AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index,
+        contract_address,
+        project_name,
+        from_address,
+        to_address,
+        tokenId,
+        erc1155_value,
+        event_type,
+        token_transfer_type,
+        _log_id,
+        _inserted_timestamp
+    FROM
+        transfer_base
+
+{% if is_incremental() %}
+UNION
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_index,
+    contract_address,
+    project_name,
+    from_address,
+    to_address,
+    tokenId,
+    erc1155_value,
+    event_type,
+    token_transfer_type,
+    _log_id,
+    _inserted_timestamp
+FROM
+    fill_transfers
+{% endif %}
 )
 SELECT
     block_number,
@@ -292,20 +400,17 @@ SELECT
     tx_hash,
     event_index,
     contract_address,
+    project_name,
     from_address,
     to_address,
-    token_id AS tokenid,
+    tokenId,
     erc1155_value,
-    CASE
-        WHEN from_address = '0x0000000000000000000000000000000000000000' THEN 'mint'
-        ELSE 'other'
-    END AS event_type,
+    event_type,
+    token_transfer_type,
     _log_id,
     _inserted_timestamp
 FROM
-    all_transfers
-WHERE
-    to_address IS NOT NULL qualify ROW_NUMBER() over (
+    final_base qualify ROW_NUMBER() over (
         PARTITION BY _log_id
         ORDER BY
             _inserted_timestamp DESC
