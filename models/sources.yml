@@ -27,13 +27,13 @@ sources:
     tables:
       - name: node_mapping
   - name: crosschain
-    database: crosschain_dev
+    database: crosschain
     schema: core
     tables:
       - name: address_labels
       - name: ez_hourly_prices
   - name: silver_crosschain
-    database: crosschain_dev
+    database: crosschain
     schema: silver
     tables:
       - name: number_sequence
