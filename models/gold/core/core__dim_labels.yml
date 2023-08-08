@@ -1,0 +1,53 @@
+version: 2
+models:
+  - name: core__dim_labels
+    description: '{{ doc("base_labels_table") }}'
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - BLOCKCHAIN
+            - CREATOR
+            - ADDRESS
+    columns:
+      - name: BLOCKCHAIN
+        description: '{{ doc("base_label_blockchain") }}'
+        tests:
+          - not_null
+      - name: CREATOR
+        description: '{{ doc("base_label_creator") }}'
+        tests:
+          - not_null
+      - name: ADDRESS
+        description: '{{ doc("base_label_address") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: 0[xX][0-9a-fA-F]+
+      - name: ADDRESS_NAME
+        description: '{{ doc("base_labels_table") }}'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING
+                - VARCHAR
+      - name: LABEL_TYPE
+        description: '{{ doc("base_label_type") }}'
+        tests:
+          - not_null
+      - name: LABEL_SUBTYPE
+        description: '{{ doc("base_label_subtype") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING
+                - VARCHAR
+      - name: PROJECT_NAME
+        description: '{{ doc("base_project_name") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - STRING
+                - VARCHAR
+
