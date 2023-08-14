@@ -5,80 +5,93 @@
     tags = ['non_realtime']
 ) }}
 
-WITH pools AS (
+WITH base_swaps AS (
 
     SELECT
-        pool_address,
-        token0,
-        token1
-    FROM
-        {{ ref('silver_dex__sushi_pools') }}
-),
-swaps_base AS (
-    SELECT
-        block_number,
-        origin_function_signature,
-        origin_from_address,
-        origin_to_address,
-        block_timestamp,
-        tx_hash,
-        event_index,
-        contract_address,
+        *,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                segmented_data [0] :: STRING
-            )
-        ) AS amountIn,
-        TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                segmented_data [1] :: STRING
-            )
-        ) AS amountOut,
-        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS tx_to,
-        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS tokenIn,
-        CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS tokenOut,
-        token0,
-        token1,
-        _log_id,
-        _inserted_timestamp
+        CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS sender,
+        CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS recipient,
+        utils.udf_hex_to_int(
+            's2c',
+            segmented_data [0] :: STRING
+        ) :: FLOAT AS amount0_unadj,
+        utils.udf_hex_to_int(
+            's2c',
+            segmented_data [1] :: STRING
+        ) :: FLOAT AS amount1_unadj,
+        utils.udf_hex_to_int(
+            's2c',
+            segmented_data [2] :: STRING
+        ) :: FLOAT AS sqrtPriceX96,
+        utils.udf_hex_to_int(
+            's2c',
+            segmented_data [3] :: STRING
+        ) :: FLOAT AS liquidity,
+        utils.udf_hex_to_int(
+            's2c',
+            segmented_data [4] :: STRING
+        ) :: FLOAT AS tick
     FROM
         {{ ref('silver__logs') }}
-        INNER JOIN pools p
-        ON p.pool_address = contract_address
     WHERE
-        topics [0] :: STRING = '0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062'
+        topics [0] :: STRING = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'
         AND tx_status = 'SUCCESS'
+        AND event_removed = 'false'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) :: DATE
+        MAX(
+            _inserted_timestamp
+        ) :: DATE
     FROM
         {{ this }}
 )
 {% endif %}
+),
+pool_data AS (
+    SELECT
+        token0_address,
+        token1_address,
+        fee,
+        fee_percent,
+        tick_spacing,
+        pool_address
+    FROM
+        {{ ref('silver_dex__sushi_pools') }}
+),
+FINAL AS (
+    SELECT
+        'base' AS blockchain,
+        block_number,
+        block_timestamp,
+        tx_hash,
+        contract_address AS pool_address,
+        recipient,
+        sender,
+        fee,
+        tick,
+        tick_spacing,
+        liquidity,
+        event_index,
+        token0_address,
+        token1_address,
+        _log_id,
+        _inserted_timestamp,
+        origin_function_signature,
+        origin_from_address,
+        origin_to_address,
+        amount0_unadj,
+        amount1_unadj
+    FROM
+        base_swaps
+        INNER JOIN pool_data
+        ON pool_data.pool_address = base_swaps.contract_address
 )
 SELECT
-    block_number,
-    block_timestamp,
-    origin_function_signature,
-    origin_from_address,
-    origin_to_address,
-    tx_hash,
-    event_index,
-    contract_address,
-    origin_from_address AS sender,
-    tx_to,
-    amountIn AS amount_in_unadj,
-    amountOut AS amount_out_unadj,
-    tokenIn AS token_in,
-    tokenOut AS token_out,
-    token0,
-    token1,
-    'Swap' AS event_name,
-    'sushiswap' AS platform,
-    _log_id,
-    _inserted_timestamp
+    *
 FROM
-    swaps_base
+    FINAL qualify(ROW_NUMBER() over(PARTITION BY _log_id
+ORDER BY
+    _inserted_timestamp DESC)) = 1
