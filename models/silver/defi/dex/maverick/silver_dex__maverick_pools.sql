@@ -47,7 +47,7 @@ WITH pools AS (
     FROM
         {{ ref ('silver__logs') }}
     WHERE
-        contract_address = '0xB2855783a346735e4AAe0c1eb894DEf861Fa9b45'
+        contract_address = '0xb2855783a346735e4aae0c1eb894def861fa9b45'
         AND topics [0] :: STRING = '0x9b3fb3a17b4e94eb4d1217257372dcc712218fcd4bc1c28482bd8a6804a7c775'
 
 {% if is_incremental() %}
