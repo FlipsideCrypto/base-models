@@ -85,11 +85,37 @@ sushi AS (
     tick_spacing,
     token0_address AS token0,
     token1_address AS token1,
-    'sushi' AS platform,
+    'sushiswap' AS platform,
     _id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__sushi_pools') }}
+
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 1
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+maverick AS (
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL as pool_name,
+    tokenA AS token0,
+    tokenB AS token1,
+    'maverick' AS platform,
+    _log_id AS _id,
+    _inserted_timestamp
+FROM
+    {{ ref('silver_dex__maverick_pools') }}
 
 {% if is_incremental() %}
 WHERE
@@ -117,6 +143,7 @@ SELECT
     _inserted_timestamp
 FROM
     {{ ref('silver_dex__swapbased_pools') }}
+
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -143,6 +170,7 @@ SELECT
     _inserted_timestamp
 FROM
     {{ ref('silver_dex__baseswap_pools') }}
+
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -163,6 +191,11 @@ all_pools_standard AS (
     *
   FROM
     swapbased
+  UNION ALL
+  SELECT
+    *
+  FROM
+    maverick
 ),
 all_pools_v3 AS (
   SELECT
@@ -259,7 +292,7 @@ FINAL AS (
         ),
         ' UNI-V3 LP'
       )
-      WHEN platform = 'sushi' THEN CONCAT(
+      WHEN platform = 'sushiswap' THEN CONCAT(
         COALESCE(
           c0.symbol,
           CONCAT(SUBSTRING(token0, 1, 5), '...', SUBSTRING(token0, 39, 42))
@@ -279,7 +312,7 @@ FINAL AS (
           tick_spacing,
           0
         ),
-        ' Sushi LP'
+        ' Sushiswap LP'
       )
     END AS pool_name,
     OBJECT_CONSTRUCT(
