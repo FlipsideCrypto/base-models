@@ -1,7 +1,6 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "pool_address",
-    full_refresh = false,
     tags = ['non_realtime']
 ) }}
 
