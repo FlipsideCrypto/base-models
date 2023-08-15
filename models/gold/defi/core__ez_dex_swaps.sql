@@ -2,8 +2,8 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAPE, MAVERICK',
-    'PURPOSE': 'DEX, SWAPS' }} }
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAP, MAVERICK',
+    'PURPOSE': 'DEX, SWAPS' } } }
 ) }}
 
 SELECT

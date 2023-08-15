@@ -8,7 +8,7 @@ SELECT
     tokens :token0 :: STRING AS token0,
     symbols: token0 :: STRING AS token0_symbol,
     decimals: token0 :: STRING AS token0_decimal
-FROM optimism.defi.dim_dex_liquidity_pools
+FROM base.defi.dim_dex_liquidity_pools
 WHERE token0_decimal = 6
 ;
 

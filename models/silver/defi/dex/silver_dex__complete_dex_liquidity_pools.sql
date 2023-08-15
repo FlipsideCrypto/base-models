@@ -310,7 +310,7 @@ FINAL AS (
           tick_spacing,
           0
         ),
-        ' Sushiswap LP'
+        ' SLP'
       )
     END AS pool_name,
     OBJECT_CONSTRUCT(
