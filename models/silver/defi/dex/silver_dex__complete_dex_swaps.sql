@@ -8,10 +8,10 @@
 WITH contracts AS (
 
   SELECT
-    contract_address as address,
-    token_symbol as symbol,
-    token_name as name,
-    token_decimals as decimals
+    contract_address AS address,
+    token_symbol AS symbol,
+    token_name AS NAME,
+    token_decimals AS decimals
   FROM
     {{ ref('silver__contracts') }}
 ),
@@ -753,5 +753,6 @@ SELECT
   f._inserted_timestamp
 FROM
   FINAL f
-LEFT JOIN {{ ref('silver_dex__complete_dex_liquidity_pools') }} p
+  LEFT JOIN {{ ref('silver_dex__complete_dex_liquidity_pools') }}
+  p
   ON f.contract_address = p.pool_address

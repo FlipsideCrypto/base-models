@@ -6,7 +6,7 @@
 
 WITH pool_creation AS (
 
-    SELECT 
+    SELECT
         block_number,
         block_timestamp,
         tx_hash,
@@ -41,7 +41,7 @@ AND pool_address NOT IN (
         {{ this }}
 )
 {% endif %}
-) 
+)
 SELECT
     block_number,
     block_timestamp,

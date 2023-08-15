@@ -16,8 +16,7 @@ WITH contracts AS (
     {{ ref('silver__contracts') }}
 ),
 balancer AS (
-
-SELECT
+  SELECT
     block_number,
     block_timestamp,
     tx_hash,
@@ -35,8 +34,9 @@ SELECT
     token5,
     token6,
     token7
-FROM
+  FROM
     {{ ref('silver_dex__balancer_pools') }}
+
 {% if is_incremental() %}
 WHERE
   _inserted_timestamp >= (
@@ -102,19 +102,19 @@ WHERE
 {% endif %}
 ),
 maverick AS (
-SELECT
+  SELECT
     block_number,
     block_timestamp,
     tx_hash,
     contract_address,
     pool_address,
-    NULL as pool_name,
+    NULL AS pool_name,
     tokenA AS token0,
     tokenB AS token1,
     'maverick' AS platform,
     _log_id AS _id,
     _inserted_timestamp
-FROM
+  FROM
     {{ ref('silver_dex__maverick_pools') }}
 
 {% if is_incremental() %}
@@ -128,20 +128,19 @@ WHERE
 {% endif %}
 ),
 swapbased AS (
-
-SELECT
+  SELECT
     block_number,
     block_timestamp,
     tx_hash,
     contract_address,
     pool_address,
-    NULL as pool_name,
+    NULL AS pool_name,
     token0,
     token1,
     'swapbased' AS platform,
     _log_id AS _id,
     _inserted_timestamp
-FROM
+  FROM
     {{ ref('silver_dex__swapbased_pools') }}
 
 {% if is_incremental() %}
@@ -155,20 +154,19 @@ WHERE
 {% endif %}
 ),
 baseswap AS (
-
-SELECT
+  SELECT
     block_number,
     block_timestamp,
     tx_hash,
     contract_address,
     pool_address,
-    NULL as pool_name,
+    NULL AS pool_name,
     token0,
     token1,
     'baseswap' AS platform,
     _log_id AS _id,
     _inserted_timestamp
-FROM
+  FROM
     {{ ref('silver_dex__baseswap_pools') }}
 
 {% if is_incremental() %}

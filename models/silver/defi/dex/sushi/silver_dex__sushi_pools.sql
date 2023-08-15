@@ -29,8 +29,8 @@ WITH created_pools AS (
     FROM
         {{ ref('silver__logs') }}
     WHERE
-        topics [0] = '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118' AND 
-        contract_address = '0xc35dadb65012ec5796536bd9864ed8773abc74c4'
+        topics [0] = '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118'
+        AND contract_address = '0xc35dadb65012ec5796536bd9864ed8773abc74c4'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -96,7 +96,6 @@ FINAL AS (
         LEFT JOIN initial_info i
         ON p.pool_address = i.contract_address
 )
-
 SELECT
     *
 FROM
