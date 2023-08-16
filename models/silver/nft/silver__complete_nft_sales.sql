@@ -48,6 +48,68 @@ WHERE
     )
 {% endif %}
 ),
+prices_raw AS (
+    SELECT
+        HOUR,
+        symbol,
+        token_address,
+        decimals,
+        price AS hourly_prices
+    FROM
+        {{ ref('core__fact_hourly_token_prices') }}
+    WHERE
+        token_address IN (
+            SELECT
+                DISTINCT currency_address
+            FROM
+                nft_base_models
+        )
+        AND HOUR :: DATE IN (
+            SELECT
+                DISTINCT block_timestamp :: DATE
+            FROM
+                nft_base_models
+        )
+
+{% if is_incremental() %}
+AND HOUR >= (
+    SELECT
+        MAX(_inserted_timestamp) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+),
+all_prices AS (
+    SELECT
+        HOUR,
+        symbol,
+        token_address,
+        decimals,
+        hourly_prices
+    FROM
+        prices_raw
+    UNION ALL
+    SELECT
+        HOUR,
+        'ETH' AS symbol,
+        'ETH' AS token_address,
+        decimals,
+        hourly_prices
+    FROM
+        prices_raw
+    WHERE
+        token_address = '0x4200000000000000000000000000000000000006'
+),
+eth_price AS (
+    SELECT
+        HOUR,
+        hourly_prices AS eth_price_hourly
+    FROM
+        prices_raw
+    WHERE
+        token_address = '0x4200000000000000000000000000000000000006'
+),
 final_base AS (
     SELECT
         block_number,
@@ -73,7 +135,6 @@ final_base AS (
         CASE
             WHEN currency_address IN (
                 'ETH',
-                '0x4200000000000000000000000000000000000042',
                 '0x4200000000000000000000000000000000000006'
             ) THEN total_price_raw / pow(
                 10,
@@ -89,7 +150,6 @@ final_base AS (
         CASE
             WHEN currency_address IN (
                 'ETH',
-                '0x4200000000000000000000000000000000000042',
                 '0x4200000000000000000000000000000000000006'
             ) THEN total_fees_raw / pow(
                 10,
@@ -105,7 +165,6 @@ final_base AS (
         CASE
             WHEN currency_address IN (
                 'ETH',
-                '0x4200000000000000000000000000000000000042',
                 '0x4200000000000000000000000000000000000006'
             ) THEN platform_fee_raw / pow(
                 10,
@@ -121,7 +180,6 @@ final_base AS (
         CASE
             WHEN currency_address IN (
                 'ETH',
-                '0x4200000000000000000000000000000000000042',
                 '0x4200000000000000000000000000000000000006'
             ) THEN creator_fee_raw / pow(
                 10,
@@ -196,8 +254,8 @@ label_fill_sales AS (
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        input_data,
         nft_log_id,
+        input_data,
         _log_id,
         GREATEST(
             t._inserted_timestamp,

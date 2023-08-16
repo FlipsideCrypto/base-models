@@ -19,4 +19,3 @@ SELECT
     erc1155_value
 FROM
     {{ ref('silver__nft_transfers') }}
-    LEFT JOIN {{ ref('silver__contracts') }} USING (contract_address)
