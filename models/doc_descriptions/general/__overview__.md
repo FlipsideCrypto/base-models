@@ -20,6 +20,7 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Dimensional Tables**
 - [dim_labels](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__dim_labels)
+- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__dim_dex_liquidity_pools)
 
 **Fact Tables:**
 - [fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_blocks)
@@ -32,6 +33,7 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Convenience Tables:**
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_decoded_event_logs)
+- [ez_dex_swaps](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_dex_swaps)
 
 ## **Helpful User-Defined Functions (UDFs)**
 
