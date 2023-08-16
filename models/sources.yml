@@ -26,12 +26,24 @@ sources:
     schema: streamline
     tables:
       - name: node_mapping
+  - name: crosschain
+    database: crosschain
+    schema: core
+    tables:
+      - name: address_labels
+      - name: ez_hourly_prices
   - name: silver_crosschain
     database: crosschain
     schema: silver
     tables:
       - name: number_sequence
       - name: apis_keys
+      - name: asset_metadata_coin_gecko
+      - name: asset_metadata_coin_market_cap
+      - name: hourly_prices_coin_gecko
+      - name: hourly_prices_coin_market_cap
+      - name: token_prices_priority_hourly
+      - name: asset_metadata_priority
   - name: ethereum_silver
     database: ethereum
     schema: silver
@@ -47,3 +59,13 @@ sources:
     schema: crosschain
     tables:
       - name: node_mapping
+  - name: base_silver
+    database: base
+    schema: silver
+    tables:
+      - name: verified_abis
+  - name: base_bronze_api
+    database: base
+    schema: bronze_api
+    tables:
+      - name: contract_abis
