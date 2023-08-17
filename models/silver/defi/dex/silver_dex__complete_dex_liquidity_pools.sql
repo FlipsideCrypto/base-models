@@ -74,6 +74,33 @@ WHERE
   )
 {% endif %}
 ),
+dackieswap AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    fee,
+    tick_spacing,
+    token0_address AS token0,
+    token1_address AS token1,
+    'dackieswap' AS platform,
+    _id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__dackie_pools') }}
+
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 1
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 sushi AS (
   SELECT
     block_number,
@@ -205,6 +232,11 @@ all_pools_v3 AS (
     *
   FROM
     sushi
+  UNION ALL
+  SELECT
+    *
+  FROM
+    dackieswap
 ),
 all_pools_other AS (
   SELECT
@@ -311,6 +343,28 @@ FINAL AS (
           0
         ),
         ' SLP'
+      )
+      WHEN platform = 'dackieswap' THEN CONCAT(
+        COALESCE(
+          c0.symbol,
+          CONCAT(SUBSTRING(token0, 1, 5), '...', SUBSTRING(token0, 39, 42))
+        ),
+        '-',
+        COALESCE(
+          c1.symbol,
+          CONCAT(SUBSTRING(token1, 1, 5), '...', SUBSTRING(token1, 39, 42))
+        ),
+        ' ',
+        COALESCE(
+          fee,
+          0
+        ),
+        ' ',
+        COALESCE(
+          tick_spacing,
+          0
+        ),
+        ' DLP'
       )
     END AS pool_name,
     OBJECT_CONSTRUCT(
