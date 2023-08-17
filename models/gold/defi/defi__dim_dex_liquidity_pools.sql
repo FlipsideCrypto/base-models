@@ -5,7 +5,7 @@
     meta={
     'database_tags':{
         'table': {
-            'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAP, MAVERICK',
+            'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAP, MAVERICK, DACKIE, WOOFI',
             'PURPOSE': 'DEX, LIQUIDITY, POOLS, LP, SWAPS',
             }
         }

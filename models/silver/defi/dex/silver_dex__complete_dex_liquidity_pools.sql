@@ -74,6 +74,33 @@ WHERE
   )
 {% endif %}
 ),
+dackieswap AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    fee,
+    tick_spacing,
+    token0_address AS token0,
+    token1_address AS token1,
+    'dackieswap' AS platform,
+    _id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__dackie_pools') }}
+
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 1
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 sushi AS (
   SELECT
     block_number,
