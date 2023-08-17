@@ -61,9 +61,9 @@ WITH router_swaps_base AS (
             '0x9aed3a8896a85fe9a8cac52c9b402d092b629a30',
             '0xd2635bc7e4e4f63b2892ed80d0b0f9dff7eda899',
             --v2
-            '0xb130a49065178465931d4f887056328cea5d723f'
+            '0x27425e9fb6a9a625e8484cfd9620851d1fa322e5'
         ) --v3
-        AND topics [0] :: STRING = '0x0e8e403c2d36126272b08c75823e988381d9dc47f2f0a9a080d95f891d95c469' --WooRouterSwap
+        AND topics [0] :: STRING = '0x27c98e911efdd224f4002f6cd831c3ad0d2759ee176f9ee8466d95826af22a1c' --WooRouterSwap
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -127,7 +127,7 @@ swaps_base AS (
             '0xeff23b4be1091b53205e35f3afcd9c7182bf3062',
             '0xb89a33227876aef02a7ebd594af9973aece2f521',
             '0x8693f9701d6db361fe9cc15bc455ef4366e39ae0',
-            '0x1f79f8a65e02f8a137ce7f79c038cc44332df448'
+            '0xb130a49065178465931d4f887056328cea5d723f'
         )
         AND topics [0] :: STRING IN (
             '0x74ef34e2ea7c5d9f7b7ed44e97ad44b4303416c3a660c3fb5b3bdb95a1d6abd3',
@@ -167,7 +167,6 @@ SELECT
         ELSE to_token
     END AS token_out,
     to_address AS tx_to,
-    swapType AS swap_type,
     fromAmount AS amount_in_unadj,
     toAmount AS amount_out_unadj,
     from_address AS sender,
@@ -197,7 +196,6 @@ SELECT
         ELSE to_token
     END AS token_out,
     to_address AS tx_to,
-    NULL AS swap_type,
     fromAmount AS amount_in_unadj,
     toAmount AS amount_out_unadj,
     from_address AS sender,

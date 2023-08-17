@@ -339,6 +339,28 @@ FINAL AS (
         ),
         ' SLP'
       )
+      WHEN platform = 'dackieswap' THEN CONCAT(
+        COALESCE(
+          c0.symbol,
+          CONCAT(SUBSTRING(token0, 1, 5), '...', SUBSTRING(token0, 39, 42))
+        ),
+        '-',
+        COALESCE(
+          c1.symbol,
+          CONCAT(SUBSTRING(token1, 1, 5), '...', SUBSTRING(token1, 39, 42))
+        ),
+        ' ',
+        COALESCE(
+          fee,
+          0
+        ),
+        ' ',
+        COALESCE(
+          tick_spacing,
+          0
+        ),
+        ' DLP'
+      )
     END AS pool_name,
     OBJECT_CONSTRUCT(
       'token0',
