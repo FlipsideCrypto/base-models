@@ -232,6 +232,11 @@ all_pools_v3 AS (
     *
   FROM
     sushi
+  UNION ALL
+  SELECT
+    *
+  FROM
+    dackieswap
 ),
 all_pools_other AS (
   SELECT
