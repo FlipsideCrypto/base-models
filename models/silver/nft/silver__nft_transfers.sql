@@ -84,10 +84,8 @@ transfer_singles AS (
         utils.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: STRING AS token_id,
-        (
-            utils.udf_hex_to_int(
-                segmented_data [1] :: STRING
-            )
+        utils.udf_hex_to_int(
+            segmented_data [1] :: STRING
         ) :: STRING AS erc1155_value,
         TO_TIMESTAMP_NTZ(_inserted_timestamp) AS _inserted_timestamp,
         event_index
@@ -95,6 +93,7 @@ transfer_singles AS (
         base
     WHERE
         topics [0] :: STRING = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62'
+        AND to_address IS NOT NULL
 ),
 transfer_batch_raw AS (
     SELECT
@@ -107,10 +106,8 @@ transfer_batch_raw AS (
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS from_address,
         CONCAT('0x', SUBSTR(topics [3] :: STRING, 27, 40)) AS to_address,
         contract_address,
-        (
-            utils.udf_hex_to_int(
-                segmented_data [2] :: STRING
-            )
+        utils.udf_hex_to_int(
+            segmented_data [2] :: STRING
         ) AS tokenid_length,
         tokenid_length AS quantity_length,
         _log_id,
@@ -119,6 +116,7 @@ transfer_batch_raw AS (
         base
     WHERE
         topics [0] :: STRING = '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb'
+        AND to_address IS NOT NULL
 ),
 flattened AS (
     SELECT
