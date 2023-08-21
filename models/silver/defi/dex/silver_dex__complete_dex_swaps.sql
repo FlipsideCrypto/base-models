@@ -21,7 +21,7 @@ prices AS (
     token_address,
     price
   FROM
-    {{ ref('core__ez_hourly_token_prices') }}
+    {{ ref('price__ez_hourly_token_prices') }}
   WHERE
     token_address IN (
       SELECT

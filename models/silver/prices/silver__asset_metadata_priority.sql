@@ -24,7 +24,7 @@ FROM
     p
     LEFT JOIN {{ ref('silver__contracts') }} C
     ON LOWER(
-        C.address
+        C.contract_address
     ) = p.token_address
 WHERE
     1 = 1

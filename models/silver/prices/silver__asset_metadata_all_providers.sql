@@ -19,7 +19,7 @@ FROM
     p
     LEFT JOIN {{ ref('silver__contracts') }} C
     ON LOWER(
-        C.address
+        C.contract_address
     ) = p.token_address
 WHERE
     1 = 1
@@ -35,6 +35,6 @@ AND p._inserted_timestamp >= (
 )
 {% endif %}
 
-qualify(ROW_NUMBER() over (PARTITION BY token_address, id, COALESCE(C.token_symbol, s.symbol), provider
+qualify(ROW_NUMBER() over (PARTITION BY token_address, id, COALESCE(C.token_symbol, p.symbol), provider
 ORDER BY
     p._inserted_timestamp DESC)) = 1

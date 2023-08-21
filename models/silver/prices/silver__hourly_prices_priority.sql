@@ -22,7 +22,7 @@ FROM
     m
     ON p.token_address = m.token_address
     LEFT JOIN {{ ref('silver__contracts') }} C
-    ON p.token_address = C.address
+    ON p.token_address = C.contract_address
 WHERE
     1 = 1
 
