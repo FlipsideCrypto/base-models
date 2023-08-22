@@ -31,8 +31,6 @@ sources:
     database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
     schema: core
     tables:
-      - name: address_labels
-      - name: ez_hourly_prices
       - name: dim_labels
       - name: ez_hourly_token_prices
   - name: silver_crosschain
