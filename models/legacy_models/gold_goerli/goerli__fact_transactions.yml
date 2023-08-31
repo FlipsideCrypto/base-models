@@ -1,4 +1,4 @@
 version: 2
 models:
   - name: goerli__fact_transactions
-    description: Deprecating soon. Please migrate your queries to mainnet.
+    description: Deprecating soon. Please migrate your queries to mainnet prior to the Sept. 13th deprecation date.
