@@ -1,12 +1,10 @@
-
 WITH pools AS (
-
     SELECT
         pool_address,
         token0,
         token1
     FROM
-        {{ref('silver_dex__aerodrome_pools')}}
+        {{ ref('silver_dex__aerodrome_pools') }}
 ),
 swaps_base AS (
     SELECT
