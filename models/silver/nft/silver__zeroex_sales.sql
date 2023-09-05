@@ -176,6 +176,17 @@ eth_transfers_raw AS (
         AND from_address = '0xdef1c0ded9bec7f1a1670819833240f027b25eff'
         AND trace_status = 'SUCCESS'
         AND eth_value > 0
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        ) :: DATE - 1
+    FROM
+        {{ this }}
+)
+{% endif %}
 ),
 logs_eth_raw AS (
     SELECT
