@@ -256,8 +256,7 @@ LEFT JOIN function_sigs USING(function_sig)
 WHERE function_name IN ('coins','base_coins','underlying_coins')
     AND read_result IS NOT NULL
     
-)
-,
+),
 
 pool_details AS (
 

@@ -15,6 +15,72 @@ WITH contracts AS (
   FROM
     {{ ref('silver__contracts') }}
 ),
+curve AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    deployer_address AS contract_address,
+    pool_address,
+    pool_name,
+    'curve' AS platform,
+    _call_id AS _id,
+    _inserted_timestamp,
+    MAX(
+      CASE
+        WHEN token_num = 1 THEN token_address
+      END
+    ) AS token0,
+    MAX(
+      CASE
+        WHEN token_num = 2 THEN token_address
+      END
+    ) AS token1,
+    MAX(
+      CASE
+        WHEN token_num = 3 THEN token_address
+      END
+    ) AS token2,
+    MAX(
+      CASE
+        WHEN token_num = 4 THEN token_address
+      END
+    ) AS token3,
+    MAX(
+      CASE
+        WHEN token_num = 5 THEN token_address
+      END
+    ) AS token4,
+    MAX(
+      CASE
+        WHEN token_num = 6 THEN token_address
+      END
+    ) AS token5,
+    MAX(
+      CASE
+        WHEN token_num = 7 THEN token_address
+      END
+    ) AS token6,
+    MAX(
+      CASE
+        WHEN token_num = 8 THEN token_address
+      END
+    ) AS token7
+  FROM
+    {{ ref('silver_dex__curve_pools') }}
+
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 1
+    FROM
+      {{ this }}
+  )
+{% endif %}
+GROUP BY
+  ALL
+),
 balancer AS (
   SELECT
     block_number,
@@ -180,6 +246,32 @@ WHERE
   )
 {% endif %}
 ),
+aerodrome AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    token0,
+    token1,
+    'aerodrome' AS platform,
+    _log_id AS _id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__aerodrome_pools') }}
+
+{% if is_incremental() %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) :: DATE - 1
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 baseswap AS (
   SELECT
     block_number,
@@ -221,6 +313,11 @@ all_pools_standard AS (
     *
   FROM
     maverick
+  UNION ALL
+  SELECT
+    *
+  FROM
+    aerodrome
 ),
 all_pools_v3 AS (
   SELECT
@@ -243,6 +340,11 @@ all_pools_other AS (
     *
   FROM
     balancer
+  UNION ALL
+  SELECT
+    *
+  FROM
+    curve
 ),
 FINAL AS (
   SELECT
