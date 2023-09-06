@@ -273,11 +273,16 @@ base_sales AS (
         tokenId,
         erc1155_value,
         IFF(
-            currency_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+            currency_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+            OR currency_address = '0x0000000000000000000000000000000000000000',
             'ETH',
             currency_address
-        ) AS currency_address,
-        total_price_raw,
+        ) AS currency_address_raw,
+        IFF(
+            currency_address = '0x0000000000000000000000000000000000000000',
+            0,
+            total_price_raw
+        ) AS total_price_raw,
         COALESCE(
             creator_fee_raw,
             0
@@ -346,7 +351,7 @@ SELECT
     nft_address,
     tokenId,
     erc1155_value,
-    currency_address,
+    currency_address_raw AS currency_address,
     total_price_raw,
     creator_fee_raw,
     platform_fee_raw,
