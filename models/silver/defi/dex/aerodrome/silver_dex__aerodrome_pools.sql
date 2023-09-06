@@ -23,7 +23,7 @@ WITH created_pools AS(
         _log_id,
         _inserted_timestamp
     FROM
-        base_dev.silver.logs
+        {{ ref('silver__logs') }}
     WHERE
         topics [0] = '0x2128d88d14c80cb081c1252a5acff7a264671bf199ce226b53788fb26065005e'
         AND contract_address = '0x420dd381b31aef6683db6b902084cb0ffece40da'
