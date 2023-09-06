@@ -18,7 +18,7 @@ WITH nft_base_models AS (
         seller_address,
         buyer_address,
         nft_address,
-        erc1155_value,
+        erc1155_value :: STRING AS erc1155_value,
         tokenId,
         currency_address,
         total_price_raw,
@@ -35,6 +35,47 @@ WITH nft_base_models AS (
         _inserted_timestamp
     FROM
         {{ ref('silver__seaport_1_5_sales') }}
+
+{% if is_incremental() %}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            ) :: DATE - 1
+        FROM
+            {{ this }}
+    )
+{% endif %}
+UNION ALL
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_type,
+    platform_address,
+    platform_name,
+    platform_exchange_version,
+    seller_address,
+    buyer_address,
+    nft_address,
+    erc1155_value :: STRING AS erc1155_value,
+    tokenId,
+    currency_address,
+    total_price_raw,
+    total_fees_raw,
+    platform_fee_raw,
+    creator_fee_raw,
+    tx_fee,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    input_data,
+    nft_log_id,
+    _log_id,
+    _inserted_timestamp
+FROM
+    {{ ref('silver__zeroex_sales') }}
 
 {% if is_incremental() %}
 WHERE
@@ -70,6 +111,33 @@ prices_raw AS (
             FROM
                 nft_base_models
         )
+        AND token_address != '0x4200000000000000000000000000000000000006'
+
+{% if is_incremental() %}
+AND HOUR >= (
+    SELECT
+        MAX(_inserted_timestamp) :: DATE - 2
+    FROM
+        {{ this }}
+)
+{% endif %}
+),
+eth_price AS (
+    SELECT
+        HOUR,
+        'ETH' AS symbol,
+        'ETH' AS token_address,
+        18 AS decimals,
+        price AS eth_price_hourly
+    FROM
+        {{ ref('silver__hourly_prices_priority_eth') }}
+    WHERE
+        HOUR :: DATE IN (
+            SELECT
+                DISTINCT block_timestamp :: DATE
+            FROM
+                nft_base_models
+        )
 
 {% if is_incremental() %}
 AND HOUR >= (
@@ -92,23 +160,21 @@ all_prices AS (
     UNION ALL
     SELECT
         HOUR,
-        'ETH' AS symbol,
-        'ETH' AS token_address,
+        symbol,
+        token_address,
         decimals,
-        hourly_prices
+        eth_price_hourly
     FROM
-        prices_raw
-    WHERE
-        token_address = '0x4200000000000000000000000000000000000006'
-),
-eth_price AS (
+        eth_price
+    UNION ALL
     SELECT
         HOUR,
-        hourly_prices AS eth_price_hourly
+        'WETH' AS symbol,
+        '0x4200000000000000000000000000000000000006' AS token_address,
+        decimals,
+        eth_price_hourly
     FROM
-        prices_raw
-    WHERE
-        token_address = '0x4200000000000000000000000000000000000006'
+        eth_price
 ),
 final_base AS (
     SELECT
@@ -140,10 +206,10 @@ final_base AS (
                 10,
                 18
             )
-            ELSE COALESCE (total_price_raw / pow(10, decimals), total_price_raw)
+            ELSE COALESCE (total_price_raw / pow(10, p.decimals), total_price_raw)
         END AS price,
         IFF(
-            decimals IS NULL,
+            p.decimals IS NULL,
             0,
             price * hourly_prices
         ) AS price_usd,
@@ -155,10 +221,10 @@ final_base AS (
                 10,
                 18
             )
-            ELSE COALESCE (total_fees_raw / pow(10, decimals), total_fees_raw)
+            ELSE COALESCE (total_fees_raw / pow(10, p.decimals), total_fees_raw)
         END AS total_fees,
         IFF(
-            decimals IS NULL,
+            p.decimals IS NULL,
             0,
             total_fees * hourly_prices
         ) AS total_fees_usd,
@@ -170,10 +236,10 @@ final_base AS (
                 10,
                 18
             )
-            ELSE COALESCE (platform_fee_raw / pow(10, decimals), platform_fee_raw)
+            ELSE COALESCE (platform_fee_raw / pow(10, p.decimals), platform_fee_raw)
         END AS platform_fee,
         IFF(
-            decimals IS NULL,
+            p.decimals IS NULL,
             0,
             platform_fee * hourly_prices
         ) AS platform_fee_usd,
@@ -185,10 +251,10 @@ final_base AS (
                 10,
                 18
             )
-            ELSE COALESCE (creator_fee_raw / pow(10, decimals), creator_fee_raw)
+            ELSE COALESCE (creator_fee_raw / pow(10, p.decimals), creator_fee_raw)
         END AS creator_fee,
         IFF(
-            decimals IS NULL,
+            p.decimals IS NULL,
             0,
             creator_fee * hourly_prices
         ) AS creator_fee_usd,
