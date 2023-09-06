@@ -1,3 +1,10 @@
+{{ config(
+    materialized = 'incremental',
+    unique_key = '_log_id',
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['non_realtime']
+) }}
+
 WITH pools AS (
     SELECT
         pool_address,

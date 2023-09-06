@@ -26,8 +26,8 @@ WITH contract_deployments AS (
         -- curve contract deployers
         from_address IN (
             '0xa5961898870943c68037f6848d2d866ed2016bcb',
-            '0x3093f9B57A428F3EB6285a589cb35bEA6e78c336',
-            '0x5EF72230578b3e399E6C6F4F6360edF95e83BBfd'
+            '0x3093f9b57a428f3eb6285a589cb35bea6e78c336',
+            '0x5ef72230578b3e399e6c6f4f6360edf95e83bbfd'
         )
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
