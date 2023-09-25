@@ -7,17 +7,46 @@
     tags = ['streamline_core_realtime']
 ) }}
 
-WITH blocks AS (
+WITH last_3_days AS (
 
     SELECT
         block_number
     FROM
+        {{ ref("_block_lookback") }}
+),
+blocks AS (
+    SELECT
+        block_number
+    FROM
         {{ ref("streamline__blocks") }}
+    WHERE
+        (
+            block_number >= (
+                SELECT
+                    block_number
+                FROM
+                    last_3_days
+            )
+        )
     EXCEPT
     SELECT
         block_number
     FROM
         {{ ref("streamline__complete_debug_traceBlockByNumber") }}
+    WHERE
+        (
+            block_number >= (
+                SELECT
+                    block_number
+                FROM
+                    last_3_days
+            )
+        )
+        AND _inserted_timestamp >= DATEADD(
+            'day',
+            -4,
+            SYSDATE()
+        )
 ),
 all_blocks AS (
     SELECT
@@ -67,3 +96,5 @@ FROM
     all_blocks
 ORDER BY
     block_number ASC
+LIMIT
+    10000

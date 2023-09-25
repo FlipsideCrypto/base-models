@@ -37,7 +37,6 @@ sources:
     database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
     schema: silver
     tables:
-      - name: number_sequence
       - name: apis_keys
       - name: asset_metadata_coin_gecko
       - name: asset_metadata_coin_market_cap
