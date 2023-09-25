@@ -79,4 +79,4 @@ FROM
 ORDER BY
     block_number ASC
 LIMIT
-    3600
+    20000

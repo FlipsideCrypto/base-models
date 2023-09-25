@@ -105,4 +105,4 @@ FROM
 ORDER BY
     block_number ASC
 LIMIT
-    1800
+    10000
