@@ -12,6 +12,12 @@ WITH last_3_days AS (
     SELECT
         block_number
     FROM
+        {{ ref("_block_lookback") }}
+),
+last_3_days AS (
+    SELECT
+        block_number
+    FROM
         {{ ref("_max_block_by_date") }}
         qualify ROW_NUMBER() over (
             ORDER BY
@@ -32,6 +38,12 @@ tbl AS (
                     last_3_days
             )
         )
+        AND block_number >= (
+            SELECT
+                block_number
+            FROM
+                last_3_days
+        )
     EXCEPT
     SELECT
         block_number
@@ -50,6 +62,12 @@ tbl AS (
             'day',
             -4,
             SYSDATE()
+        )
+        AND block_number >= (
+            SELECT
+                block_number
+            FROM
+                last_3_days
         )
 )
 SELECT
