@@ -1,6 +1,7 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'nft_log_id',
+    incremental_strategy = 'delete+insert',
+    unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
     tags = ['non_realtime']
 ) }}
@@ -31,8 +32,8 @@ raw_decoded_logs AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+                _inserted_timestamp
+            ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -91,8 +92,8 @@ raw_logs AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+                _inserted_timestamp
+            ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -1657,8 +1658,8 @@ mao_orderhash AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+                _inserted_timestamp
+            ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -1700,8 +1701,8 @@ nft_transfer_operator AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-            _inserted_timestamp
-        ) :: DATE - 1
+                _inserted_timestamp
+            ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
