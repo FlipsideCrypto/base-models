@@ -19,6 +19,7 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Core Tables
 
 **Dimensional Tables**
+- [dim_contracts](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__dim_contracts)
 - [dim_labels](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__dim_labels)
 
 **Fact Tables:**
@@ -31,6 +32,8 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Convenience Tables:**
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_decoded_event_logs)
+- [ez_eth_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_eth_transfers)
+- [ez_token_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_token_transfers)
 
 ### Price Tables (base.price)
 - [fact_hourly_token_prices](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.price__fact_hourly_token_prices)
