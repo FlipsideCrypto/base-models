@@ -2,6 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
+    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
     cluster_by = ['block_timestamp::DATE']
 ) }}
 
