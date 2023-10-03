@@ -114,15 +114,6 @@ prices_raw AS (
                 nft_base_models
         )
         AND token_address != '0x4200000000000000000000000000000000000006'
-
-{% if is_incremental() %}
-AND HOUR >= (
-    SELECT
-        MAX(_inserted_timestamp) - INTERVAL '36 hours'
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 eth_price AS (
     SELECT
