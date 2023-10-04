@@ -24,6 +24,7 @@ SELECT
     sub_traces,
     trace_status,
     error_reason,
-    trace_index
+    trace_index,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__traces') }}

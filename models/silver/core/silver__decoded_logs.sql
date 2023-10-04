@@ -192,7 +192,8 @@ SELECT
     DATA,
     event_removed,
     tx_status,
-    is_pending
+    is_pending,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     new_records
 
@@ -217,7 +218,8 @@ SELECT
     DATA,
     event_removed,
     tx_status,
-    is_pending
+    is_pending,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     missing_data
 {% endif %}

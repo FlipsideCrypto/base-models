@@ -82,7 +82,8 @@ SELECT
         2
     ) AS amount_usd,
     _call_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     eth_base A
     LEFT JOIN {{ ref('silver__hourly_prices_priority_eth') }}

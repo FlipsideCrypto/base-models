@@ -404,7 +404,8 @@ SELECT
     event_type,
     token_transfer_type,
     _log_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     final_base qualify ROW_NUMBER() over (
         PARTITION BY _log_id

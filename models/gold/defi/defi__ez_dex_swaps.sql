@@ -28,6 +28,7 @@ SELECT
     token_out,
     symbol_in,
     symbol_out,
-    _log_id
+    _log_id,
+    _last_modified_timestamp
 FROM
     {{ ref('silver_dex__complete_dex_swaps') }}

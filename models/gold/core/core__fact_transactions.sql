@@ -43,7 +43,8 @@ SELECT
     tx_status AS status,
     r,
     s,
-    v
+    v,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}

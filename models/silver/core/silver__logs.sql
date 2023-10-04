@@ -176,7 +176,8 @@ FROM
 {% endif %}
 )
 SELECT
-    *
+    *,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     FINAL qualify(ROW_NUMBER() over (PARTITION BY block_number, event_index
 ORDER BY

@@ -60,7 +60,8 @@ SELECT
         transactions_root,
         'uncles',
         uncles
-    ) AS block_header_json
+    ) AS block_header_json,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__tx_count') }}

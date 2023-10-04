@@ -54,7 +54,8 @@ SELECT
     raw_amount,
     _inserted_timestamp,
     event_index,
-    raw_amount_precise
+    raw_amount_precise,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     logs
 WHERE

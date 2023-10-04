@@ -10,6 +10,7 @@ SELECT
     symbol,
     NAME,
     decimals,
-    provider
+    provider,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__asset_metadata_all_providers') }}

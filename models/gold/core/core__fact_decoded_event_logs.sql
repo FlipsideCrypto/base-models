@@ -12,6 +12,7 @@ SELECT
     contract_address,
     event_name,
     decoded_flat AS decoded_log,
-    decoded_data AS full_decoded_log
+    decoded_data AS full_decoded_log,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__decoded_logs') }}

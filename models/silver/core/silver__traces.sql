@@ -392,7 +392,8 @@ SELECT
     utils.udf_decimal_adjust(
         eth_value_precise_raw,
         18
-    ) AS eth_value_precise
+    ) AS eth_value_precise,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     FINAL qualify(ROW_NUMBER() over(PARTITION BY block_number, tx_position, trace_index
 ORDER BY

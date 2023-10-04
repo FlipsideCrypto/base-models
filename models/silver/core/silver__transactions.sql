@@ -375,7 +375,8 @@ SELECT
     tx_fee_precise,
     tx_type,
     _inserted_timestamp,
-    DATA
+    DATA,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     FINAL
 WHERE

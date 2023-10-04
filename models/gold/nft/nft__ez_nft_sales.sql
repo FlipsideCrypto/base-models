@@ -31,6 +31,7 @@ SELECT
     creator_fee_usd,
     origin_from_address,
     origin_to_address,
-    origin_function_signature
+    origin_function_signature,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__complete_nft_sales') }}

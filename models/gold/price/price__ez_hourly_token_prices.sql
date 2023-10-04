@@ -10,6 +10,7 @@ SELECT
     symbol,
     decimals,
     price,
-    is_imputed
+    is_imputed,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__hourly_prices_priority') }}

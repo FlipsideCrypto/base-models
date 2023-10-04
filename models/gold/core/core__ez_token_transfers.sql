@@ -39,7 +39,8 @@ SELECT
         WHEN price IS NULL THEN 'false'
         ELSE 'true'
     END AS has_price,
-    _log_id
+    _log_id,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('core__fact_token_transfers') }}
     t

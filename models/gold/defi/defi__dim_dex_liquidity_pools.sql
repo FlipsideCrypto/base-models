@@ -22,6 +22,7 @@ SELECT
     pool_name,
     tokens,
     symbols,
-    decimals
+    decimals,
+    _last_modified_timestamp
 FROM
     {{ ref('silver_dex__complete_dex_liquidity_pools') }}

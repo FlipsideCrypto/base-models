@@ -14,7 +14,8 @@ SELECT
     token_name AS NAME,
     token_decimals AS decimals,
     provider,
-    p._inserted_timestamp
+    p._inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('bronze__asset_metadata_all_providers') }}
     p

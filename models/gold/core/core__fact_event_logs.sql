@@ -17,6 +17,7 @@ SELECT
     DATA,
     event_removed,
     tx_status,
-    _log_id
+    _log_id,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__logs') }}

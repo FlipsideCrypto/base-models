@@ -14,7 +14,8 @@ SELECT
         C.token_symbol,
         m.symbol
     ) AS symbol,
-    C.token_decimals AS decimals
+    C.token_decimals AS decimals,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('bronze__hourly_prices_priority') }}
     p

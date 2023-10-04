@@ -2,7 +2,8 @@
   materialized = 'incremental',
   unique_key = "_log_id",
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime']
+  tags = ['non_realtime'],
+  on_schema_change = 'append_new_columns'
 ) }}
 
 WITH contracts AS (
@@ -1159,7 +1160,8 @@ SELECT
   symbol_in,
   symbol_out,
   f._log_id,
-  f._inserted_timestamp
+  f._inserted_timestamp,
+  SYSDATE() AS _last_modified_timestamp
 FROM
   FINAL f
   LEFT JOIN {{ ref('silver_dex__complete_dex_liquidity_pools') }}

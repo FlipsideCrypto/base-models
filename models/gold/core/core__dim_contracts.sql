@@ -12,7 +12,11 @@ SELECT
     c0.block_number AS created_block_number,
     c0.block_timestamp AS created_block_timestamp,
     c0.tx_hash AS created_tx_hash,
-    c0.creator_address AS creator_address
+    c0.creator_address AS creator_address,
+    GREATEST(
+        c0._last_modified_timestamp,
+        c1._last_modified_timestamp
+    ) AS _last_modified_timestamp
 FROM
     {{ ref('silver__created_contracts') }}
     c0

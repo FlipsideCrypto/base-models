@@ -13,7 +13,8 @@ SELECT
     label_type,
     label_subtype,
     address_name,
-    project_name
+    project_name,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('bronze__labels') }}
 WHERE

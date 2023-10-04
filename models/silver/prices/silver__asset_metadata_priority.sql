@@ -11,14 +11,15 @@ SELECT
         C.token_symbol,
         p.symbol
     ) AS symbol,
-    C.token_name AS name,
+    C.token_name AS NAME,
     C.token_decimals AS decimals,
     p.provider,
     CASE
         WHEN p.provider = 'coingecko' THEN 1
         WHEN p.provider = 'coinmarketcap' THEN 2
     END AS priority,
-    p._inserted_timestamp
+    p._inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('bronze__asset_metadata_priority') }}
     p

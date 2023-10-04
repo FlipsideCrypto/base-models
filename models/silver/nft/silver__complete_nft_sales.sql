@@ -388,7 +388,8 @@ SELECT
     nft_log_id,
     input_data,
     _log_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     final_joins qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
 ORDER BY

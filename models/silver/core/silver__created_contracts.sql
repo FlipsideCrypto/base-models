@@ -11,7 +11,8 @@ SELECT
     to_address AS created_contract_address,
     from_address AS creator_address,
     input AS created_contract_input,
-    _inserted_timestamp
+    _inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('silver__traces') }}
 WHERE

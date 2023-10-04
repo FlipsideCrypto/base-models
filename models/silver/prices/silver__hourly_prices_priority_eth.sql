@@ -9,7 +9,8 @@ SELECT
     token_address,
     price,
     is_imputed,
-    _inserted_timestamp
+    _inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
     {{ ref('bronze__hourly_prices_priority_eth') }}
 WHERE

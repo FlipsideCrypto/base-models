@@ -9,6 +9,7 @@ SELECT
     id,
     symbol,
     NAME,
-    decimals
+    decimals,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__asset_metadata_priority') }}

@@ -2,7 +2,8 @@
   materialized = 'incremental',
   unique_key = "_id",
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime']
+  tags = ['non_realtime'],
+  on_schema_change = 'append_new_columns'
 ) }}
 
 WITH contracts AS (
@@ -625,6 +626,7 @@ SELECT
   symbols,
   decimals,
   _id,
-  _inserted_timestamp
+  _inserted_timestamp,
+  SYSDATE() AS _last_modified_timestamp
 FROM
   FINAL

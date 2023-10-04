@@ -47,7 +47,8 @@ SELECT
     ) :: INT AS total_difficulty,
     DATA :transactionsRoot :: STRING AS transactions_root,
     DATA :uncles AS uncles,
-    _inserted_timestamp
+    _inserted_timestamp,
+    SYSDATE() AS _last_modified_timestamp
 FROM
 
 {% if is_incremental() %}

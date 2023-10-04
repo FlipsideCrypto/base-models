@@ -9,6 +9,7 @@ SELECT
     token_address,
     price,
     is_imputed,
-    provider
+    provider,
+    _last_modified_timestamp
 FROM
     {{ ref('silver__hourly_prices_all_providers') }}

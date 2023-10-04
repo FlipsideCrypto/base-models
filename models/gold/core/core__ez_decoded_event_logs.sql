@@ -20,7 +20,12 @@ SELECT
     topics,
     DATA,
     event_removed,
-    tx_status
+    tx_status,
+    GREATEST(
+        d._last_modified_timestamp,
+        C._last_modified_timestamp
+    ) AS _last_modified_timestamp
 FROM
-    {{ ref('silver__decoded_logs') }} 
-    LEFT JOIN {{ ref('silver__contracts') }} using (contract_address)
+    {{ ref('silver__decoded_logs') }}
+    d
+    LEFT JOIN {{ ref('silver__contracts') }} C USING (contract_address)
