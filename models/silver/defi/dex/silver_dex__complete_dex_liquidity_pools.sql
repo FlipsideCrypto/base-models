@@ -2,8 +2,7 @@
   materialized = 'incremental',
   unique_key = "_id",
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime'],
-  on_schema_change = 'append_new_columns'
+  tags = ['non_realtime']
 ) }}
 
 WITH contracts AS (
