@@ -2,8 +2,8 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
-    post_hook = "{{ fsc_utils.block_reorg(this, 12) }}",
-    cluster_by = ['block_timestamp::DATE']
+    cluster_by = ['block_timestamp::DATE'],
+    tags = ['non_realtime','reorg']
 ) }}
 
 WITH router_swaps_base AS (
