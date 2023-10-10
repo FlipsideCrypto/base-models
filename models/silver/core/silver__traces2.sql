@@ -4,7 +4,8 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = "block_timestamp::date, _inserted_timestamp::date",
-    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION"
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+    tags = ['core','non_realtime']
 ) }}
 
 WITH bronze_traces AS (
@@ -187,14 +188,14 @@ final_traces AS (
         trace_json :error :: STRING AS error_reason,
         trace_json :from :: STRING AS from_address,
         trace_json :to :: STRING AS to_address,
-        utils.udf_decimal_adjust(
+        IFNULL(
             utils.udf_hex_to_int(
-                IFF(
-                    trace_json :value IS NULL,
-                    '0x0',
-                    trace_json :value :: STRING
-                )
+                trace_json :value :: STRING
             ),
+            '0'
+        ) AS eth_value_precise_raw,
+        utils.udf_decimal_adjust(
+            eth_value_precise_raw,
             18
         ) AS eth_value_precise,
         eth_value_precise :: FLOAT AS eth_value,
@@ -234,6 +235,7 @@ new_records AS (
         f.trace_index,
         f.from_address,
         f.to_address,
+        f.eth_value_precise_raw,
         f.eth_value_precise,
         f.eth_value,
         f.gas,
@@ -286,6 +288,7 @@ missing_data AS (
         t.trace_index,
         t.from_address,
         t.to_address,
+        t.eth_value_precise_raw,
         t.eth_value_precise,
         t.eth_value,
         t.gas,
@@ -325,6 +328,7 @@ FINAL AS (
         trace_index,
         from_address,
         to_address,
+        eth_value_precise_raw,
         eth_value_precise,
         eth_value,
         gas,
@@ -354,6 +358,7 @@ SELECT
     trace_index,
     from_address,
     to_address,
+    eth_value_precise_raw,
     eth_value_precise,
     eth_value,
     gas,
@@ -374,7 +379,30 @@ FROM
 {% endif %}
 )
 SELECT
-    *
+    block_number,
+    tx_hash,
+    block_timestamp,
+    tx_status,
+    tx_position,
+    trace_index,
+    from_address,
+    to_address,
+    eth_value_precise,
+    eth_value,
+    gas,
+    gas_used,
+    input,
+    output,
+    TYPE,
+    identifier,
+    sub_traces,
+    error_reason,
+    trace_status,
+    DATA,
+    is_pending,
+    _call_id,
+    _inserted_timestamp,
+    eth_value_precise_raw
 FROM
     FINAL qualify(ROW_NUMBER() over(PARTITION BY block_number, tx_position, trace_index
 ORDER BY
