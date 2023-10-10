@@ -1,8 +1,9 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = "_id",
+  incremental_strategy = 'delete+insert',
+  unique_key = ['block_number','platform','version'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['non_realtime']
+  tags = ['non_realtime','reorg']
 ) }}
 
 WITH contracts AS (
@@ -24,6 +25,7 @@ curve AS (
     pool_address,
     pool_name,
     'curve' AS platform,
+    'v1' AS version,
     _call_id AS _id,
     _inserted_timestamp,
     MAX(
@@ -73,7 +75,7 @@ curve AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -90,6 +92,7 @@ balancer AS (
     pool_address,
     pool_name,
     'balancer' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp,
     token0,
@@ -107,7 +110,7 @@ balancer AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -125,6 +128,7 @@ uni_v3 AS (
     token0_address AS token0,
     token1_address AS token1,
     'uniswap-v3' AS platform,
+    'v3' AS version,
     _id,
     _inserted_timestamp
   FROM
@@ -134,7 +138,7 @@ uni_v3 AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -152,6 +156,7 @@ dackieswap AS (
     token0_address AS token0,
     token1_address AS token1,
     'dackieswap' AS platform,
+    'v1' AS version,
     _id,
     _inserted_timestamp
   FROM
@@ -161,7 +166,7 @@ dackieswap AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -179,6 +184,7 @@ sushi AS (
     token0_address AS token0,
     token1_address AS token1,
     'sushiswap' AS platform,
+    'v1' AS version,
     _id,
     _inserted_timestamp
   FROM
@@ -188,7 +194,7 @@ sushi AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -205,6 +211,7 @@ maverick AS (
     tokenA AS token0,
     tokenB AS token1,
     'maverick' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -214,7 +221,7 @@ maverick AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -231,6 +238,7 @@ swapbased AS (
     token0,
     token1,
     'swapbased' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -240,7 +248,7 @@ swapbased AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -257,6 +265,7 @@ aerodrome AS (
     token0,
     token1,
     'aerodrome' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -266,7 +275,7 @@ aerodrome AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -283,6 +292,7 @@ baseswap AS (
     token0,
     token1,
     'baseswap' AS platform,
+    'v1' AS version,
     _log_id AS _id,
     _inserted_timestamp
   FROM
@@ -292,7 +302,7 @@ baseswap AS (
 WHERE
   _inserted_timestamp >= (
     SELECT
-      MAX(_inserted_timestamp) :: DATE - 1
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
       {{ this }}
   )
@@ -386,6 +396,7 @@ FINAL AS (
       c1.decimals
     ) AS decimals,
     platform,
+    version,
     _id,
     p._inserted_timestamp
   FROM
@@ -488,6 +499,7 @@ FINAL AS (
       c1.decimals
     ) AS decimals,
     platform,
+    version,
     _id,
     p._inserted_timestamp
   FROM
@@ -592,6 +604,7 @@ FINAL AS (
       c7.decimals
     ) AS decimals,
     platform,
+    version,
     _id,
     p._inserted_timestamp
   FROM
@@ -618,6 +631,7 @@ SELECT
   block_timestamp,
   tx_hash,
   platform,
+  version,
   contract_address,
   pool_address,
   pool_name,

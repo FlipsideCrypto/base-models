@@ -1,8 +1,9 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = 'nft_log_id',
+    incremental_strategy = 'delete+insert',
+    unique_key = ['block_number','platform_name','platform_exchange_version'],
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime']
+    tags = ['non_realtime','reorg']
 ) }}
 
 WITH nft_base_models AS (
@@ -42,7 +43,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -83,7 +84,7 @@ WHERE
         SELECT
             MAX(
                 _inserted_timestamp
-            ) :: DATE - 1
+            ) - INTERVAL '36 hours'
         FROM
             {{ this }}
     )
@@ -112,15 +113,6 @@ prices_raw AS (
                 nft_base_models
         )
         AND token_address != '0x4200000000000000000000000000000000000006'
-
-{% if is_incremental() %}
-AND HOUR >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 eth_price AS (
     SELECT
@@ -138,15 +130,6 @@ eth_price AS (
             FROM
                 nft_base_models
         )
-
-{% if is_incremental() %}
-AND HOUR >= (
-    SELECT
-        MAX(_inserted_timestamp) :: DATE - 2
-    FROM
-        {{ this }}
-)
-{% endif %}
 ),
 all_prices AS (
     SELECT
