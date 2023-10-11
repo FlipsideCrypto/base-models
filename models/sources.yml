@@ -67,7 +67,6 @@ sources:
     schema: silver
     tables:
       - name: verified_abis
-      - name: replay_trace_blocks
   - name: base_bronze_api
     database: base
     schema: bronze_api
