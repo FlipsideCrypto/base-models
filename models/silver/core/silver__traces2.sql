@@ -16,17 +16,27 @@ WITH bronze_traces AS (
         DATA :result AS full_traces,
         _inserted_timestamp
     FROM
-        {{ ref('bronze__streamline_FR_traces') }}
-    WHERE
-        block_number IN (
-            SELECT
-                DISTINCT missing_block
-            FROM
-                {{ ref('silver__replay_trace_blocks') }}
-        )
-        AND DATA :result IS NOT NULL qualify(ROW_NUMBER() over (PARTITION BY block_number, tx_position
-    ORDER BY
-        _inserted_timestamp DESC)) = 1
+
+{% if is_incremental() %}
+{{ ref('bronze__streamline_traces') }}
+WHERE
+    _inserted_timestamp >= (
+        SELECT
+            MAX(_inserted_timestamp) _inserted_timestamp
+        FROM
+            {{ this }}
+    )
+    AND DATA :result IS NOT NULL
+{% else %}
+    {{ ref('bronze__streamline_FR_traces') }}
+WHERE
+    _partition_by_block_id <= 2300000
+    AND DATA :result IS NOT NULL
+{% endif %}
+
+qualify(ROW_NUMBER() over (PARTITION BY block_number, tx_position
+ORDER BY
+    _inserted_timestamp DESC)) = 1
 ),
 flatten_traces AS (
     SELECT
