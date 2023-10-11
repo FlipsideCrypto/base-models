@@ -22,7 +22,10 @@ WITH bronze_traces AS (
             SELECT
                 DISTINCT missing_block
             FROM
-                {{ ref('silver__replay_trace_blocks') }}
+                {{ source(
+                    "base_silver",
+                    "replay_trace_blocks"
+                ) }}
         )
         AND DATA :result IS NOT NULL qualify(ROW_NUMBER() over (PARTITION BY block_number, tx_position
     ORDER BY
