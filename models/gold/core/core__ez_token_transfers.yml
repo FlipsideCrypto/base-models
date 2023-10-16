@@ -10,6 +10,8 @@ models:
         description: '{{ doc("base_block_timestamp") }}'
       - name: TX_HASH
         description: '{{ doc("base_transfer_tx_hash") }}'
+      - name: EVENT_INDEX
+        description: '{{ doc("base_event_index") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
         description: '{{ doc("base_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
