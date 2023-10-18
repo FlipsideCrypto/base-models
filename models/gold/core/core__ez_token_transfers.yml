@@ -35,15 +35,13 @@ models:
       - name: AMOUNT_USD
         description: '{{ doc("base_transfer_amount_usd") }}'
       - name: DECIMALS
-        description: 'The number of decimal places this contract needs adjusted where token values exist.'
+        description: '{{ doc("decimals") }}'
       - name: SYMBOL
-        description: 'The symbol belonging to the address of the token.'
+        description: '{{ doc("symbol") }}'
       - name: TOKEN_PRICE
         description: '{{ doc("base_transfer_token_price") }}'
       - name: HAS_DECIMAL
         description: '{{ doc("base_transfer_has_decimal") }}'
-      - name: HAS_SYMBOL
-        description: '{{ doc("base_transfer_has_symbol") }}'
       - name: HAS_PRICE
         description: '{{ doc("base_transfer_has_price") }}'
       - name: _LOG_ID

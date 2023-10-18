@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = ['block_timestamp::DATE', '_inserted_timestamp::DATE'],
-    tags = ['non_realtime','reorg']
+    tags = ['non_realtime','reorg','heal']
 ) }}
 
 WITH logs AS (
@@ -34,13 +34,13 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) - INTERVAL '12 hours'
+        ) - INTERVAL '48 hours'
     FROM
         {{ this }}
 )
 {% endif %}
 ),
-new_records AS (
+token_transfers AS (
     SELECT
         block_number,
         block_timestamp,
@@ -72,9 +72,14 @@ new_records AS (
         C.token_decimals AS decimals,
         C.token_symbol AS symbol,
         price AS token_price,
-        C.token_decimals IS NOT NULL AS has_decimal,
-        C.token_symbol IS NOT NULL AS has_symbol,
-        price IS NOT NULL AS has_price,
+        CASE
+            WHEN C.token_decimals IS NULL THEN 'false'
+            ELSE 'true'
+        END AS has_decimal,
+        CASE
+            WHEN price IS NULL THEN 'false'
+            ELSE 'true'
+        END AS has_price,
         _log_id,
         _inserted_timestamp
     FROM
@@ -93,25 +98,27 @@ new_records AS (
         AND from_address IS NOT NULL
 )
 
-{% if is_incremental() %},
-heal_missing_contracts AS (
+{% if is_incremental() and var(
+    'HEAL_MODEL'
+) %},
+heal_model AS (
     SELECT
-        t.block_number,
-        t.block_timestamp,
-        t.tx_hash,
-        t.event_index,
-        t.origin_function_signature,
-        t.origin_from_address,
-        t.origin_to_address,
-        t.contract_address,
-        t.from_address,
-        t.to_address,
-        t.raw_amount_precise,
-        t.raw_amount,
+        t0.block_number,
+        t0.block_timestamp,
+        t0.tx_hash,
+        t0.event_index,
+        t0.origin_function_signature,
+        t0.origin_from_address,
+        t0.origin_to_address,
+        t0.contract_address,
+        t0.from_address,
+        t0.to_address,
+        t0.raw_amount_precise,
+        t0.raw_amount,
         IFF(
             C.token_decimals IS NOT NULL,
             utils.udf_decimal_adjust(
-                t.raw_amount_precise,
+                t0.raw_amount_precise,
                 C.token_decimals
             ),
             NULL
@@ -119,123 +126,125 @@ heal_missing_contracts AS (
         amount_precise_heal :: FLOAT AS amount_heal,
         IFF(
             C.token_decimals IS NOT NULL
-            AND p.price IS NOT NULL,
+            AND price IS NOT NULL,
             amount_heal * p.price,
             NULL
-        ) AS amount_usd_heal,
+        ) AS amount_usd,
         C.token_decimals AS decimals,
         C.token_symbol AS symbol,
         p.price AS token_price,
-        C.token_decimals IS NOT NULL AS has_decimal,
-        C.token_symbol IS NOT NULL AS has_symbol,
-        p.price IS NOT NULL AS has_price,
-        t._log_id,
-        t._inserted_timestamp
+        CASE
+            WHEN C.token_decimals IS NULL THEN 'false'
+            ELSE 'true'
+        END AS has_decimal,
+        CASE
+            WHEN p.price IS NULL THEN 'false'
+            ELSE 'true'
+        END AS has_price,
+        t0._log_id,
+        t0._inserted_timestamp
     FROM
         {{ this }}
-        t
-        INNER JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+        t0
         LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
         p
-        ON t.contract_address = p.token_address
+        ON t0.contract_address = p.token_address
         AND DATE_TRUNC(
             'hour',
-            t.block_timestamp
+            t0.block_timestamp
         ) = HOUR
+        LEFT JOIN {{ ref('silver__contracts') }} C
+        ON C.contract_address = t0.contract_address
     WHERE
-        t.decimals IS NULL
-        AND C.token_decimals IS NOT NULL
-        AND t._inserted_timestamp < (
+        t0.block_number IN (
             SELECT
-                MAX(
-                    _inserted_timestamp
-                ) - INTERVAL '12 hours'
+                DISTINCT t1.block_number AS block_number
             FROM
                 {{ this }}
+                t1
+            WHERE
+                t1.decimals IS NULL
+                AND _inserted_timestamp < (
+                    SELECT
+                        MAX(
+                            _inserted_timestamp
+                        ) - INTERVAL '24 hours'
+                    FROM
+                        {{ this }}
+                )
+                AND EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        {{ ref('silver__contracts') }} C
+                    WHERE
+                        C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                        AND C.token_decimals IS NOT NULL
+                        AND C.contract_address = t1.contract_address)
+                )
+                OR t0.block_number IN (
+                    SELECT
+                        DISTINCT t2.block_number
+                    FROM
+                        {{ this }}
+                        t2
+                    WHERE
+                        t2.token_price IS NULL
+                        AND _inserted_timestamp < (
+                            SELECT
+                                MAX(
+                                    _inserted_timestamp
+                                ) - INTERVAL '24 hours'
+                            FROM
+                                {{ this }}
+                        )
+                        AND EXISTS (
+                            SELECT
+                                1
+                            FROM
+                                {{ ref('silver__hourly_prices_priority') }}
+                                p
+                            WHERE
+                                p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                                AND p.price IS NOT NULL
+                                AND p.token_address = t2.contract_address
+                                AND p.hour = DATE_TRUNC(
+                                    'hour',
+                                    t2.block_timestamp
+                                )
+                        )
+                )
         )
-),
-heal_missing_prices AS (
+    {% endif %}
     SELECT
-        t.block_number,
-        t.block_timestamp,
-        t.tx_hash,
-        t.event_index,
-        t.origin_function_signature,
-        t.origin_from_address,
-        t.origin_to_address,
-        t.contract_address,
-        t.from_address,
-        t.to_address,
-        t.raw_amount_precise,
-        t.raw_amount,
-        t.amount_precise,
-        t.amount,
-        IFF(
-            t.decimals IS NOT NULL
-            AND p.price IS NOT NULL,
-            t.amount * p.price,
-            NULL
-        ) AS amount_usd_heal,
-        t.decimals,
-        t.symbol,
-        p.price AS token_price,
-        t.decimals IS NOT NULL AS has_decimal,
-        t.symbol IS NOT NULL AS has_symbol,
-        p.price IS NOT NULL AS has_price,
-        t._log_id,
-        t._inserted_timestamp
+        block_number,
+        block_timestamp,
+        tx_hash,
+        event_index,
+        origin_function_signature,
+        origin_from_address,
+        origin_to_address,
+        contract_address,
+        from_address,
+        to_address,
+        raw_amount_precise,
+        raw_amount,
+        amount_precise,
+        amount,
+        amount_usd,
+        decimals,
+        symbol,
+        token_price,
+        has_decimal,
+        has_price,
+        _log_id,
+        _inserted_timestamp
     FROM
-        {{ this }}
-        t
-        INNER JOIN {{ ref('price__ez_hourly_token_prices') }}
-        p
-        ON t.contract_address = p.token_address
-        AND DATE_TRUNC(
-            'hour',
-            t.block_timestamp
-        ) = HOUR
-    WHERE
-        t.decimals IS NOT NULL
-        AND t.token_price IS NULL
-        AND p.price IS NOT NULL
-        AND t._inserted_timestamp < (
-            SELECT
-                MAX(
-                    _inserted_timestamp
-                ) - INTERVAL '12 hours'
-            FROM
-                {{ this }}
-        )
-)
-{% endif %}
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    event_index,
-    origin_function_signature,
-    origin_from_address,
-    origin_to_address,
-    contract_address,
-    from_address,
-    to_address,
-    raw_amount_precise,
-    raw_amount,
-    amount_precise,
-    amount,
-    amount_usd,
-    decimals,
-    symbol,
-    token_price,
-    has_decimal,
-    has_symbol,
-    has_price,
-    _log_id,
-    _inserted_timestamp
-FROM
-    new_records
+        token_transfers
 
-{% if is_incremental() %}
+{% if is_incremental() and var(
+    'HEAL_MODEL'
+) %}
 UNION ALL
 SELECT
     block_number,
@@ -252,42 +261,14 @@ SELECT
     raw_amount,
     amount_precise_heal AS amount_precise,
     amount_heal AS amount,
-    amount_usd_heal AS amount_usd,
+    amount_usd,
     decimals,
     symbol,
     token_price,
     has_decimal,
-    has_symbol,
     has_price,
     _log_id,
     _inserted_timestamp
 FROM
-    heal_missing_contracts
-UNION ALL
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    event_index,
-    origin_function_signature,
-    origin_from_address,
-    origin_to_address,
-    contract_address,
-    from_address,
-    to_address,
-    raw_amount_precise,
-    raw_amount,
-    amount_precise,
-    amount,
-    amount_usd_heal AS amount_usd,
-    decimals,
-    symbol,
-    token_price,
-    has_decimal,
-    has_symbol,
-    has_price,
-    _log_id,
-    _inserted_timestamp
-FROM
-    heal_missing_prices
+    heal_model
 {% endif %}

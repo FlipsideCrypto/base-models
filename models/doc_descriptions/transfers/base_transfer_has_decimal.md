@@ -1,5 +1,5 @@
 {% docs base_transfer_has_decimal %}
 
-Whether or not our contracts model contains the necessary decimal adjustment for this token. 
+This column will be deprecated in the future. Please use `decimals` column instead.
 
 {% enddocs %}
