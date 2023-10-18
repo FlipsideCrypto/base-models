@@ -25,11 +25,11 @@ models:
       - name: TO_ADDRESS
         description: '{{ doc("base_transfer_to_address") }}'
       - name: RAW_AMOUNT_PRECISE
-        description: '{{ doc("precise_amount_unadjusted") }}'
+        description: '{{ doc("base_transfer_raw_amount_precise") }}'
       - name: RAW_AMOUNT
         description: '{{ doc("base_transfer_raw_amount") }}'
       - name: AMOUNT_PRECISE
-        description: '{{ doc("precise_amount_adjusted") }}'
+        description: '{{ doc("base_transfer_amount_precise") }}'
       - name: AMOUNT
         description: '{{ doc("base_transfer_amount") }}'
       - name: AMOUNT_USD
