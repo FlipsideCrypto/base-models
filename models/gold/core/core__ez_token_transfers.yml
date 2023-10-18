@@ -45,4 +45,4 @@ models:
       - name: HAS_PRICE
         description: '{{ doc("base_transfer_has_price") }}'
       - name: _LOG_ID
-      - name: _INSERTED_TIMESTAMP
+        description: '{{ doc("base_log_id_transfers") }}'
