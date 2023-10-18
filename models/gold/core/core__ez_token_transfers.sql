@@ -25,6 +25,7 @@ SELECT
     token_price,
     has_decimal,
     has_price,
-    _log_id
+    _log_id,
+    _inserted_timestamp
 FROM
     {{ ref('silver__transfers') }}
