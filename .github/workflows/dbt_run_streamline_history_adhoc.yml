@@ -29,7 +29,7 @@ on:
         description: 'DBT Run Command'
         required: true
         options:
-          - dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True,"WAIT":120}' -m tag:streamline_decoded_logs_complete tag:streamline_decoded_logs_history
+          - dbt run --threads 8 --vars '{"STREAMLINE_INVOKE_STREAMS":True,"WAIT":120}' -m "base_models,tag:streamline_decoded_logs_complete" "base_models,tag:streamline_decoded_logs_history"
     
 env:
   DBT_PROFILES_DIR: ./
