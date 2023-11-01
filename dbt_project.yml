@@ -64,3 +64,4 @@ vars:
   OBSERV_FULL_TEST: False
   WAIT: 0
   HEAL_MODEL: False
+  START_GHA_TASKS: False
