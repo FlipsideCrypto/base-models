@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = 'block_number',
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime','reorg']
+    tags = ['curated','reorg']
 ) }}
 
 WITH raw_logs AS (
@@ -79,8 +79,8 @@ WITH raw_logs AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-                _inserted_timestamp
-            ) - INTERVAL '24 hours'
+            _inserted_timestamp
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -119,8 +119,8 @@ token_transfers_raw AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-                _inserted_timestamp
-            ) - INTERVAL '24 hours'
+            _inserted_timestamp
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -182,8 +182,8 @@ eth_transfers_raw AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-                _inserted_timestamp
-            ) - INTERVAL '24 hours'
+            _inserted_timestamp
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -325,8 +325,8 @@ tx_data AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-                _inserted_timestamp
-            ) - INTERVAL '24 hours'
+            _inserted_timestamp
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )

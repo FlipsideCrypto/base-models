@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['non_realtime']
+    tags = ['curated']
 ) }}
 
 WITH created_pools AS (
@@ -65,8 +65,8 @@ initial_info AS (
 AND _inserted_timestamp >= (
     SELECT
         MAX(
-                _inserted_timestamp
-            ) - INTERVAL '12 hours'
+            _inserted_timestamp
+        ) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
