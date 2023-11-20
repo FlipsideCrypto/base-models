@@ -8,6 +8,8 @@ SELECT
     tx_hash,
     block_number,
     block_timestamp,
+    tx_position,
+    trace_index,
     identifier,
     origin_from_address,
     origin_to_address,
@@ -19,10 +21,6 @@ SELECT
     amount_precise_raw,
     amount_precise,
     amount_usd,
-    _call_id,
-    _inserted_timestamp,
-    tx_position,
-    trace_index,
     COALESCE (
         native_transfers_id,
         {{ dbt_utils.generate_surrogate_key(

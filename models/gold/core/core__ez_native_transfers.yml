@@ -4,43 +4,41 @@ models:
     description: '{{ doc("base_ez_eth_transfers_table_doc") }}'
       
     columns:
+      - name: TX_HASH
+        description: '{{ doc("base_transfer_tx_hash") }}'
       - name: BLOCK_NUMBER
         description: '{{ doc("base_block_number") }}'
       - name: BLOCK_TIMESTAMP
         description: '{{ doc("base_block_timestamp") }}'
-      - name: TX_HASH
-        description: '{{ doc("base_transfer_tx_hash") }}'
-      - name: FROM_ADDRESS
-        description: '{{ doc("base_transfer_from_address") }}'
-      - name: TO_ADDRESS
-        description: '{{ doc("base_transfer_to_address") }}'
-      - name: AMOUNT
-        description: '{{ doc("base_eth_amount") }}'
-      - name: TOKEN_PRICE
-        description: '{{ doc("base_transfer_token_price") }}'
-      - name: AMOUNT_USD
-        description: '{{ doc("base_eth_amount_usd") }}' 
-      - name: HAS_PRICE
-        description: '{{ doc("base_transfer_has_price") }}' 
-      - name: ORIGIN_FUNCTION_SIGNATURE
-        description: '{{ doc("base_origin_sig") }}'
+      - name: TX_POSITION
+        description: '{{ doc("base_tx_position") }}'
+      - name: TRACE_INDEX
+        description: '{{ doc("base_trace_index") }}'
+      - name: IDENTIFIER
+        description: '{{ doc("base_traces_identifier") }}'
       - name: ORIGIN_FROM_ADDRESS
         description: '{{ doc("base_origin_from") }}'
       - name: ORIGIN_TO_ADDRESS
         description: '{{ doc("base_origin_to") }}'
-      - name: IDENTIFIER
-        description: '{{ doc("base_traces_identifier") }}'
+      - name: ORIGIN_FUNCTION_SIGNATURE
+        description: '{{ doc("base_origin_sig") }}'
+      - name: FROM_ADDRESS
+        description: '{{ doc("base_transfer_from_address") }}'
+      - name: TO_ADDRESS
+        description: '{{ doc("base_transfer_to_address") }}'
+      - name: SYMBOL
+        description: 'Native asset symbol, e.g. `ETH`'
+      - name: AMOUNT
+        description: '{{ doc("base_eth_amount") }}'
       - name: AMOUNT_PRECISE_RAW
         description: '{{ doc("precise_amount_unadjusted") }}'
       - name: AMOUNT_PRECISE
         description: '{{ doc("precise_amount_adjusted") }}'
+      - name: AMOUNT_USD
+        description: '{{ doc("base_eth_amount_usd") }}' 
       - name: EZ_NATIVE_TRANSFERS_ID
         description: '{{ doc("pk") }}'   
       - name: INSERTED_TIMESTAMP
         description: '{{ doc("inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("modified_timestamp") }}' 
-      - name: _CALL_ID
-        description: '{{ doc("internal_column") }}'
-      - name: _INSERTED_TIMESTAMP
-        description: '{{ doc("internal_column") }}'
