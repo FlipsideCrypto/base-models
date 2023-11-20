@@ -21,7 +21,7 @@ models:
       - name: EVENT_REMOVED
         description: '{{ doc("base_event_removed") }}'  
       - name: _LOG_ID
-        description: '{{ doc("base_log_id_events") }}'  
+        description: '{{ doc("internal_column") }}'
       - name: TX_STATUS
         description: '{{ doc("base_tx_status") }}' 
       - name: ORIGIN_FUNCTION_SIGNATURE

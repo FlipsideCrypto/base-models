@@ -39,7 +39,7 @@ models:
       - name: EVENT_INDEX
         description: '{{ doc("base_event_index") }}'
       - name: _LOG_ID
-        description: '{{ doc("base_log_id_events") }}'
+        description: '{{ doc("internal_column") }}'
       - name: ORIGIN_FUNCTION_SIGNATURE
         description: '{{ doc("base_tx_origin_sig") }}'
       - name: ORIGIN_FROM_ADDRESS
