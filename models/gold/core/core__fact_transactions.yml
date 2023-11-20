@@ -21,11 +21,11 @@ models:
       - name: TO_ADDRESS
         description: '{{ doc("base_to_address") }}' 
       - name: ETH_VALUE
-        description: 'Migration to `VALUE` column is in progress. Use `VALUE` instead.' 
+        description: '{{ doc("amount_deprecation") }}'
       - name: ETH_VALUE_PRECISE_RAW
-        description: 'Migration to `VALUE_PRECISE_RAW` column is in progress. Use `VALUE_PRECISE_RAW` instead.'
+        description: '{{ doc("amount_deprecation") }}'
       - name: ETH_VALUE_PRECISE
-        description: 'Migration to `VALUE_PRECISE` column is in progress. Use `VALUE_PRECISE` instead.'
+        description: '{{ doc("amount_deprecation") }}'
       - name: VALUE
         description: '{{ doc("base_value") }}' 
       - name: VALUE_PRECISE_RAW

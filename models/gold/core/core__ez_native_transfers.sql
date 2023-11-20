@@ -14,6 +14,7 @@ SELECT
     origin_function_signature,
     from_address,
     to_address,
+    'ETH' AS symbol,
     amount,
     amount_precise_raw,
     amount_precise,

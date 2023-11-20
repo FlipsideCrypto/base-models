@@ -16,8 +16,4 @@ The utc timestamp at which the row was last modified.
 
 {% enddocs %}
 
-{% docs internal_column %}    
 
-Deprecated. This column is no longer used. Please remove from your query by 01/01/2024.
-
-{% enddocs %}
