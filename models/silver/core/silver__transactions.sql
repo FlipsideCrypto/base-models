@@ -375,7 +375,13 @@ SELECT
     tx_fee_precise,
     tx_type,
     _inserted_timestamp,
-    DATA
+    DATA,
+    {{ dbt_utils.generate_surrogate_key(
+        ['tx_hash']
+    ) }} AS transactions_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     FINAL
 WHERE

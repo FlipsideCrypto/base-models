@@ -371,7 +371,13 @@ SELECT
     nft_log_id,
     input_data,
     _log_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    {{ dbt_utils.generate_surrogate_key(
+        ['block_number','platform_name','platform_exchange_version']
+    ) }} AS complete_nft_sales_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     final_joins qualify(ROW_NUMBER() over(PARTITION BY nft_log_id
 ORDER BY

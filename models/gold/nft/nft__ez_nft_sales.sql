@@ -2,7 +2,7 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' } } }
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' }} }
 ) }}
 
 SELECT
@@ -31,6 +31,20 @@ SELECT
     creator_fee_usd,
     origin_from_address,
     origin_to_address,
-    origin_function_signature
+    origin_function_signature,
+    COALESCE (
+        complete_nft_sales_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['block_number','platform_name','platform_exchange_version']
+        ) }}
+    ) AS ez_nft_sales_id,
+    COALESCE(
+        inserted_timestamp,
+        '2000-01-01'
+    ) AS inserted_timestamp,
+    COALESCE(
+        modified_timestamp,
+        '2000-01-01'
+    ) AS modified_timestamp
 FROM
     {{ ref('silver__complete_nft_sales') }}

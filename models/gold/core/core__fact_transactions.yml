@@ -21,10 +21,16 @@ models:
       - name: TO_ADDRESS
         description: '{{ doc("base_to_address") }}' 
       - name: ETH_VALUE
-        description: '{{ doc("base_value") }}' 
+        description: 'Migration to `VALUE` column is in progress. Use `VALUE` instead.' 
       - name: ETH_VALUE_PRECISE_RAW
-        description: '{{ doc("precise_amount_unadjusted") }}'
+        description: 'Migration to `VALUE_PRECISE_RAW` column is in progress. Use `VALUE_PRECISE_RAW` instead.'
       - name: ETH_VALUE_PRECISE
+        description: 'Migration to `VALUE_PRECISE` column is in progress. Use `VALUE_PRECISE` instead.'
+      - name: VALUE
+        description: '{{ doc("base_value") }}' 
+      - name: VALUE_PRECISE_RAW
+        description: '{{ doc("precise_amount_unadjusted") }}'
+      - name: VALUE_PRECISE
         description: '{{ doc("precise_amount_adjusted") }}'
       - name: TX_FEE
         description: '{{ doc("base_tx_fee") }}' 
@@ -68,3 +74,9 @@ models:
         description: The s value of the transaction signature.
       - name: V
         description: The v value of the transaction signature.
+      - name: FACT_TRANSACTIONS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 

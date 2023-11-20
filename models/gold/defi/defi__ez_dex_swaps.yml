@@ -50,5 +50,11 @@ models:
         description: '{{ doc("eth_dex_swaps_amount_in_unadj") }}'
       - name: AMOUNT_OUT_UNADJ
         description: '{{ doc("eth_dex_swaps_amount_out_unadj") }}'
+      - name: EZ_DEX_SWAPS_ID
+        description: '{{ doc("pk") }}'   
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
 
 
