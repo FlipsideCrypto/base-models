@@ -373,7 +373,7 @@ SELECT
     _log_id,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
-        ['block_number','platform_name','platform_exchange_version']
+        ['nft_address','tokenId','platform_exchange_version','_log_id']
     ) }} AS complete_nft_sales_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
