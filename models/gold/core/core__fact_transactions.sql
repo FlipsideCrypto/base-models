@@ -60,7 +60,7 @@ SELECT
     ) AS modified_timestamp,
     VALUE AS eth_value,
     eth_value_precise_raw,
-    eth_value_precise,
+    eth_value_precise
 FROM
     {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
