@@ -152,7 +152,16 @@ new_records AS (
         r.l1_fee_scalar,
         r.l1_gas_used,
         r.l1_gas_price,
-        utils.udf_decimal_adjust((r.gas_used * t.gas_price) + ((r.l1_gas_price / pow(10, 9)) * r.l1_gas_used * r.l1_fee_scalar), 9) AS tx_fee_precise,
+        utils.udf_decimal_adjust(
+            (
+                r.gas_used * utils.udf_hex_to_int(
+                    t.data :gasPrice :: STRING
+                ) :: bigint
+            ) + FLOOR(
+                r.l1_gas_price * r.l1_gas_used * r.l1_fee_scalar
+            ),
+            18
+        ) AS tx_fee_precise,
         COALESCE(
             tx_fee_precise :: FLOAT,
             0
@@ -219,7 +228,16 @@ missing_data AS (
         r.l1_fee_scalar,
         r.l1_gas_used,
         r.l1_gas_price,
-        utils.udf_decimal_adjust((r.gas_used * t.gas_price) + ((r.l1_gas_price / pow(10, 9)) * r.l1_gas_used * r.l1_fee_scalar), 9) AS tx_fee_precise_heal,
+        utils.udf_decimal_adjust(
+            (
+                r.gas_used * utils.udf_hex_to_int(
+                    t.data :gasPrice :: STRING
+                ) :: bigint
+            ) + FLOOR(
+                r.l1_gas_price * r.l1_gas_used * r.l1_fee_scalar
+            ),
+            18
+        ) AS tx_fee_precise_heal,
         COALESCE(
             tx_fee_precise_heal :: FLOAT,
             0
