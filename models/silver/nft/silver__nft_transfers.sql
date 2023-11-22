@@ -234,6 +234,7 @@ all_transfers AS (
         erc1155_value,
         _inserted_timestamp,
         event_index,
+        1 AS intra_event_index,
         'erc721_Transfer' AS token_transfer_type,
         CONCAT(
             _log_id,
@@ -256,6 +257,7 @@ all_transfers AS (
         erc1155_value,
         _inserted_timestamp,
         event_index,
+        1 AS intra_event_index,
         'erc1155_TransferSingle' AS token_transfer_type,
         CONCAT(
             _log_id,
@@ -280,6 +282,7 @@ all_transfers AS (
         erc1155_value,
         _inserted_timestamp,
         event_index,
+        intra_event_index,
         'erc1155_TransferBatch' AS token_transfer_type,
         CONCAT(
             _log_id,
@@ -301,6 +304,7 @@ transfer_base AS (
         block_timestamp,
         tx_hash,
         event_index,
+        intra_event_index,
         contract_address,
         C.token_name AS project_name,
         from_address,
@@ -328,6 +332,7 @@ fill_transfers AS (
         t.block_timestamp,
         t.tx_hash,
         t.event_index,
+        t.intra_event_index,
         t.contract_address,
         C.token_name AS project_name,
         t.from_address,
@@ -356,6 +361,7 @@ final_base AS (
         block_timestamp,
         tx_hash,
         event_index,
+        intra_event_index,
         contract_address,
         project_name,
         from_address,
@@ -376,6 +382,7 @@ SELECT
     block_timestamp,
     tx_hash,
     event_index,
+    intra_event_index,
     contract_address,
     project_name,
     from_address,
@@ -395,6 +402,7 @@ SELECT
     block_timestamp,
     tx_hash,
     event_index,
+    intra_event_index,
     contract_address,
     project_name,
     from_address,
@@ -406,7 +414,7 @@ SELECT
     _log_id,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
-        ['tx_hash','event_index']
+        ['tx_hash','event_index','intra_event_index']
     ) }} AS nft_transfers_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,

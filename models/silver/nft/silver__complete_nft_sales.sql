@@ -12,6 +12,7 @@ WITH nft_base_models AS (
         block_number,
         block_timestamp,
         tx_hash,
+        event_index,
         event_type,
         platform_address,
         platform_name,
@@ -53,6 +54,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
+    event_index,
     event_type,
     platform_address,
     platform_name,
@@ -164,6 +166,7 @@ final_base AS (
         block_number,
         block_timestamp,
         tx_hash,
+        event_index,
         event_type,
         platform_address,
         platform_name,
@@ -273,6 +276,7 @@ label_fill_sales AS (
         block_number,
         block_timestamp,
         tx_hash,
+        event_index,
         event_type,
         platform_address,
         platform_name,
@@ -338,6 +342,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
+    event_index,
     event_type,
     platform_address,
     platform_name,
@@ -373,7 +378,7 @@ SELECT
     _log_id,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
-        ['nft_address','tokenId','platform_exchange_version','_log_id']
+        ['tx_hash', 'event_index', 'nft_address','tokenId','platform_exchange_version']
     ) }} AS complete_nft_sales_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
