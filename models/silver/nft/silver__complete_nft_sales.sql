@@ -281,7 +281,7 @@ label_fill_sales AS (
         platform_address,
         platform_name,
         platform_exchange_version,
-        NULL AS aggregator_name,
+        aggregator_name,
         seller_address,
         buyer_address,
         nft_address,
@@ -322,6 +322,30 @@ label_fill_sales AS (
     WHERE
         t.project_name IS NULL
         AND C.token_name IS NOT NULL
+),
+blocks_fill AS (
+    SELECT
+        * exclude (
+            complete_nft_sales_id,
+            inserted_timestamp,
+            modified_timestamp,
+            _invocation_id
+        )
+    FROM
+        {{ this }}
+    WHERE
+        block_number IN (
+            SELECT
+                block_number
+            FROM
+                label_fill_sales
+        )
+        AND nft_log_id NOT IN (
+            SELECT
+                nft_log_id
+            FROM
+                label_fill_sales
+        )
 )
 {% endif %},
 final_joins AS (
@@ -331,11 +355,16 @@ final_joins AS (
         final_base
 
 {% if is_incremental() %}
-UNION
+UNION ALL
 SELECT
     *
 FROM
     label_fill_sales
+UNION ALL
+SELECT
+    *
+FROM
+    blocks_fill
 {% endif %}
 )
 SELECT
