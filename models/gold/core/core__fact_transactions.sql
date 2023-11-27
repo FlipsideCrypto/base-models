@@ -15,8 +15,8 @@ SELECT
     from_address,
     to_address,
     VALUE,
-    eth_value_precise_raw AS value_precise_raw,
-    eth_value_precise AS value_precise,
+    value_precise_raw,
+    value_precise,
     tx_fee,
     tx_fee_precise,
     gas_price,
@@ -59,8 +59,8 @@ SELECT
         '2000-01-01'
     ) AS modified_timestamp,
     VALUE AS eth_value,
-    eth_value_precise_raw,
-    eth_value_precise
+    value_precise_raw AS eth_value_precise_raw,
+    value_precise AS eth_value_precise
 FROM
     {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
