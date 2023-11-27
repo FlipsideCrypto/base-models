@@ -26,8 +26,6 @@ models:
         description: '{{ doc("base_transfer_from_address") }}'
       - name: TO_ADDRESS
         description: '{{ doc("base_transfer_to_address") }}'
-      - name: SYMBOL
-        description: 'Native asset symbol, e.g. `ETH`'
       - name: AMOUNT
         description: '{{ doc("base_eth_amount") }}'
       - name: AMOUNT_PRECISE_RAW
