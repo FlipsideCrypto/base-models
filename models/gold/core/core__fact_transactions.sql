@@ -50,12 +50,14 @@ SELECT
             ['tx_hash']
         ) }}
     ) AS fact_transactions_id,
-    COALESCE(
-        inserted_timestamp,
+    GREATEST(
+        A.inserted_timestamp,
+        b.inserted_timestamp,
         '2000-01-01'
     ) AS inserted_timestamp,
-    COALESCE(
-        modified_timestamp,
+    GREATEST(
+        A.modified_timestamp,
+        b.modified_timestamp,
         '2000-01-01'
     ) AS modified_timestamp,
     VALUE AS eth_value,
