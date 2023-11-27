@@ -353,6 +353,30 @@ fill_transfers AS (
     WHERE
         t.project_name IS NULL
         AND C.token_name IS NOT NULL
+),
+blocks_fill AS (
+    SELECT
+        * exclude (
+            nft_transfers_id,
+            inserted_timestamp,
+            modified_timestamp,
+            _invocation_id
+        )
+    FROM
+        {{ this }}
+    WHERE
+        block_number IN (
+            SELECT
+                block_number
+            FROM
+                fill_transfers
+        )
+        AND _log_id NOT IN (
+            SELECT
+                _log_id
+            FROM
+                fill_transfers
+        )
 )
 {% endif %},
 final_base AS (
@@ -376,7 +400,7 @@ final_base AS (
         transfer_base
 
 {% if is_incremental() %}
-UNION
+UNION ALL
 SELECT
     block_number,
     block_timestamp,
@@ -395,6 +419,25 @@ SELECT
     _inserted_timestamp
 FROM
     fill_transfers
+UNION ALL
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    event_index,
+    intra_event_index,
+    contract_address,
+    project_name,
+    from_address,
+    to_address,
+    tokenId,
+    erc1155_value,
+    event_type,
+    token_transfer_type,
+    _log_id,
+    _inserted_timestamp
+FROM
+    blocks_fill
 {% endif %}
 )
 SELECT
