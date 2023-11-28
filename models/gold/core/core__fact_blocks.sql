@@ -67,13 +67,25 @@ SELECT
             ['a.block_number']
         ) }}
     ) AS fact_blocks_id,
-    COALESCE(
-        inserted_timestamp,
-        '2000-01-01'
+    GREATEST(
+        COALESCE(
+            A.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            d.inserted_timestamp,
+            '2000-01-01'
+        )
     ) AS inserted_timestamp,
-    COALESCE(
-        modified_timestamp,
-        '2000-01-01'
+    GREATEST(
+        COALESCE(
+            A.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            d.modified_timestamp,
+            '2000-01-01'
+        )
     ) AS modified_timestamp
 FROM
     {{ ref('silver__blocks') }} A
