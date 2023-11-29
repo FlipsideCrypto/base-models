@@ -14,9 +14,9 @@ SELECT
     origin_function_signature,
     from_address,
     to_address,
-    VALUE AS eth_value,
-    eth_value_precise_raw,
-    eth_value_precise,
+    VALUE,
+    value_precise_raw,
+    value_precise,
     tx_fee,
     tx_fee_precise,
     gas_price,
@@ -43,7 +43,18 @@ SELECT
     tx_status AS status,
     r,
     s,
-    v
+    v,
+    COALESCE (
+        transactions_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash']
+        ) }}
+    ) AS fact_transactions_id,
+    GREATEST(COALESCE(A.inserted_timestamp, '2000-01-01'), COALESCE(b.inserted_timestamp, '2000-01-01')) AS inserted_timestamp,
+    GREATEST(COALESCE(A.modified_timestamp, '2000-01-01'), COALESCE(b.modified_timestamp, '2000-01-01')) AS modified_timestamp,
+    VALUE AS eth_value,
+    value_precise_raw AS eth_value_precise_raw,
+    value_precise AS eth_value_precise
 FROM
     {{ ref('silver__transactions') }} A
     LEFT JOIN {{ ref('silver__state_hashes') }}
