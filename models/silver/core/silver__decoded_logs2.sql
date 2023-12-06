@@ -3,13 +3,11 @@
     materialized = "incremental",
     unique_key = ['block_number', 'event_index'],
     cluster_by = "block_timestamp::date",
-    incremental_predicates = ["dynamic_range", "block_number"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
+    full_refresh = false,
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['decoded_logs','reorg']
 ) }}
-
--- full_refresh = false,
 
 WITH base_data AS (
 
