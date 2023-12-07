@@ -53,7 +53,8 @@ SELECT
             '&apikey={base_key}'),
     { 'User-Agent': 'FlipsideStreamline' },
     {},
-    'EXPLORER') AS abi_data, 
+    'EXPLORER'
+    ) AS abi_data, 
     SYSDATE() AS _inserted_timestamp
 FROM
     row_nos rn
