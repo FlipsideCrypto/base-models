@@ -10,7 +10,7 @@ WITH base AS (
     SELECT
         contract_address
     FROM
-        bsc.silver.relevant_abi_contracts --{{ ref('silver__relevant_abi_contracts') }}
+        {{ ref('silver__relevant_abi_contracts') }}
 
 {% if is_incremental() %}
 EXCEPT
