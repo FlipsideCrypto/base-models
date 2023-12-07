@@ -5,11 +5,12 @@
     tags = ['non_realtime']
 ) }}
 
-with base AS (
+WITH base AS (
+
     SELECT
         contract_address
     FROM
-        {{ ref('silver__relevant_abi_contracts') }}
+        bsc.silver.relevant_abi_contracts --{{ ref('silver__relevant_abi_contracts') }}
 
 {% if is_incremental() %}
 EXCEPT
@@ -45,17 +46,7 @@ row_nos AS (
 ),
 batched AS ({% for item in range(15) %}
 SELECT
-    rn.contract_address, base.live.udf_api(
-    'GET', 
-        CONCAT(
-            'https://api.basescan.org/api?module=contract&action=getabi&address=', 
-            rn.contract_address,
-            '&apikey={base_key}'),
-    { 'User-Agent': 'FlipsideStreamline' },
-    {},
-    'EXPLORER'
-    ) AS abi_data, 
-    SYSDATE() AS _inserted_timestamp
+    rn.contract_address, base.live.udf_api('GET', CONCAT('https://api.basescan.org/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={base_key}'),{ 'User-Agent': 'FlipsideStreamline' },{},'EXPLORER') AS abi_data, SYSDATE() AS _inserted_timestamp
 FROM
     row_nos rn
 WHERE
