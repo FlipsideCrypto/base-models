@@ -60,7 +60,7 @@ WITH token_transfers AS (
         AND tr.tx_hash = tx.tx_hash
     WHERE
         tr.from_address <> '0x0000000000000000000000000000000000000000'
-        AND tr.to_address = '0x1d68124e65fafc907325e3edbf8c4d84499daa8b'
+        AND tr.to_address = '0x8d2de8d2f73f1f4cab472ac9a881c9b123c79627'
         AND tr.origin_function_signature = '0x0f5287b0' -- tokenTransfer
         AND destination_chain_id <> 0
 

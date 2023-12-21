@@ -81,7 +81,7 @@ contract_reads AS (
             'node_mapping'
         ) }}
         ON 1 = 1
-        AND chain = 'optimism'
+        AND chain = 'base'
 ),
 reads_flat AS (
     SELECT
