@@ -29,7 +29,7 @@ WITH supply AS (
         C.token_name,
         C.token_symbol,
         C.token_decimals,
-        'arbitrum' AS blockchain,
+        'base' AS blockchain,
         _log_id,
         l._inserted_timestamp
     FROM

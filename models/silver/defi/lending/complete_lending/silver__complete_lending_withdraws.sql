@@ -24,7 +24,7 @@ WITH aave_withdraws AS (
         amount,
         depositor_address,
         'Aave V3' AS platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM
@@ -61,7 +61,7 @@ granary_withdraws as (
         amount,
         depositor_address,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM
@@ -98,7 +98,7 @@ seamless_withdraws as (
         amount,
         depositor_address,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM
@@ -134,7 +134,7 @@ comp_withdraws as (
         amount,
         depositor_address,
         compound_version AS platform,
-        'arbitrum' AS blockchain,
+        'base' AS blockchain,
         _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM
@@ -170,7 +170,7 @@ sonne_withdraws as (
         amount,
         redeemer AS depositor_address,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM
@@ -207,7 +207,7 @@ moonwell_withdraws as (
         amount,
         redeemer AS depositor_address,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM

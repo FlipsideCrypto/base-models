@@ -24,7 +24,7 @@ WITH aave_deposits AS (
     amount_unadj,
     amount,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -58,7 +58,7 @@ granary_deposits as (
     amount_unadj,
     amount,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -92,7 +92,7 @@ seamless_deposits as (
     amount_unadj,
     amount,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -125,7 +125,7 @@ SELECT
   amount_unadj,
   amount,
   compound_version AS platform,
-  'arbitrum' AS blockchain,
+  'base' AS blockchain,
   _LOG_ID,
   _INSERTED_TIMESTAMP
 FROM
@@ -158,7 +158,7 @@ sonne_deposits as (
     amount_unadj,
     amount,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -191,7 +191,7 @@ moonwell_deposits as (
     amount_unadj,
     amount,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM

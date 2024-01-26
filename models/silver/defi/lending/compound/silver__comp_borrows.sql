@@ -31,7 +31,7 @@ WITH borrow AS (
         C.compound_market_decimals AS decimals,
         C.underlying_asset_address,
         C.underlying_asset_symbol,
-        'arbitrum' AS blockchain,
+        'base' AS blockchain,
         _log_id,
         l._inserted_timestamp
     FROM

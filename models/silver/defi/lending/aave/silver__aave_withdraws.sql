@@ -85,7 +85,7 @@ SELECT
     depositor depositor_address,
     aave_version AS platform,
     atoken_meta.underlying_symbol AS symbol,
-    'arbitrum' AS blockchain,
+    'base' AS blockchain,
     _log_id,
     _inserted_timestamp
 FROM

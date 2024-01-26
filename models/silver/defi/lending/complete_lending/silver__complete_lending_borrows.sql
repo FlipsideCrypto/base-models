@@ -24,7 +24,7 @@ WITH aave_borrows AS (
         amount_unadj,
         amount,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
@@ -60,7 +60,7 @@ granary_borrows as (
         amount_unadj,
         amount,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
@@ -95,12 +95,12 @@ SELECT
     amount_unadj,
     amount,
     compound_version AS platform,
-    'arbitrum' AS blockchain,
-    l._LOG_ID,
-    l._INSERTED_TIMESTAMP
+    'base' AS blockchain,
+    A._LOG_ID,
+    A._INSERTED_TIMESTAMP
 FROM
     {{ ref('silver__comp_borrows') }}
-    l
+    A
 
 {% if is_incremental() and 'exactly' not in var('HEAL_CURATED_MODEL') %}
 WHERE
@@ -132,7 +132,7 @@ sonne_borrows as (
         amount_unadj,
         amount,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
@@ -168,7 +168,7 @@ seamless_borrows as (
         amount_unadj,
         amount,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM
@@ -203,7 +203,7 @@ moonwell_borrows as (
         amount_unadj,
         amount,
         platform,
-        'optimism' AS blockchain,
+        'base' AS blockchain,
         A._LOG_ID,
         A._INSERTED_TIMESTAMP
     FROM

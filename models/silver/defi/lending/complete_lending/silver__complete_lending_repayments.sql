@@ -25,7 +25,7 @@ WITH aave_repayments AS (
     payer AS payer_address,
     borrower,
     'Aave V3' AS platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -60,7 +60,7 @@ granary_repayments as (
     payer AS payer_address,
     borrower,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -96,7 +96,7 @@ seamless_repayments as (
     payer AS payer_address,
     borrower,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -131,7 +131,7 @@ comp_repayments as (
     repayer AS payer_address,
     borrower,
     compound_version AS platform,
-    'arbitrum' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -166,7 +166,7 @@ sonne_repayments as (
     payer AS payer_address,
     borrower,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -201,7 +201,7 @@ moonwell_repayments as (
     payer AS payer_address,
     borrower,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM

@@ -27,7 +27,7 @@ WITH aave_liquidations AS (
     debt_asset,
     debt_token_symbol AS debt_asset_symbol,
     'Aave V3' AS platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -65,7 +65,7 @@ granary_liquidations AS (
     debt_asset,
     debt_token_symbol AS debt_asset_symbol,
     'Granary' AS platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -103,7 +103,7 @@ seamless_liquidations AS (
     debt_asset,
     debt_token_symbol AS debt_asset_symbol,
     'Granary' AS platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
@@ -141,7 +141,7 @@ comp_liquidations as (
     debt_asset,
     debt_asset_symbol,
     l.compound_version AS platform,
-    'arbitrum' AS blockchain,
+    'base' AS blockchain,
     l._LOG_ID,
     l._INSERTED_TIMESTAMP
   FROM
@@ -180,7 +180,7 @@ sonne_liquidations as (
     collateral_token AS debt_asset,
     collateral_symbol AS debt_asset_symbol,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     l._LOG_ID,
     l._INSERTED_TIMESTAMP
   FROM
@@ -219,7 +219,7 @@ moonwell_liquidations as (
     collateral_token AS debt_asset,
     collateral_symbol AS debt_asset_symbol,
     platform,
-    'optimism' AS blockchain,
+    'base' AS blockchain,
     l._LOG_ID,
     l._INSERTED_TIMESTAMP
   FROM
