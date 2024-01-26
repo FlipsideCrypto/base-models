@@ -53,7 +53,7 @@ flashloan AS (
             origin_to_address,
             contract_address
         ) AS lending_pool_contract,
-        'Moonwell' AS seamless_version,
+        'Seamless' AS seamless_version,
         _inserted_timestamp,
         _log_id
     FROM

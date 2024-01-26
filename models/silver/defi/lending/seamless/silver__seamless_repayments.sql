@@ -43,7 +43,7 @@ repay AS(
         utils.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: INTEGER AS repayed_amount,
-        'Moonwell' AS seamless_version,
+        'Seamless' AS seamless_version,
         origin_to_address AS lending_pool_contract,
         origin_from_address AS repayer_address,
         _log_id,

@@ -46,7 +46,7 @@ deposits AS(
         utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         ) :: INTEGER AS deposit_quantity,
-        'Moonwell' AS seamless_version,
+        'Seamless' AS seamless_version,
         origin_from_address AS depositor_address,
         COALESCE(
             origin_to_address,
