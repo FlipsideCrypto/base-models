@@ -37,7 +37,7 @@ moonwell_repayments AS (
     utils.udf_hex_to_int(
       segmented_data [2] :: STRING
     ) :: INTEGER AS repayed_amount_raw,
-    'moonwell' AS platform,
+    'Moonwell' AS platform,
     _inserted_timestamp,
     _log_id
   FROM

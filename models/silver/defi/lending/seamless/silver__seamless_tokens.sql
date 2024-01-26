@@ -94,7 +94,7 @@ a_token_step_2 AS (
         atoken_symbol,
         _inserted_timestamp,
         _log_id,
-        'seamless' AS protocol
+        'Moonwell' AS protocol
     FROM
         a_token_step_1
 )

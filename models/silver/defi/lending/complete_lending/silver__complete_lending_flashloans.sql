@@ -107,7 +107,7 @@ seamless_flashloans as (
   FROM
     {{ ref('silver__seamless_flashloans') }}
 
-{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT

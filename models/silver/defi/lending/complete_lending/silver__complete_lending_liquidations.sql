@@ -109,7 +109,7 @@ seamless_liquidations AS (
   FROM
   {{ ref('silver__seamless_liquidations') }}
 
-{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -226,7 +226,7 @@ moonwell_liquidations as (
     {{ ref('silver__moonwell_liquidations') }}
     l
 
-{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   l._inserted_timestamp >= (
     SELECT

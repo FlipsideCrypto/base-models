@@ -57,7 +57,7 @@ borrow AS (
             origin_to_address,
             contract_address
         ) AS lending_pool_contract,
-        'seamless' AS seamless_version,
+        'Moonwell' AS seamless_version,
         _inserted_timestamp,
         _log_id
     FROM

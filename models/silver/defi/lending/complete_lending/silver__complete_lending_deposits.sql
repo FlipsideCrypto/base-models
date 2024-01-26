@@ -98,7 +98,7 @@ seamless_deposits as (
   FROM
     {{ ref('silver__seamless_deposits') }}
 
-{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -197,7 +197,7 @@ moonwell_deposits as (
   FROM
     {{ ref('silver__moonwell_deposits') }}
 
-{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT

@@ -42,7 +42,7 @@ moonwell_borrows AS (
       segmented_data [3] :: STRING
     ) :: INTEGER AS totalBorrows,
     contract_address AS token,
-    'moonwell' AS platform,
+    'Moonwell' AS platform,
     _inserted_timestamp,
     _log_id
   FROM

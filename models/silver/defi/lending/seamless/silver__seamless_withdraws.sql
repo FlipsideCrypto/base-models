@@ -43,7 +43,7 @@ withdraw AS(
             segmented_data [0] :: STRING
         ) :: INTEGER AS withdraw_amount,
         tx_hash,
-        'seamless' AS seamless_version,
+        'Moonwell' AS seamless_version,
         origin_to_address AS lending_pool_contract,
         _inserted_timestamp,
         _log_id

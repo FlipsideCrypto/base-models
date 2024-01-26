@@ -207,7 +207,7 @@ moonwell_repayments as (
   FROM
     {{ ref('silver__moonwell_repayments') }}
 
- {% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
+ {% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
   WHERE
     _inserted_timestamp >= (
       SELECT

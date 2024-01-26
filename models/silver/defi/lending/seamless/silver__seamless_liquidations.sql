@@ -48,7 +48,7 @@ liquidation AS(
             segmented_data [1] :: STRING
         ) :: INTEGER AS liquidated_amount,
         CONCAT('0x', SUBSTR(segmented_data [2] :: STRING, 25, 40)) AS liquidator_address,
-        'seamless' AS seamless_version,
+        'Moonwell' AS seamless_version,
         COALESCE(
             origin_to_address,
             contract_address

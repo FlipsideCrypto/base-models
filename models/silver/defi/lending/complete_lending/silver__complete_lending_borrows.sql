@@ -174,7 +174,7 @@ seamless_borrows as (
     FROM
         {{ ref('silver__seamless_borrows') }} A
 
-{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
     WHERE
         A._inserted_timestamp >= (
             SELECT
@@ -209,7 +209,7 @@ moonwell_borrows as (
     FROM
         {{ ref('silver__moonwell_borrows') }} A
 
-{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
