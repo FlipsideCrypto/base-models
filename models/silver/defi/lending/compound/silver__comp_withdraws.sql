@@ -6,7 +6,22 @@
     tags = ['non_realtime','reorg']
 ) }}
 
-WITH withdraw AS (
+
+WITH 
+comp_assets as (
+    SELECT
+        compound_market_address,
+        compound_market_name,
+        compound_market_symbol,
+        compound_market_decimals,
+        underlying_asset_address,
+        underlying_asset_name,
+        underlying_asset_symbol,
+        underlying_asset_decimals
+    FROM
+        {{ ref('silver__comp_asset_details') }}
+),
+withdraw AS (
 
     SELECT
         tx_hash,
@@ -38,6 +53,7 @@ WITH withdraw AS (
         ON token_address = C.contract_address
     WHERE
         topics [0] = '0xd6d480d5b3068db003533b170d67561494d72e3bf9fa40a266471351ebba9e16' --WithdrawCollateral
+        AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
 
 {% if is_incremental() %}
 AND l._inserted_timestamp >= (
@@ -73,11 +89,6 @@ SELECT
     _log_id,
     _inserted_timestamp
 FROM
-    withdraw w
-WHERE
-    compound_market IN (
-        '0xa5edbdd9646f8dff606d7448e414884c7d905dca',
-        '0x9c4ec768c28520b50860ea7a15bd7213a9ff58bf'
-    ) qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    withdraw w qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC)) = 1

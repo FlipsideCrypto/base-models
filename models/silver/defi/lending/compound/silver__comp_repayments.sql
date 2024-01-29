@@ -6,7 +6,21 @@
     tags = ['non_realtime','reorg']
 ) }}
 
-WITH repayments AS (
+WITH 
+comp_assets as (
+    SELECT
+        compound_market_address,
+        compound_market_name,
+        compound_market_symbol,
+        compound_market_decimals,
+        underlying_asset_address,
+        underlying_asset_name,
+        underlying_asset_symbol,
+        underlying_asset_decimals
+    FROM
+        {{ ref('silver__comp_asset_details') }}
+),
+repayments AS (
 
     SELECT
         tx_hash,
@@ -40,14 +54,11 @@ WITH repayments AS (
     FROM
         {{ ref('silver__logs') }}
         l
-        LEFT JOIN {{ ref('silver__comp_asset_details') }} C
+        LEFT JOIN comp_assets C
         ON contract_address = C.compound_market_address
     WHERE
         topics [0] = '0xd1cf3d156d5f8f0d50f6c122ed609cec09d35c9b9fb3fff6ea0959134dae424e' --Supply
-        AND l.contract_address IN (
-            LOWER('0xA5EDBDD9646f8dFF606d7448e414884C7d905dCA'),
-            LOWER('0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf')
-        )
+        AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
 
 {% if is_incremental() %}
 AND l._inserted_timestamp >= (
@@ -85,11 +96,6 @@ SELECT
     _log_id,
     _inserted_timestamp
 FROM
-    repayments w
-WHERE
-    compound_market IN (
-        '0xa5edbdd9646f8dff606d7448e414884c7d905dca',
-        '0x9c4ec768c28520b50860ea7a15bd7213a9ff58bf'
-    ) qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    repayments w qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     _inserted_timestamp DESC)) = 1
