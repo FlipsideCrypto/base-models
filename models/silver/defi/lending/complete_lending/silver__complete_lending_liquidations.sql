@@ -3,7 +3,7 @@
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = tags = ['reorg','curated']
+  tags = ['reorg','curated']
 ) }}
 
 WITH aave AS (
