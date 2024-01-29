@@ -6,7 +6,7 @@
     tags = ['reorg','curated']
 ) }}
 
-WITH aave_withdraws AS (
+WITH aave AS (
 
     SELECT
         tx_hash,
@@ -43,7 +43,7 @@ WHERE
 {% endif %}
 ),
 
-granary_withdraws as (
+granary as (
 
     SELECT
         tx_hash,
@@ -80,7 +80,7 @@ granary_withdraws as (
     {% endif %}
 ),
 
-seamless_withdraws as (
+seamless as (
 
     SELECT
         tx_hash,
@@ -104,7 +104,7 @@ seamless_withdraws as (
     FROM
         {{ ref('silver__seamless_withdraws') }}
 
-    {% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+    {% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
     WHERE
         _inserted_timestamp >= (
             SELECT
@@ -117,7 +117,7 @@ seamless_withdraws as (
     {% endif %}
 ),
 
-comp_withdraws as (
+comp as (
     SELECT
         tx_hash,
         block_number,
@@ -152,7 +152,7 @@ comp_withdraws as (
     {% endif %}
 ),
 
-sonne_withdraws as (
+sonne as (
         
     SELECT
         tx_hash,
@@ -189,7 +189,7 @@ sonne_withdraws as (
     {% endif %}
 ),
 
-moonwell_withdraws as (
+moonwell as (
         
     SELECT
         tx_hash,
@@ -213,7 +213,7 @@ moonwell_withdraws as (
     FROM
         {{ ref('silver__moonwell_withdraws') }}
 
-    {% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+    {% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
     WHERE
         _inserted_timestamp >= (
             SELECT
@@ -231,32 +231,32 @@ withdraws_union as (
     SELECT
         *
     FROM
-        aave_withdraws
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_withdraws
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        comp_withdraws
+        comp
     UNION ALL
     SELECT
         *
     FROM
-        sonne_withdraws
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        seamless_withdraws
+        seamless
     UNION ALL
     SELECT
         *
     FROM
-        moonwell_withdraws
+        moonwell
 ),
 
 FINAL AS (

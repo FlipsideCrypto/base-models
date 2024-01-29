@@ -6,7 +6,7 @@
   tags = ['reorg','curated']
 ) }}
 
-WITH aave_repayments AS (
+WITH aave AS (
 
   SELECT
     tx_hash,
@@ -41,7 +41,7 @@ WHERE
 {% endif %}
 ),
 
-granary_repayments as (
+granary as (
 
   SELECT
     tx_hash,
@@ -77,7 +77,7 @@ granary_repayments as (
   {% endif %}
 ),
 
-seamless_repayments as (
+seamless as (
 
   SELECT
     tx_hash,
@@ -113,7 +113,7 @@ seamless_repayments as (
   {% endif %}
 ),
 
-comp_repayments as (
+comp as (
   SELECT
     tx_hash,
     block_number,
@@ -148,7 +148,7 @@ comp_repayments as (
   {% endif %}
 ),
 
-sonne_repayments as (
+sonne as (
   SELECT
     tx_hash,
     block_number,
@@ -183,7 +183,7 @@ sonne_repayments as (
   {% endif %}
 ),
 
-moonwell_repayments as (
+moonwell as (
   SELECT
     tx_hash,
     block_number,
@@ -207,7 +207,7 @@ moonwell_repayments as (
   FROM
     {{ ref('silver__moonwell_repayments') }}
 
- {% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+ {% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
   WHERE
     _inserted_timestamp >= (
       SELECT
@@ -222,32 +222,32 @@ repayments_union as (
     SELECT
         *
     FROM
-        aave_repayments
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_repayments
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        comp_repayments
+        comp
     UNION ALL
     SELECT
         *
     FROM
-        sonne_repayments
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        seamless_repayments
+        seamless
     UNION ALL
     SELECT
         *
     FROM
-        moonwell_repayments
+        moonwell
 ),
 FINAL AS (
   SELECT

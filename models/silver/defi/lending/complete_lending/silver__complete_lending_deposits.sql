@@ -6,7 +6,7 @@
   tags = ['reorg','curated']
 ) }}
 
-WITH aave_deposits AS (
+WITH aave AS (
 
   SELECT
     tx_hash,
@@ -40,7 +40,7 @@ WHERE
   )
 {% endif %}
 ),
-granary_deposits as (
+granary as (
 
   SELECT
     tx_hash,
@@ -74,7 +74,7 @@ WHERE
   )
 {% endif %}
 ),
-seamless_deposits as (
+seamless as (
 
   SELECT
     tx_hash,
@@ -98,7 +98,7 @@ seamless_deposits as (
   FROM
     {{ ref('silver__seamless_deposits') }}
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -108,7 +108,7 @@ WHERE
   )
 {% endif %}
 ),
-comp_deposits as (
+comp as (
 SELECT
   tx_hash,
   block_number,
@@ -141,7 +141,7 @@ WHERE
   )
 {% endif %}
 ),
-sonne_deposits as (
+sonne as (
   SELECT
     tx_hash,
     block_number,
@@ -174,7 +174,7 @@ WHERE
   )
 {% endif %}
 ),
-moonwell_deposits as (
+moonwell as (
   SELECT
     tx_hash,
     block_number,
@@ -197,7 +197,7 @@ moonwell_deposits as (
   FROM
     {{ ref('silver__moonwell_deposits') }}
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -211,32 +211,32 @@ deposit_union as (
     SELECT
         *
     FROM
-        aave_deposits
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_deposits
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        comp_deposits
+        comp
     UNION ALL
     SELECT
         *
     FROM
-        sonne_deposits
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        seamless_deposits
+        seamless
     UNION ALL
     SELECT
         *
     FROM
-        moonwell_deposits
+        moonwell
 ),
 FINAL AS (
   SELECT

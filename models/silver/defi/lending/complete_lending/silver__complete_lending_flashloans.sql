@@ -6,7 +6,7 @@
   tags = ['reorg','curated']
 ) }}
 
-WITH aave_flashloans AS (
+WITH aave AS (
 
   SELECT
     tx_hash,
@@ -44,7 +44,7 @@ WHERE
 {% endif %}
 ),
 
-granary_flashloans as (
+granary as (
   SELECT
     tx_hash,
     block_number,
@@ -81,7 +81,7 @@ WHERE
 {% endif %}
 ),
 
-seamless_flashloans as (
+seamless as (
   SELECT
     tx_hash,
     block_number,
@@ -107,7 +107,7 @@ seamless_flashloans as (
   FROM
     {{ ref('silver__seamless_flashloans') }}
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -122,17 +122,17 @@ flashloan_union as (
   SELECT
     *
   FROM
-    aave_flashloans
+    aave
   UNION ALL
   SELECT
     *
   FROM
-    granary_flashloans
+    granary
   UNION ALL
   SELECT
     *
   FROM
-    seamless_flashloans
+    seamless
 ),
 
 FINAL AS (

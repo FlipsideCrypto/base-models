@@ -6,7 +6,7 @@
     tags = ['reorg','curated']
 ) }}
 
-WITH aave_borrows AS (
+WITH aave AS (
 
     SELECT
         tx_hash,
@@ -42,7 +42,7 @@ WHERE
     )
 {% endif %}
 ),
-granary_borrows as (
+granary as (
 
     SELECT
         tx_hash,
@@ -78,7 +78,7 @@ granary_borrows as (
         )
     {% endif %}
 ),
-comp_borrows as (
+comp as (
 SELECT
     tx_hash,
     block_number,
@@ -102,7 +102,7 @@ FROM
     {{ ref('silver__comp_borrows') }}
     A
 
-{% if is_incremental() and 'exactly' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'comp' not in var('HEAL_CURATED_MODEL') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
@@ -115,7 +115,7 @@ WHERE
 {% endif %}
 
 ),
-sonne_borrows as (
+sonne as (
     SELECT
         tx_hash,
         block_number,
@@ -150,7 +150,7 @@ WHERE
     )
 {% endif %}
 ),
-seamless_borrows as (
+seamless as (
 
     SELECT
         tx_hash,
@@ -174,7 +174,7 @@ seamless_borrows as (
     FROM
         {{ ref('silver__seamless_borrows') }} A
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
     WHERE
         A._inserted_timestamp >= (
             SELECT
@@ -186,7 +186,7 @@ seamless_borrows as (
         )
     {% endif %}
 ),
-moonwell_borrows as (
+moonwell as (
     SELECT
         tx_hash,
         block_number,
@@ -209,7 +209,7 @@ moonwell_borrows as (
     FROM
         {{ ref('silver__moonwell_borrows') }} A
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
@@ -225,32 +225,32 @@ borrow_union as (
     SELECT
         *
     FROM
-        aave_borrows
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_borrows
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        comp_borrows
+        comp
     UNION ALL
     SELECT
         *
     FROM
-        sonne_borrows
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        seamless_borrows
+        seamless
     UNION ALL
     SELECT
         *
     FROM
-        moonwell_borrows
+        moonwell
 ),
 FINAL AS (
     SELECT

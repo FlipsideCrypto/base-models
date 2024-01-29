@@ -6,7 +6,7 @@
   tags = ['non_realtime','reorg','curated']
 ) }}
 
-WITH aave_liquidations AS (
+WITH aave AS (
   SELECT
     tx_hash,
     block_number,
@@ -44,7 +44,7 @@ WHERE
 {% endif %}
 ),
 
-granary_liquidations AS (
+granary AS (
   SELECT
     tx_hash,
     block_number,
@@ -82,7 +82,7 @@ WHERE
 {% endif %}
 ),
 
-seamless_liquidations AS (
+seamless AS (
   SELECT
     tx_hash,
     block_number,
@@ -109,7 +109,7 @@ seamless_liquidations AS (
   FROM
   {{ ref('silver__seamless_liquidations') }}
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -120,7 +120,7 @@ WHERE
 {% endif %}
 ),
 
-comp_liquidations as (
+comp as (
   SELECT
     tx_hash,
     block_number,
@@ -159,7 +159,7 @@ WHERE
 {% endif %}
 ),
 
-sonne_liquidations as (
+sonne as (
   SELECT
     tx_hash,
     block_number,
@@ -198,7 +198,7 @@ WHERE
 {% endif %}
 ),
 
-moonwell_liquidations as (
+moonwell as (
   SELECT
     tx_hash,
     block_number,
@@ -226,7 +226,7 @@ moonwell_liquidations as (
     {{ ref('silver__moonwell_liquidations') }}
     l
 
-{% if is_incremental() and 'Moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   l._inserted_timestamp >= (
     SELECT
@@ -241,32 +241,32 @@ liquidation_union as (
     SELECT
         *
     FROM
-        aave_liquidations
+        aave
     UNION ALL
     SELECT
         *
     FROM
-        granary_liquidations
+        granary
     UNION ALL
     SELECT
         *
     FROM
-        comp_liquidations
+        comp
     UNION ALL
     SELECT
         *
     FROM
-        sonne_liquidations
+        sonne
     UNION ALL
     SELECT
         *
     FROM
-        seamless_liquidations
+        seamless
     UNION ALL
     SELECT
         *
     FROM
-        moonwell_liquidations
+        moonwell
 ),
 
 contracts AS (
