@@ -77,8 +77,8 @@ SELECT
     contract_address,
     compound_market,
     depositor_address,
-    w.underlying_asset_address AS token_address,
-    w.token_symbol AS token_symbol,
+    asset AS token_address,
+    token_symbol AS token_symbol,
     supply_amount AS amount_unadj,
     supply_amount / pow(
         10,
