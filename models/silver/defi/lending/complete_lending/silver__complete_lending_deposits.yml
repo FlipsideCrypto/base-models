@@ -20,6 +20,7 @@ models:
               datepart: day
               interval: 30
       - name: EVENT_INDEX
+        tests:
           - not_null
       - name: PROTOCOL_MARKET
         tests:
