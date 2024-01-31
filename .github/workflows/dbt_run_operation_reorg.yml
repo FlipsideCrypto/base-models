@@ -45,7 +45,7 @@ jobs:
         id: list_models
         run: |
           reorg_model_list=$(dbt list --select "base_models,tag:reorg" --resource-type model --output name | tail -n +4 | awk -F'.' '{print $NF}' | tr '\n' ',' | sed 's/,$//')
-          echo "model_list=$reorg_model_list" >> $GITHUB_OUTPUT
+          echo "model_list=$reorg_model_list" >> $GITHUB_ENV
   
       - name: Execute block_reorg macro
         run: |
