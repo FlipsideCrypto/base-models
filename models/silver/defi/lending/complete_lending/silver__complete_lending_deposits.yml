@@ -23,6 +23,8 @@ models:
         tests:
           - not_null
       - name: PROTOCOL_MARKET
+        tests:
+          - not_null
       - name: DEPOSITOR
         tests:
           - not_null
