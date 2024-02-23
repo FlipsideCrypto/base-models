@@ -782,7 +782,7 @@ aerodrome_swaps AS (
     LEFT JOIN contracts c2
     ON s.token_out = c2.address
 
-{% if is_incremental() and 'aerodrom_swaps' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'aerodrome_swaps' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -885,6 +885,36 @@ all_dex_standard AS (
     _inserted_timestamp
   FROM
     swapbased_swaps
+  UNION ALL
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    pool_name,
+    event_name,
+    amount_in_unadj,
+    amount_out_unadj,
+    amount_in,
+    amount_out,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    version,
+    token_in,
+    token_out,
+    symbol_in,
+    symbol_out,
+    decimals_in,
+    decimals_out,
+    _log_id,
+    _inserted_timestamp
+  FROM
+    univ2_swaps
   UNION ALL
   SELECT
     block_number,

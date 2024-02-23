@@ -349,6 +349,11 @@ all_pools_standard AS (
   SELECT
     *
   FROM
+    univ2
+  UNION ALL
+  SELECT
+    *
+  FROM
     maverick
   UNION ALL
   SELECT
