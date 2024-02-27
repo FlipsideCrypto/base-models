@@ -22,11 +22,6 @@ sources:
       - name: goerli_transactions
       - name: goerli_debug_traceTransaction
       - name: goerli_eth_getTransactionReceipt
-  - name: udfs_streamline
-    database: udfs
-    schema: streamline
-    tables:
-      - name: node_mapping
   - name: crosschain
     database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
     schema: core
@@ -37,7 +32,6 @@ sources:
     database: "{{ 'crosschain' if target.database == 'BASE' else 'crosschain_dev' }}"
     schema: silver
     tables:
-      - name: apis_keys
       - name: asset_metadata_coin_gecko
       - name: asset_metadata_coin_market_cap
       - name: hourly_prices_coin_gecko

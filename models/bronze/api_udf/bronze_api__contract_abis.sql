@@ -46,7 +46,7 @@ row_nos AS (
 ),
 batched AS ({% for item in range(15) %}
 SELECT
-    rn.contract_address, live.udf_api('GET', CONCAT('https://api.basescan.org/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={base_key}'),{ 'User-Agent': 'FlipsideStreamline' },{},'EXPLORER') AS abi_data, SYSDATE() AS _inserted_timestamp
+    rn.contract_address, live.udf_api('GET', CONCAT('https://api.basescan.org/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={key}'),{ 'User-Agent': 'FlipsideStreamline' },{}, 'Vault/prod/block_explorers/base_scan') AS abi_data, SYSDATE() AS _inserted_timestamp
 FROM
     row_nos rn
 WHERE
