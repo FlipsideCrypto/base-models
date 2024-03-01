@@ -47,17 +47,6 @@ AND _inserted_timestamp > (
 GROUP BY
     to_address
 ),
-previous_totals AS (
-
-{% if is_incremental() %}
-SELECT
-    contract_address, total_event_count, total_call_count, max_inserted_timestamp_logs, max_inserted_timestamp_traces
-FROM
-    {{ this }}
-{% else %}
-SELECT
-    NULL AS contract_address, 0 AS total_event_count, 0 AS total_call_count, '1970-01-01 00:00:00' AS max_inserted_timestamp_logs, '1970-01-01 00:00:00' AS max_inserted_timestamp_traces
-{% endif %}),
 active_contracts AS (
     SELECT
         contract_address
@@ -68,7 +57,18 @@ active_contracts AS (
         contract_address
     FROM
         function_calls
-)
+),
+previous_totals AS (
+
+{% if is_incremental() %}
+SELECT
+    contract_address, total_event_count, total_call_count, max_inserted_timestamp_logs, max_inserted_timestamp_traces
+FROM
+    {{ this }}
+{% else %}
+SELECT
+    NULL AS contract_address, 0 AS total_event_count, 0 AS total_call_count, '1970-01-01 00:00:00' AS max_inserted_timestamp_logs, '1970-01-01 00:00:00' AS max_inserted_timestamp_traces
+{% endif %})
 SELECT
     C.contract_address,
     COALESCE(
@@ -100,22 +100,14 @@ SELECT
     ) AS total_interaction_count,
     COALESCE(
         e.max_inserted_timestamp_logs,
-
-{% if is_incremental() %}
-p.max_inserted_timestamp_logs,
-{% endif %}
-
-'1970-01-01 00:00:00'
-) AS max_inserted_timestamp_logs,
-COALESCE(
-    f.max_inserted_timestamp_traces,
-
-{% if is_incremental() %}
-p.max_inserted_timestamp_traces,
-{% endif %}
-
-'1970-01-01 00:00:00'
-) AS max_inserted_timestamp_traces
+        p.max_inserted_timestamp_logs,
+        '1970-01-01 00:00:00'
+    ) AS max_inserted_timestamp_logs,
+    COALESCE(
+        f.max_inserted_timestamp_traces,
+        p.max_inserted_timestamp_traces,
+        '1970-01-01 00:00:00'
+    ) AS max_inserted_timestamp_traces
 FROM
     active_contracts C
     LEFT JOIN emitted_events e
