@@ -9,15 +9,15 @@ WITH emitted_events AS (
     SELECT
         contract_address,
         COUNT(*) AS event_count,
-        MAX(block_timestamp) AS max_block_timestamp_logs
+        MAX(_inserted_timestamp) AS max_inserted_timestamp_logs
     FROM
         {{ ref('silver__logs') }}
 
 {% if is_incremental() %}
 WHERE
-    block_timestamp > (
+    _inserted_timestamp > (
         SELECT
-            MAX(max_block_timestamp_logs)
+            MAX(max_inserted_timestamp_logs)
         FROM
             {{ this }}
     )
@@ -29,7 +29,7 @@ function_calls AS (
     SELECT
         to_address AS contract_address,
         COUNT(*) AS function_call_count,
-        MAX(block_timestamp) AS max_block_timestamp_traces
+        MAX(_inserted_timestamp) AS max_inserted_timestamp_traces
     FROM
         {{ ref('silver__traces') }}
     WHERE
@@ -37,9 +37,9 @@ function_calls AS (
         AND trace_status = 'SUCCESS'
 
 {% if is_incremental() %}
-AND block_timestamp > (
+AND _inserted_timestamp > (
     SELECT
-        MAX(max_block_timestamp_traces)
+        MAX(max_inserted_timestamp_traces)
     FROM
         {{ this }}
 )
@@ -51,12 +51,12 @@ previous_totals AS (
 
 {% if is_incremental() %}
 SELECT
-    contract_address, total_event_count, total_call_count, max_block_timestamp_logs, max_block_timestamp_traces
+    contract_address, total_event_count, total_call_count, max_inserted_timestamp_logs, max_inserted_timestamp_traces
 FROM
     {{ this }}
 {% else %}
 SELECT
-    NULL AS contract_address, 0 AS total_event_count, 0 AS total_call_count, '1970-01-01 00:00:00' AS max_block_timestamp_logs, '1970-01-01 00:00:00' AS max_block_timestamp_traces
+    NULL AS contract_address, 0 AS total_event_count, 0 AS total_call_count, '1970-01-01 00:00:00' AS max_inserted_timestamp_logs, '1970-01-01 00:00:00' AS max_inserted_timestamp_traces
 {% endif %})
 
 {% if is_incremental() %},
@@ -102,23 +102,23 @@ SELECT
         0
     ) AS total_interaction_count,
     COALESCE(
-        e.max_block_timestamp_logs,
+        e.max_inserted_timestamp_logs,
 
 {% if is_incremental() %}
-pe.max_block_timestamp_logs,
+pe.max_inserted_timestamp_logs,
 {% endif %}
 
 '1970-01-01 00:00:00'
-) AS max_block_timestamp_logs,
+) AS max_inserted_timestamp_logs,
 COALESCE(
-    f.max_block_timestamp_traces,
+    f.max_inserted_timestamp_traces,
 
 {% if is_incremental() %}
-pe.max_block_timestamp_traces,
+pe.max_inserted_timestamp_traces,
 {% endif %}
 
 '1970-01-01 00:00:00'
-) AS max_block_timestamp_traces
+) AS max_inserted_timestamp_traces
 FROM
 
 {% if is_incremental() %}
