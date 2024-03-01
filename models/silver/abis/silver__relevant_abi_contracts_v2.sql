@@ -57,45 +57,42 @@ FROM
 {% else %}
 SELECT
     NULL AS contract_address, 0 AS total_event_count, 0 AS total_call_count, '1970-01-01 00:00:00' AS max_inserted_timestamp_logs, '1970-01-01 00:00:00' AS max_inserted_timestamp_traces
-{% endif %})
-
-{% if is_incremental() %},
+{% endif %}),
 active_contracts AS (
     SELECT
-        contract_address AS created_contract_address
+        contract_address
     FROM
         emitted_events
     UNION
     SELECT
-        contract_address AS created_contract_address
+        contract_address
     FROM
         function_calls
 )
-{% endif %}
 SELECT
-    C.created_contract_address AS contract_address,
+    C.contract_address,
     COALESCE(
-        pe.total_event_count,
+        p.total_event_count,
         0
     ) + COALESCE(
         e.event_count,
         0
     ) AS total_event_count,
     COALESCE(
-        pe.total_call_count,
+        p.total_call_count,
         0
     ) + COALESCE(
         f.function_call_count,
         0
     ) AS total_call_count,
     COALESCE(
-        pe.total_event_count,
+        p.total_event_count,
         0
     ) + COALESCE(
         e.event_count,
         0
     ) + COALESCE(
-        pe.total_call_count,
+        p.total_call_count,
         0
     ) + COALESCE(
         f.function_call_count,
@@ -105,7 +102,7 @@ SELECT
         e.max_inserted_timestamp_logs,
 
 {% if is_incremental() %}
-pe.max_inserted_timestamp_logs,
+p.max_inserted_timestamp_logs,
 {% endif %}
 
 '1970-01-01 00:00:00'
@@ -114,21 +111,16 @@ COALESCE(
     f.max_inserted_timestamp_traces,
 
 {% if is_incremental() %}
-pe.max_inserted_timestamp_traces,
+p.max_inserted_timestamp_traces,
 {% endif %}
 
 '1970-01-01 00:00:00'
 ) AS max_inserted_timestamp_traces
 FROM
-
-{% if is_incremental() %}
-active_contracts C
-{% else %}
-    {{ ref('silver__created_contracts') }} C
-{% endif %}
-LEFT JOIN emitted_events e
-ON C.created_contract_address = e.contract_address
-LEFT JOIN function_calls f
-ON C.created_contract_address = f.contract_address
-LEFT JOIN previous_totals pe
-ON C.created_contract_address = pe.contract_address
+    active_contracts C
+    LEFT JOIN emitted_events e
+    ON C.contract_address = e.contract_address
+    LEFT JOIN function_calls f
+    ON C.contract_address = f.contract_address
+    LEFT JOIN previous_totals p
+    ON C.contract_address = p.contract_address
