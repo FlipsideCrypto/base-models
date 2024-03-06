@@ -91,7 +91,7 @@ curve_swaps AS (
       'null'
     ) <> COALESCE(token_symbol_out, 'null')
 
-{% if is_incremental() and 'curve' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'curve_swaps' not in var('HEAL_CURATED_MODEL') %}
 AND _inserted_timestamp >= (
   SELECT
     MAX(_inserted_timestamp) - INTERVAL '36 hours'
