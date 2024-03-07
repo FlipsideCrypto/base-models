@@ -71,7 +71,7 @@ curve AS (
   FROM
     {{ ref('silver_dex__curve_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'curve' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -106,7 +106,7 @@ balancer AS (
   FROM
     {{ ref('silver_dex__balancer_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'balancer' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -134,7 +134,34 @@ uni_v3 AS (
   FROM
     {{ ref('silver_dex__univ3_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'uni_v3' not in var('HEAL_CURATED_MODEL') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+uni_v2 AS (
+
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    token0,
+    token1,
+    'uniswap-v2' AS platform,
+    'v2' AS version,
+    _log_id AS _id,
+    _inserted_timestamp
+FROM
+    {{ ref('silver_dex__univ2_pools') }}
+{% if is_incremental() and 'uni_v2' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -162,7 +189,7 @@ dackieswap AS (
   FROM
     {{ ref('silver_dex__dackie_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'dackieswap' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -190,7 +217,7 @@ sushi AS (
   FROM
     {{ ref('silver_dex__sushi_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'sushi' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -217,7 +244,7 @@ maverick AS (
   FROM
     {{ ref('silver_dex__maverick_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'maverick' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -244,7 +271,7 @@ swapbased AS (
   FROM
     {{ ref('silver_dex__swapbased_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'swapbased' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -271,7 +298,7 @@ aerodrome AS (
   FROM
     {{ ref('silver_dex__aerodrome_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'aerodrome' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -298,7 +325,7 @@ baseswap AS (
   FROM
     {{ ref('silver_dex__baseswap_pools') }}
 
-{% if is_incremental() %}
+{% if is_incremental() and 'baseswap' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -318,6 +345,11 @@ all_pools_standard AS (
     *
   FROM
     swapbased
+  UNION ALL
+  SELECT
+    *
+  FROM
+    uni_v2
   UNION ALL
   SELECT
     *
