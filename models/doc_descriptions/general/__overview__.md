@@ -32,7 +32,7 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Convenience Tables:**
 - [ez_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_decoded_event_logs)
-- [ez_eth_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_eth_transfers)
+- [ez_native_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_native_transfers)
 - [ez_token_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_token_transfers)
 
 ### Price Tables (base.price)
