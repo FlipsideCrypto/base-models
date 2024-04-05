@@ -1,8 +1,0 @@
-version: 2
-models:
-  - name: silver__contracts_genesis
-    description: This model identifies all contracts that have been deployed on Base's first instance with GENESIS blocks that are not present in creation traces.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - CONTRACT_ADDRESS
