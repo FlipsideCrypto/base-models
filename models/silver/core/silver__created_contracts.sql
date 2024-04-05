@@ -59,8 +59,7 @@ SELECT
 FROM
     {{ ref('silver__genesis_contracts_backfill') }}
 
-{# {% if is_incremental() %}
+{% if is_incremental() %}
 WHERE
     1 = 2
-{% endif %} #}
---add back after run
+{% endif %}
