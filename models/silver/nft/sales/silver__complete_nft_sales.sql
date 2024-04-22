@@ -142,7 +142,7 @@ prices_raw AS (
         decimals,
         price AS hourly_prices
     FROM
-        {{ ref('price__ez_hourly_token_prices') }}
+        {{ ref('price__ez_prices_hourly') }}
     WHERE
         token_address IN (
             SELECT
@@ -166,7 +166,7 @@ eth_price AS (
         18 AS decimals,
         price AS eth_price_hourly
     FROM
-        {{ ref('silver__hourly_prices_priority_eth') }}
+        {{ ref('silver__complete_token_prices') }}
     WHERE
         HOUR :: DATE IN (
             SELECT
@@ -174,6 +174,7 @@ eth_price AS (
             FROM
                 nft_base_models
         )
+        AND token_address = '0x4200000000000000000000000000000000000006'
 ),
 all_prices AS (
     SELECT
