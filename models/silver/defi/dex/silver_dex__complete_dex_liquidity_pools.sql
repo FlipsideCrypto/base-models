@@ -171,6 +171,33 @@ WHERE
   )
 {% endif %}
 ),
+alienbase AS (
+
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    token0,
+    token1,
+    'alienbase' AS platform,
+    'v2' AS version,
+    _log_id AS _id,
+    _inserted_timestamp
+FROM
+    {{ ref('silver_dex__alienbase_pools') }}
+{% if is_incremental() and 'alienbase' not in var('HEAL_CURATED_MODEL') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 dackieswap AS (
   SELECT
     block_number,
@@ -218,34 +245,6 @@ sushi AS (
     {{ ref('silver_dex__sushi_pools') }}
 
 {% if is_incremental() and 'sushi' not in var('HEAL_CURATED_MODEL') %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) - INTERVAL '12 hours'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
-alienbase AS (
-  SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    contract_address,
-    pool_address,
-    fee,
-    tick_spacing,
-    token0_address AS token0,
-    token1_address AS token1,
-    'alienbaseswap' AS platform,
-    'v1' AS version,
-    _id,
-    _inserted_timestamp
-  FROM
-    {{ ref('silver_dex__alienbase_pools') }}
-
-{% if is_incremental() and 'alienbase' not in var('HEAL_CURATED_MODEL') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -382,6 +381,11 @@ all_pools_standard AS (
   SELECT
     *
   FROM
+    alienbase
+  UNION ALL
+  SELECT
+    *
+  FROM
     maverick
   UNION ALL
   SELECT
@@ -399,11 +403,6 @@ all_pools_v3 AS (
     *
   FROM
     sushi
-  UNION ALL
-  SELECT
-    *
-  FROM
-    alienbase
   UNION ALL
   SELECT
     *
