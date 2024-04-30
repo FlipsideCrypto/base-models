@@ -171,6 +171,33 @@ WHERE
   )
 {% endif %}
 ),
+alienbase AS (
+
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    token0,
+    token1,
+    'alienbase' AS platform,
+    'v2' AS version,
+    _log_id AS _id,
+    _inserted_timestamp
+FROM
+    {{ ref('silver_dex__alienbase_pools') }}
+{% if is_incremental() and 'alienbase' not in var('HEAL_CURATED_MODEL') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '12 hours'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 dackieswap AS (
   SELECT
     block_number,
@@ -350,6 +377,11 @@ all_pools_standard AS (
     *
   FROM
     uni_v2
+  UNION ALL
+  SELECT
+    *
+  FROM
+    alienbase
   UNION ALL
   SELECT
     *
