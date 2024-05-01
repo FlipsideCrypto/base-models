@@ -38,24 +38,29 @@ base:
 
 To control the creation of UDF or SP macros with dbt run:
 * UPDATE_UDFS_AND_SPS
-When True, executes all macros included in the on-run-start hooks within dbt_project.yml on model run as normal
-When False, none of the on-run-start macros are executed on model run
+  * Default values are False
+  * When True, executes all macros included in the on-run-start hooks within dbt_project.yml on model run as normal
+  * When False, none of the on-run-start macros are executed on model run
 
-Default values are False
+  * Usage: `dbt run --vars '{"UPDATE_UDFS_AND_SPS":True}' -m ...`
 
-* Usage:
-dbt run --var '{"UPDATE_UDFS_AND_SPS":True}'  -m ...
+Use a variable to negate incremental logic:
+* Example use case: reload records in a curated complete table without a full-refresh, such as `silver_bridge.complete_bridge_activity`:
+* HEAL_MODELS
+  * Default is an empty array []
+  * When item is included in var array [], incremental logic will be skipped for that CTE / code block  
+  * When item is not included in var array [] or does not match specified item in model, incremental logic will apply
+  * Example set up: `{% if is_incremental() and 'axelar' not in var('HEAL_MODELS') %}`
 
-To reload records in a curated complete table without a full-refresh, such as `silver_bridge.complete_bridge_activity`:
-* HEAL_CURATED_MODEL
-Default is an empty array []
-When item is included in var array [], incremental logic will be skipped for that CTE / code block  
-When item is not included in var array [] or does not match specified item in model, incremental logic will apply
-Example set up: `{% if is_incremental() and 'axelar' not in var('HEAL_CURATED_MODEL') %}`
+  * Usage:
+    * Single CTE: `dbt run --vars '{"HEAL_MODELS":"axelar"}' -m ...`
+    * Multiple CTEs: `dbt run --vars '{"HEAL_MODELS":["axelar","across","celer_cbridge"]}' -m ...`
 
-* Usage:
-Single CTE: dbt run --var '{"HEAL_CURATED_MODEL":"axelar"}' -m ...
-Multiple CTEs: dbt run --var '{"HEAL_CURATED_MODEL":["axelar","across","celer_cbridge"]}' -m ...
+* LOOKBACK
+  * Default is a string representing the specified time interval e.g. '12 hours', '7 days' etc.
+  * Example set up: `SELECT MAX(_inserted_timestamp) - INTERVAL '{{ var('LOOKBACK', '4 hours') }}'`
+
+  * Usage: `dbt run --vars '{"LOOKBACK":"36 hours"}' -m ...`
 
 ### Resources:
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
@@ -97,7 +102,7 @@ To add/update a model's snowflake tags, add/modify the `meta` model property und
 By default, model tags are pushed to Snowflake on each load. You can disable this by setting the `UPDATE_SNOWFLAKE_TAGS` project variable to `False` during a run.
 
 ```
-dbt run --var '{"UPDATE_SNOWFLAKE_TAGS":False}' -s models/core/core__fact_blocks.sql
+dbt run --vars '{"UPDATE_SNOWFLAKE_TAGS":False}' -s models/core/core__fact_blocks.sql
 ```
 
 ### Querying for existing tags on a model in snowflake

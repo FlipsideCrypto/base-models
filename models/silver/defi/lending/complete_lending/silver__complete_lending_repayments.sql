@@ -30,7 +30,7 @@ WITH aave AS (
     _INSERTED_TIMESTAMP
   FROM
     {{ ref('silver__aave_repayments') }}
-{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'aave' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -66,7 +66,7 @@ granary as (
   FROM
     {{ ref('silver__granary_repayments') }}
 
-  {% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
+  {% if is_incremental() and 'granary' not in var('HEAL_MODELS') %}
   WHERE
     _inserted_timestamp >= (
       SELECT
@@ -102,7 +102,7 @@ seamless as (
   FROM
     {{ ref('silver__seamless_repayments') }}
 
-  {% if is_incremental() and 'seameless' not in var('HEAL_CURATED_MODEL') %}
+  {% if is_incremental() and 'seameless' not in var('HEAL_MODELS') %}
   WHERE
     _inserted_timestamp >= (
       SELECT
@@ -137,7 +137,7 @@ comp as (
   FROM
     {{ ref('silver__comp_repayments') }}
 
-  {% if is_incremental() and 'comp' not in var('HEAL_CURATED_MODEL') %}
+  {% if is_incremental() and 'comp' not in var('HEAL_MODELS') %}
   WHERE
     _inserted_timestamp >= (
       SELECT
@@ -172,7 +172,7 @@ sonne as (
   FROM
     {{ ref('silver__sonne_repayments') }}
 
- {% if is_incremental() and 'sonne' not in var('HEAL_CURATED_MODEL') %}
+ {% if is_incremental() and 'sonne' not in var('HEAL_MODELS') %}
   WHERE
     _inserted_timestamp >= (
       SELECT
@@ -207,7 +207,7 @@ moonwell as (
   FROM
     {{ ref('silver__moonwell_repayments') }}
 
- {% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
+ {% if is_incremental() and 'moonwell' not in var('HEAL_MODELS') %}
   WHERE
     _inserted_timestamp >= (
       SELECT

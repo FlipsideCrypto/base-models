@@ -33,7 +33,7 @@ WITH aave AS (
   FROM
     {{ ref('silver__aave_flashloans') }}
 
-{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'aave' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -70,7 +70,7 @@ granary as (
   FROM
     {{ ref('silver__granary_flashloans') }}
 
-{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'granary' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -107,7 +107,7 @@ seamless as (
   FROM
     {{ ref('silver__seamless_flashloans') }}
 
-{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seamless' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT

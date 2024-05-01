@@ -38,7 +38,7 @@ WITH nft_base_models AS (
     FROM
         {{ ref('silver__seaport_1_5_sales') }}
 
-{% if is_incremental() and 'seaport_1_5' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seaport_1_5' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
@@ -80,7 +80,7 @@ SELECT
 FROM
     {{ ref('silver__zeroex_sales') }}
 
-{% if is_incremental() and 'zeroex' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'zeroex' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
@@ -122,7 +122,7 @@ SELECT
 FROM
     {{ ref('silver__seaport_1_6_sales') }}
 
-{% if is_incremental() and 'seaport_1_6' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'seaport_1_6' not in var('HEAL_MODELS') %}
 WHERE
     _inserted_timestamp >= (
         SELECT
