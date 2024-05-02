@@ -44,6 +44,14 @@ To control the creation of UDF or SP macros with dbt run:
 
   * Usage: `dbt run --vars '{"UPDATE_UDFS_AND_SPS":True}' -m ...`
 
+Use a variable to heal a model incrementally:
+* HEAL_MODEL
+  * Default is FALSE (Boolean)
+  * When FALSE, logic will be negated
+  * When TRUE, heal logic will apply
+
+  * Usage: `dbt run --vars '{"HEAL_MODEL":True}' -m ...`
+
 Use a variable to negate incremental logic:
 * Example use case: reload records in a curated complete table without a full-refresh, such as `silver_bridge.complete_bridge_activity`:
 * HEAL_MODELS
@@ -56,6 +64,7 @@ Use a variable to negate incremental logic:
     * Single CTE: `dbt run --vars '{"HEAL_MODELS":"axelar"}' -m ...`
     * Multiple CTEs: `dbt run --vars '{"HEAL_MODELS":["axelar","across","celer_cbridge"]}' -m ...`
 
+Use a variable to extend the incremental lookback period:
 * LOOKBACK
   * Default is a string representing the specified time interval e.g. '12 hours', '7 days' etc.
   * Example set up: `SELECT MAX(_inserted_timestamp) - INTERVAL '{{ var('LOOKBACK', '4 hours') }}'`
