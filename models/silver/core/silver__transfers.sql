@@ -1,4 +1,4 @@
--- depends_on: {{ ref('silver__complete_token_prices') }}
+-- depends_on: {{ ref('silver__hourly_prices_priority') }}
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
@@ -85,7 +85,7 @@ token_transfers AS (
         _inserted_timestamp
     FROM
         logs t
-        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
+        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
         p
         ON t.contract_address = p.token_address
         AND DATE_TRUNC(
@@ -147,7 +147,7 @@ heal_model AS (
     FROM
         {{ this }}
         t0
-        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
+        LEFT JOIN {{ ref('price__ez_hourly_token_prices') }}
         p
         ON t0.contract_address = p.token_address
         AND DATE_TRUNC(
@@ -203,7 +203,7 @@ heal_model AS (
                             SELECT
                                 1
                             FROM
-                                {{ ref('silver__complete_token_prices') }}
+                                {{ ref('silver__hourly_prices_priority') }}
                                 p
                             WHERE
                                 p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())

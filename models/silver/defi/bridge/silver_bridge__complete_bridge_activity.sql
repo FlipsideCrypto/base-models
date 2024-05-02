@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('silver__complete_token_prices') }}
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
@@ -585,7 +586,7 @@ complete_bridge_activity AS (
 
 {% if is_incremental() and var(
     'HEAL_MODEL'
-) %} --do we need this var or can it heal every run?
+) %}
 heal_model AS (
     SELECT
         block_number,
@@ -622,11 +623,11 @@ heal_model AS (
                 d.chain
             )
         END AS destination_chain,
-        t.token_address,
+        t0.token_address,
         CASE
             WHEN platform = 'axelar' THEN COALESCE(
                 C.token_symbol,
-                t.token_symbol
+                t0.token_symbol
             )
             ELSE C.token_symbol
         END AS token_symbol,
@@ -644,15 +645,15 @@ heal_model AS (
             ELSE NULL
         END AS amount_usd_unadj,
         _id,
-        t._inserted_timestamp
+        t0._inserted_timestamp
     FROM
         {{ this }}
-        t
+        t0
         LEFT JOIN {{ ref('silver__contracts') }} C
-        ON t.token_address = C.contract_address
+        ON t0.token_address = C.contract_address
         LEFT JOIN {{ ref('price__ez_prices_hourly') }}
         p
-        ON t.token_address = p.token_address
+        ON t0.token_address = p.token_address
         AND DATE_TRUNC(
             'hour',
             block_timestamp
@@ -662,55 +663,113 @@ heal_model AS (
             'dim_chains'
         ) }}
         d
-        ON d.chain_id :: STRING = t.destination_chain_id :: STRING
+        ON d.chain_id :: STRING = t0.destination_chain_id :: STRING
         OR LOWER(
             d.chain
         ) = LOWER(
-            t.destination_chain
+            t0.destination_chain
         )
-    WHERE t.amount_usd_unadj IS NULL
-),
-{% endif %}
-
-FINAL AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        origin_from_address,
-        origin_to_address,
-        origin_function_signature,
-        tx_hash,
-        event_index,
-        bridge_address,
-        event_name,
-        platform,
-        version,
-        sender,
-        receiver,
-        destination_chain_receiver,
-        destination_chain_id,
-        destination_chain,
-        token_address,
-        token_symbol,
-        token_decimals,
-        amount_unadj,
-        amount,
-        CASE
-            WHEN amount_usd_unadj < 1e+15 THEN amount_usd_unadj
-            ELSE NULL
-        END AS amount_usd,
-        _id,
-        _inserted_timestamp,
-        {{ dbt_utils.generate_surrogate_key(
-            ['_id']
-        ) }} AS complete_bridge_activity_id,
-        SYSDATE() AS inserted_timestamp,
-        SYSDATE() AS modified_timestamp,
-        '{{ invocation_id }}' AS _invocation_id
-    FROM
-        complete_bridge_activity
     WHERE
-        destination_chain <> 'base'
+        t0.block_number IN (
+            SELECT
+                DISTINCT t1.block_number AS block_number
+            FROM
+                {{ this }}
+                t1
+            WHERE
+                t1.token_decimals IS NULL
+                AND t1._inserted_timestamp < (
+                    SELECT
+                        MAX(
+                            _inserted_timestamp
+                        ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                    FROM
+                        {{ this }}
+                )
+                AND EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        {{ ref('silver__contracts') }} C
+                    WHERE
+                        C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                        AND C.token_decimals IS NOT NULL
+                        AND C.contract_address = t1.token_address)
+                )
+                OR t0.block_number IN (
+                    SELECT
+                        DISTINCT t2.block_number AS block_number
+                    FROM
+                        {{ this }}
+                        t2
+                    WHERE
+                        t2.amount_usd IS NULL
+                        AND t2._inserted_timestamp < (
+                            SELECT
+                                MAX(
+                                    _inserted_timestamp
+                                ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                            FROM
+                                {{ this }}
+                        )
+                        AND EXISTS (
+                            SELECT
+                                1
+                            FROM
+                                {{ ref('silver__complete_token_prices') }}
+                                p
+                            WHERE
+                                p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                                AND p.price IS NOT NULL
+                                AND p.token_address = t2.token_address
+                                AND p.hour = DATE_TRUNC(
+                                    'hour',
+                                    t2.block_timestamp
+                                )
+                        )
+                )
+        ),
+    {% endif %}
+
+    FINAL AS (
+        SELECT
+            block_number,
+            block_timestamp,
+            origin_from_address,
+            origin_to_address,
+            origin_function_signature,
+            tx_hash,
+            event_index,
+            bridge_address,
+            event_name,
+            platform,
+            version,
+            sender,
+            receiver,
+            destination_chain_receiver,
+            destination_chain_id,
+            destination_chain,
+            token_address,
+            token_symbol,
+            token_decimals,
+            amount_unadj,
+            amount,
+            CASE
+                WHEN amount_usd_unadj < 1e+15 THEN amount_usd_unadj
+                ELSE NULL
+            END AS amount_usd,
+            _id,
+            _inserted_timestamp,
+            {{ dbt_utils.generate_surrogate_key(
+                ['_id']
+            ) }} AS complete_bridge_activity_id,
+            SYSDATE() AS inserted_timestamp,
+            SYSDATE() AS modified_timestamp,
+            '{{ invocation_id }}' AS _invocation_id
+        FROM
+            complete_bridge_activity
+        WHERE
+            destination_chain <> 'base'
 
 {% if is_incremental() and var(
     'HEAL_MODEL'
