@@ -34,7 +34,7 @@ base:
       client_session_keep_alive: False
       query_tag: <TAG>
 ```
-### Variables
+## Variables
 
 To control the creation of UDF or SP macros with dbt run:
 * UPDATE_UDFS_AND_SPS
@@ -70,14 +70,6 @@ Use a variable to extend the incremental lookback period:
   * Example set up: `SELECT MAX(_inserted_timestamp) - INTERVAL '{{ var('LOOKBACK', '4 hours') }}'`
 
   * Usage: `dbt run --vars '{"LOOKBACK":"36 hours"}' -m ...`
-
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
-
 
 ## Applying Model Tags
 
@@ -120,3 +112,10 @@ dbt run --vars '{"UPDATE_SNOWFLAKE_TAGS":False}' -s models/core/core__fact_block
 select *
 from table(base.information_schema.tag_references('base.core.fact_blocks', 'table'));
 ```
+
+### Resources:
+- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
+- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
+- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
+- Find [dbt events](https://events.getdbt.com) near you
+- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
