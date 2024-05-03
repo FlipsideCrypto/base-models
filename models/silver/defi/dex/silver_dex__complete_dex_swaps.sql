@@ -94,6 +94,14 @@ sushi_swaps AS (
       ELSE token1_address
     END AS token_out,
     CASE
+      WHEN amount0_unadj > 0 THEN c1.decimals
+      ELSE c2.decimals
+    END AS decimals_in,
+    CASE
+      WHEN amount0_unadj < 0 THEN c1.decimals
+      ELSE c2.decimals
+    END AS decimals_out,
+    CASE
       WHEN amount0_unadj > 0 THEN c1.symbol
       ELSE c2.symbol
     END AS symbol_in,
@@ -196,6 +204,14 @@ dackie_swaps AS (
       ELSE token1_address
     END AS token_out,
     CASE
+      WHEN amount0_unadj > 0 THEN c1.decimals
+      ELSE c2.decimals
+    END AS decimals_in,
+    CASE
+      WHEN amount0_unadj < 0 THEN c1.decimals
+      ELSE c2.decimals
+    END AS decimals_out,
+    CASE
       WHEN amount0_unadj > 0 THEN c1.symbol
       ELSE c2.symbol
     END AS symbol_in,
@@ -297,6 +313,14 @@ univ3_swaps AS (
       WHEN amount0_unadj < 0 THEN token0_address
       ELSE token1_address
     END AS token_out,
+    CASE
+      WHEN amount0_unadj > 0 THEN c1.decimals
+      ELSE c2.decimals
+    END AS decimals_in,
+    CASE
+      WHEN amount0_unadj < 0 THEN c1.decimals
+      ELSE c2.decimals
+    END AS decimals_out,
     CASE
       WHEN amount0_unadj > 0 THEN c1.symbol
       ELSE c2.symbol
@@ -416,37 +440,19 @@ univ2_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
     platform,
-    'v2' AS version,
+    'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__univ2_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'univ2_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -468,20 +474,8 @@ alienbase_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -489,16 +483,10 @@ alienbase_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__alienbase_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'alienbase_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -520,20 +508,8 @@ maverick_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -541,16 +517,10 @@ maverick_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__maverick_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'maverick_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -572,20 +542,8 @@ woofi_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -593,38 +551,10 @@ woofi_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(
-        COALESCE(
-          symbol_in,
-          CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))
-        ),
-        COALESCE(
-          symbol_out,
-          CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42))
-        )
-      ),
-      '-',
-      GREATEST(
-        COALESCE(
-          symbol_in,
-          CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))
-        ),
-        COALESCE(
-          symbol_out,
-          CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42))
-        )
-      )
-    ) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__woofi_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'woofi_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -646,20 +576,8 @@ balancer_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -667,16 +585,10 @@ balancer_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__balancer_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'balancer_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -698,20 +610,8 @@ baseswap_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -719,16 +619,10 @@ baseswap_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__baseswap_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'baseswap_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -750,20 +644,8 @@ swapbased_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -771,16 +653,10 @@ swapbased_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__swapbased_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'swapbased_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -802,20 +678,8 @@ aerodrome_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -823,16 +687,10 @@ aerodrome_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    NULL AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__aerodrome_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'aerodrome_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -854,20 +712,8 @@ voodoo_swaps AS (
     origin_to_address,
     contract_address,
     event_name,
-    c1.decimals AS decimals_in,
-    c1.symbol AS symbol_in,
     amount_in_unadj,
-    CASE
-      WHEN decimals_in IS NULL THEN amount_in_unadj
-      ELSE (amount_in_unadj / pow(10, decimals_in))
-    END AS amount_in,
-    c2.decimals AS decimals_out,
-    c2.symbol AS symbol_out,
     amount_out_unadj,
-    CASE
-      WHEN decimals_out IS NULL THEN amount_out_unadj
-      ELSE (amount_out_unadj / pow(10, decimals_out))
-    END AS amount_out,
     sender,
     tx_to,
     event_index,
@@ -875,26 +721,10 @@ voodoo_swaps AS (
     'v1' AS version,
     token_in,
     token_out,
-    CONCAT(
-      LEAST(
-          COALESCE(symbol_in, CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))),
-          COALESCE(symbol_out, CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42)))
-      ),
-      '-',
-      GREATEST(
-          COALESCE(symbol_in, CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))),
-          COALESCE(symbol_out, CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42)))
-      )
-    ) AS pool_name,
     _log_id,
     _inserted_timestamp
   FROM
     {{ ref('silver_dex__voodoo_swaps') }}
-    s
-    LEFT JOIN contracts c1
-    ON s.token_in = c1.address
-    LEFT JOIN contracts c2
-    ON s.token_out = c2.address
 
 {% if is_incremental() and 'voodoo_swaps' not in var('HEAL_MODELS') %}
 WHERE
@@ -936,11 +766,6 @@ all_dex_standard AS (
   SELECT
     *
   FROM
-    curve_swaps
-  UNION ALL
-  SELECT
-    *
-  FROM
     woofi_swaps
   UNION ALL
   SELECT
@@ -975,6 +800,12 @@ all_dex_custom AS (
   FROM
     dackie_swaps
 ),
+all_dex_other AS (
+  SELECT
+    *
+  FROM
+    curve_swaps
+),
 FINAL AS (
   SELECT
     block_number,
@@ -984,39 +815,79 @@ FINAL AS (
     origin_from_address,
     origin_to_address,
     contract_address,
-    pool_name,
     event_name,
+    token_in,
+    c1.decimals AS decimals_in,
+    c1.symbol AS symbol_in,
     amount_in_unadj,
-    amount_in,
     CASE
-      WHEN s.decimals_in IS NOT NULL THEN ROUND(
+      WHEN decimals_in IS NULL THEN amount_in_unadj
+      ELSE (amount_in_unadj / pow(10, decimals_in))
+    END AS amount_in,
+    CASE
+      WHEN decimals_in IS NOT NULL THEN ROUND(
         amount_in * p1.price,
         2
       )
       ELSE NULL
     END AS amount_in_usd,
+    token_out,
+    c2.decimals AS decimals_out,
+    c2.symbol AS symbol_out,
     amount_out_unadj,
-    amount_out,
     CASE
-      WHEN s.decimals_out IS NOT NULL THEN ROUND(
+      WHEN decimals_out IS NULL THEN amount_out_unadj
+      ELSE (amount_out_unadj / pow(10, decimals_out))
+    END AS amount_out,
+    CASE
+      WHEN decimals_out IS NOT NULL THEN ROUND(
         amount_out * p2.price,
         2
       )
       ELSE NULL
     END AS amount_out_usd,
+    CASE
+      WHEN platform IN (
+        'woofi',
+        'voodoo'
+      ) THEN CONCAT(
+        LEAST(
+          COALESCE(
+            symbol_in,
+            CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))
+          ),
+          COALESCE(
+            symbol_out,
+            CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42))
+          )
+        ),
+        '-',
+        GREATEST(
+          COALESCE(
+            symbol_in,
+            CONCAT(SUBSTRING(token_in, 1, 5), '...', SUBSTRING(token_in, 39, 42))
+          ),
+          COALESCE(
+            symbol_out,
+            CONCAT(SUBSTRING(token_out, 1, 5), '...', SUBSTRING(token_out, 39, 42))
+          )
+        )
+      )
+      ELSE NULL
+    END AS pool_name,
     sender,
     tx_to,
     event_index,
     platform,
     version,
-    token_in,
-    token_out,
-    symbol_in,
-    symbol_out,
     _log_id,
     _inserted_timestamp
   FROM
     all_dex_standard s
+    LEFT JOIN contracts c1
+    ON s.token_in = c1.address
+    LEFT JOIN contracts c2
+    ON s.token_out = c2.address
     LEFT JOIN prices p1
     ON s.token_in = p1.token_address
     AND DATE_TRUNC(
@@ -1038,33 +909,91 @@ FINAL AS (
     origin_from_address,
     origin_to_address,
     contract_address,
-    pool_name,
     event_name,
+    token_in,
+    decimals_in,
+    symbol_in,
     amount_in_unadj,
     amount_in,
     ROUND(
       amount_in_usd,
       2
     ) AS amount_in_usd,
+    token_out,
+    decimals_out,
+    symbol_out,
     amount_out_unadj,
     amount_out,
     ROUND(
       amount_out_usd,
       2
     ) AS amount_out_usd,
+    pool_name,
     sender,
     tx_to,
     event_index,
     platform,
     version,
-    token_in,
-    token_out,
-    symbol_in,
-    symbol_out,
     _log_id,
     _inserted_timestamp
   FROM
     all_dex_custom C
+  UNION ALL
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    event_name,
+    token_in,
+    decimals_in,
+    symbol_in,
+    amount_in_unadj,
+    amount_in,
+    CASE
+      WHEN t.decimals_in IS NOT NULL THEN ROUND(
+        amount_in * p1.price,
+        2
+      )
+      ELSE NULL
+    END AS amount_in_usd,
+    token_out,
+    decimals_out,
+    symbol_out,
+    amount_out_unadj,
+    amount_out,
+    CASE
+      WHEN t.decimals_out IS NOT NULL THEN ROUND(
+        amount_out * p2.price,
+        2
+      )
+      ELSE NULL
+    END AS amount_out_usd,
+    pool_name,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    version,
+    _log_id,
+    _inserted_timestamp
+  FROM
+    all_dex_other t
+    LEFT JOIN prices p1
+    ON t.token_in = p1.token_address
+    AND DATE_TRUNC(
+      'hour',
+      block_timestamp
+    ) = p1.hour
+    LEFT JOIN prices p2
+    ON t.token_out = p2.token_address
+    AND DATE_TRUNC(
+      'hour',
+      block_timestamp
+    ) = p2.hour
 )
 SELECT
   f.block_number,
