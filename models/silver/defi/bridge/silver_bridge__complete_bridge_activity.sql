@@ -733,48 +733,20 @@ heal_model AS (
 
     FINAL AS (
         SELECT
-            block_number,
-            block_timestamp,
-            origin_from_address,
-            origin_to_address,
-            origin_function_signature,
-            tx_hash,
-            event_index,
-            bridge_address,
-            event_name,
-            platform,
-            version,
-            sender,
-            receiver,
-            destination_chain_receiver,
-            destination_chain_id,
-            destination_chain,
-            token_address,
-            token_symbol,
-            token_decimals,
-            amount_unadj,
-            amount,
-            CASE
-                WHEN amount_usd_unadj < 1e+15 THEN amount_usd_unadj
-                ELSE NULL
-            END AS amount_usd,
-            _id,
-            _inserted_timestamp,
-            {{ dbt_utils.generate_surrogate_key(
-                ['_id']
-            ) }} AS complete_bridge_activity_id,
-            SYSDATE() AS inserted_timestamp,
-            SYSDATE() AS modified_timestamp,
-            '{{ invocation_id }}' AS _invocation_id
+            *
         FROM
             complete_bridge_activity
-        WHERE
-            destination_chain <> 'base'
 
 {% if is_incremental() and var(
     'HEAL_MODEL'
 ) %}
 UNION ALL
+SELECT
+    *
+FROM
+    heal_model
+{% endif %}
+)
 SELECT
     block_number,
     block_timestamp,
@@ -810,14 +782,8 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    heal_model
+    FINAL
 WHERE
-    destination_chain <> 'base'
-{% endif %}
-)
-SELECT
-    *
-FROM
-    FINAL qualify (ROW_NUMBER() over (PARTITION BY _id
+    destination_chain <> 'base' qualify (ROW_NUMBER() over (PARTITION BY _id
 ORDER BY
     _inserted_timestamp DESC)) = 1
