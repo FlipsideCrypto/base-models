@@ -446,7 +446,7 @@ univ2_swaps AS (
     tx_to,
     event_index,
     platform,
-    'v1' AS version,
+    'v2' AS version,
     token_in,
     token_out,
     _log_id,
