@@ -314,6 +314,40 @@ WHERE
   )
 {% endif %}
 ),
+curve AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    event_name,
+    tokens_sold AS amount_in_unadj,
+    tokens_bought AS amount_out_unadj,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    'v1' AS version,
+    token_in,
+    token_out,
+    _log_id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__curve_swaps') }}
+
+{% if is_incremental() and 'curve' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 --union all standard, type 1 dex CTEs here
 all_dex AS (
   SELECT
@@ -360,6 +394,11 @@ all_dex AS (
     *
   FROM
     voodoo
+  UNION ALL
+  SELECT
+    *
+  FROM
+    curve
 ),
 complete_dex_swaps_t1 AS (
   SELECT
@@ -473,7 +512,13 @@ heal_model AS (
     event_name,
     token_in,
     c1.token_decimals AS decimals_in,
-    c1.token_symbol AS symbol_in,
+    CASE
+      WHEN t0.platform = 'curve' THEN COALESCE(
+        c1.token_symbol,
+        t0.symbol_in
+      )
+      ELSE t0.symbol_in
+    END AS symbol_in,
     amount_in_unadj,
     CASE
       WHEN decimals_in IS NULL THEN amount_in_unadj
@@ -485,7 +530,13 @@ heal_model AS (
     END AS amount_in_usd,
     token_out,
     c2.token_decimals AS decimals_out,
-    c2.token_symbol AS symbol_out,
+    CASE
+      WHEN t0.platform = 'curve' THEN COALESCE(
+        c2.token_symbol,
+        t0.symbol_out
+      )
+      ELSE t0.symbol_out
+    END AS symbol_out,
     amount_out_unadj,
     CASE
       WHEN decimals_out IS NULL THEN amount_out_unadj
@@ -745,6 +796,20 @@ SELECT
   SYSDATE() AS modified_timestamp,
   '{{ invocation_id }}' AS _invocation_id
 FROM
-  FINAL qualify (ROW_NUMBER() over (PARTITION BY _log_id
+  FINAL
+WHERE
+  (
+    platform = 'curve'
+    AND amount_out <> 0
+    AND COALESCE(
+      symbol_in,
+      'null'
+    ) <> COALESCE(
+      symbol_out,
+      'null'
+    )
+  ) --verify this is needed
+  OR platform <> 'curve' 
+  qualify (ROW_NUMBER() over (PARTITION BY _log_id
 ORDER BY
   _inserted_timestamp DESC)) = 1

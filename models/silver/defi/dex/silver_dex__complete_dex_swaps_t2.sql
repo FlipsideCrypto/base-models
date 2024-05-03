@@ -315,23 +315,23 @@ heal_model AS (
     t0._inserted_timestamp
   FROM
     {{ this }}
-    t0
+    t0 --verify use of token_in vs token0_address
     LEFT JOIN {{ ref('silver__contracts') }}
     c1
-    ON c1.contract_address = t0.token0_address
+    ON c1.contract_address = t0.token_in
     LEFT JOIN {{ ref('silver__contracts') }}
     c2
-    ON c2.contract_address = t0.token1_address
+    ON c2.contract_address = t0.token_out
     LEFT JOIN {{ ref('price__ez_prices_hourly') }}
     p1
-    ON t0.token0_address = p1.token_address
+    ON t0.token_in = p1.token_address
     AND DATE_TRUNC(
       'hour',
       block_timestamp
     ) = p1.hour
     LEFT JOIN {{ ref('price__ez_prices_hourly') }}
     p2
-    ON t0.token1_address = p2.token_address
+    ON t0.token_out = p2.token_address
     AND DATE_TRUNC(
       'hour',
       block_timestamp
@@ -364,7 +364,7 @@ heal_model AS (
           WHERE
             C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
             AND C.token_decimals IS NOT NULL
-            AND C.contract_address = t1.token0_address)
+            AND C.contract_address = t1.token_in)
         )
         OR t0.block_number IN (
           SELECT
@@ -390,7 +390,7 @@ heal_model AS (
               WHERE
                 C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                 AND C.token_decimals IS NOT NULL
-                AND C.contract_address = t2.token1_address)
+                AND C.contract_address = t2.token_out)
             )
             OR t0.block_number IN (
               SELECT
@@ -417,7 +417,7 @@ heal_model AS (
                   WHERE
                     p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                     AND p.price IS NOT NULL
-                    AND p.token_address = t3.token0_address
+                    AND p.token_address = t3.token_in
                     AND p.hour = DATE_TRUNC(
                       'hour',
                       t3.block_timestamp
@@ -449,7 +449,7 @@ heal_model AS (
                   WHERE
                     p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                     AND p.price IS NOT NULL
-                    AND p.token_address = t4.token1_address
+                    AND p.token_address = t4.token_out
                     AND p.hour = DATE_TRUNC(
                       'hour',
                       t4.block_timestamp
