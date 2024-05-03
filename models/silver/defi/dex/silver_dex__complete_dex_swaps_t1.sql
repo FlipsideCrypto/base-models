@@ -314,7 +314,7 @@ WHERE
   )
 {% endif %}
 ),
---union all standard dex CTEs here
+--union all standard, type 1 dex CTEs here
 all_dex AS (
   SELECT
     *
@@ -380,10 +380,7 @@ complete_dex_swaps_t1 AS (
       ELSE (amount_in_unadj / pow(10, decimals_in))
     END AS amount_in,
     CASE
-      WHEN decimals_in IS NOT NULL THEN ROUND(
-        amount_in * p1.price,
-        2
-      )
+      WHEN decimals_in IS NOT NULL THEN amount_in * p1.price
       ELSE NULL
     END AS amount_in_usd,
     token_out,
@@ -395,10 +392,7 @@ complete_dex_swaps_t1 AS (
       ELSE (amount_out_unadj / pow(10, decimals_out))
     END AS amount_out,
     CASE
-      WHEN decimals_out IS NOT NULL THEN ROUND(
-        amount_out * p2.price,
-        2
-      )
+      WHEN decimals_out IS NOT NULL THEN amount_out * p2.price
       ELSE NULL
     END AS amount_out_usd,
     CASE
@@ -486,10 +480,7 @@ heal_model AS (
       ELSE (amount_in_unadj / pow(10, decimals_in))
     END AS amount_in,
     CASE
-      WHEN decimals_in IS NOT NULL THEN ROUND(
-        amount_in * p1.price,
-        2
-      )
+      WHEN decimals_in IS NOT NULL THEN amount_in * p1.price
       ELSE NULL
     END AS amount_in_usd,
     token_out,
@@ -501,10 +492,7 @@ heal_model AS (
       ELSE (amount_out_unadj / pow(10, decimals_out))
     END AS amount_out,
     CASE
-      WHEN decimals_out IS NOT NULL THEN ROUND(
-        amount_out * p2.price,
-        2
-      )
+      WHEN decimals_out IS NOT NULL THEN amount_out * p2.price
       ELSE NULL
     END AS amount_out_usd,
     CASE
@@ -679,7 +667,7 @@ heal_model AS (
                   WHERE
                     p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                     AND p.price IS NOT NULL
-                    AND p.token_address = t4.token_in
+                    AND p.token_address = t4.token_out
                     AND p.hour = DATE_TRUNC(
                       'hour',
                       t4.block_timestamp
@@ -717,20 +705,26 @@ SELECT
   event_name,
   amount_in_unadj,
   amount_in,
-  CASE
-    WHEN amount_out_usd IS NULL
-    OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_out_usd, 0)) > 0.75
-    OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_in_usd, 0)) > 0.75 THEN NULL
-    ELSE amount_in_usd
-  END AS amount_in_usd,
+  ROUND(
+    CASE
+      WHEN amount_out_usd IS NULL
+      OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_out_usd, 0)) > 0.75
+      OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_in_usd, 0)) > 0.75 THEN NULL
+      ELSE amount_in_usd
+    END,
+    2
+  ) AS amount_in_usd,
   amount_out_unadj,
   amount_out,
-  CASE
-    WHEN amount_in_usd IS NULL
-    OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_in_usd, 0)) > 0.75
-    OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_out_usd, 0)) > 0.75 THEN NULL
-    ELSE amount_out_usd
-  END AS amount_out_usd,
+  ROUND(
+    CASE
+      WHEN amount_in_usd IS NULL
+      OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_in_usd, 0)) > 0.75
+      OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_out_usd, 0)) > 0.75 THEN NULL
+      ELSE amount_out_usd
+    END,
+    2
+  ) AS amount_out_usd,
   sender,
   tx_to,
   event_index,

@@ -552,10 +552,7 @@ complete_bridge_activity AS (
             ELSE amount_unadj
         END AS amount,
         CASE
-            WHEN C.token_decimals IS NOT NULL THEN ROUND(
-                amount * p.price,
-                2
-            )
+            WHEN C.token_decimals IS NOT NULL THEN amount * p.price
             ELSE NULL
         END AS amount_usd_unadj,
         _id,
@@ -638,10 +635,7 @@ heal_model AS (
             ELSE amount_unadj
         END AS amount,
         CASE
-            WHEN C.token_decimals IS NOT NULL THEN ROUND(
-                amount * p.price,
-                2
-            )
+            WHEN C.token_decimals IS NOT NULL THEN amount * p.price
             ELSE NULL
         END AS amount_usd_unadj,
         _id,
@@ -769,10 +763,13 @@ SELECT
     token_decimals,
     amount_unadj,
     amount,
-    CASE
-        WHEN amount_usd_unadj < 1e+15 THEN amount_usd_unadj
-        ELSE NULL
-    END AS amount_usd,
+    ROUND(
+        CASE
+            WHEN amount_usd_unadj < 1e + 15 THEN amount_usd_unadj
+            ELSE NULL
+        END,
+        2
+    ) AS amount_usd,
     _id,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
