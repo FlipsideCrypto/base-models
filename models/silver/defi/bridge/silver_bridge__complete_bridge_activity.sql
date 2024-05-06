@@ -765,7 +765,7 @@ SELECT
     amount,
     ROUND(
         CASE
-            WHEN amount_usd_unadj < 1e + 15 THEN amount_usd_unadj
+            WHEN amount_usd_unadj < 1e+15 THEN amount_usd_unadj
             ELSE NULL
         END,
         2
