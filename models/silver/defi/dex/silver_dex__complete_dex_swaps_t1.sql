@@ -796,20 +796,6 @@ SELECT
   SYSDATE() AS modified_timestamp,
   '{{ invocation_id }}' AS _invocation_id
 FROM
-  FINAL
-WHERE
-  (
-    platform = 'curve'
-    AND amount_out <> 0
-    AND COALESCE(
-      symbol_in,
-      'null'
-    ) <> COALESCE(
-      symbol_out,
-      'null'
-    )
-  ) --verify this is needed
-  OR platform <> 'curve' 
-  qualify (ROW_NUMBER() over (PARTITION BY _log_id
+  FINAL qualify (ROW_NUMBER() over (PARTITION BY _log_id
 ORDER BY
   _inserted_timestamp DESC)) = 1
