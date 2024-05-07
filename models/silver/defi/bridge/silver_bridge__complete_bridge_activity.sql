@@ -554,7 +554,7 @@ complete_bridge_activity AS (
         CASE
             WHEN C.token_decimals IS NOT NULL THEN amount * p.price
             ELSE NULL
-        END AS amount_usd_unadj,
+        END AS amount_usd,
         _id,
         b._inserted_timestamp
     FROM
@@ -637,7 +637,7 @@ heal_model AS (
         CASE
             WHEN C.token_decimals IS NOT NULL THEN amount * p.price
             ELSE NULL
-        END AS amount_usd_unadj,
+        END AS amount_usd,
         _id,
         t0._inserted_timestamp
     FROM
@@ -664,9 +664,21 @@ heal_model AS (
             t0.destination_chain
         )
     WHERE
-        t0.block_number IN (
+        CONCAT(
+            t0.block_number,
+            '-',
+            t0.platform,
+            '-',
+            t0.version
+        ) IN (
             SELECT
-                DISTINCT t1.block_number AS block_number
+                CONCAT(
+                    t1.block_number,
+                    '-',
+                    t1.platform,
+                    '-',
+                    t1.version
+                )
             FROM
                 {{ this }}
                 t1
@@ -689,10 +701,24 @@ heal_model AS (
                         C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                         AND C.token_decimals IS NOT NULL
                         AND C.contract_address = t1.token_address)
+                    GROUP BY
+                        1
                 )
-                OR t0.block_number IN (
+                OR CONCAT(
+                    t0.block_number,
+                    '-',
+                    t0.platform,
+                    '-',
+                    t0.version
+                ) IN (
                     SELECT
-                        DISTINCT t2.block_number AS block_number
+                        CONCAT(
+                            t2.block_number,
+                            '-',
+                            t2.platform,
+                            '-',
+                            t2.version
+                        )
                     FROM
                         {{ this }}
                         t2
@@ -721,6 +747,8 @@ heal_model AS (
                                     t2.block_timestamp
                                 )
                         )
+                    GROUP BY
+                        1
                 )
         ),
     {% endif %}
@@ -763,13 +791,7 @@ SELECT
     token_decimals,
     amount_unadj,
     amount,
-    ROUND(
-        CASE
-            WHEN amount_usd_unadj < 1e+15 THEN amount_usd_unadj
-            ELSE NULL
-        END,
-        2
-    ) AS amount_usd,
+    amount_usd,
     _id,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
