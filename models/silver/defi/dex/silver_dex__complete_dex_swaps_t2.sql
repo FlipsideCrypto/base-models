@@ -364,7 +364,7 @@ heal_model AS (
           WHERE
             C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
             AND C.token_decimals IS NOT NULL
-            AND C.contract_address = t1.token0_address)
+            AND C.contract_address = t1.token_in)
         )
         OR t0.block_number IN (
           SELECT
@@ -390,7 +390,7 @@ heal_model AS (
               WHERE
                 C._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                 AND C.token_decimals IS NOT NULL
-                AND C.contract_address = t2.token1_address)
+                AND C.contract_address = t2.token_out)
             )
             OR t0.block_number IN (
               SELECT
@@ -417,7 +417,7 @@ heal_model AS (
                   WHERE
                     p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                     AND p.price IS NOT NULL
-                    AND p.token_address = t3.token0_address
+                    AND p.token_address = t3.token_in
                     AND p.hour = DATE_TRUNC(
                       'hour',
                       t3.block_timestamp
@@ -449,7 +449,7 @@ heal_model AS (
                   WHERE
                     p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
                     AND p.price IS NOT NULL
-                    AND p.token_address = t4.token1_address
+                    AND p.token_address = t4.token_out
                     AND p.hour = DATE_TRUNC(
                       'hour',
                       t4.block_timestamp
@@ -495,26 +495,10 @@ SELECT
   amount1_usd,
   amount_in_unadj,
   amount_in,
-  ROUND(
-    CASE
-      WHEN amount_out_usd IS NULL
-      OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_out_usd, 0)) > 0.75
-      OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_in_usd, 0)) > 0.75 THEN NULL
-      ELSE amount_in_usd
-    END,
-    2
-  ) AS amount_in_usd,
+  amount_in_usd,
   amount_out_unadj,
   amount_out,
-  ROUND(
-    CASE
-      WHEN amount_in_usd IS NULL
-      OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_in_usd, 0)) > 0.75
-      OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_out_usd, 0)) > 0.75 THEN NULL
-      ELSE amount_out_usd
-    END,
-    2
-  ) AS amount_out_usd,
+  amount_out_usd,
   sender,
   tx_to,
   event_index,

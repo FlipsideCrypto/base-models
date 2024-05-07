@@ -494,7 +494,7 @@ complete_dex_swaps_t1 AS (
     ) = p2.hour
     LEFT JOIN {{ ref('silver_dex__complete_dex_liquidity_pools') }}
     lp
-    ON s.contract_address = lp.pool_address --check for nulls
+    ON s.contract_address = lp.pool_address
 ),
 
 {% if is_incremental() and var(
@@ -756,26 +756,10 @@ SELECT
   event_name,
   amount_in_unadj,
   amount_in,
-  ROUND(
-    CASE
-      WHEN amount_out_usd IS NULL
-      OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_out_usd, 0)) > 0.75
-      OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_in_usd, 0)) > 0.75 THEN NULL
-      ELSE amount_in_usd
-    END,
-    2
-  ) AS amount_in_usd,
+  amount_in_usd,
   amount_out_unadj,
   amount_out,
-  ROUND(
-    CASE
-      WHEN amount_in_usd IS NULL
-      OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_in_usd, 0)) > 0.75
-      OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_out_usd, 0)) > 0.75 THEN NULL
-      ELSE amount_out_usd
-    END,
-    2
-  ) AS amount_out_usd,
+  amount_out_usd,
   sender,
   tx_to,
   event_index,
