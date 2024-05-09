@@ -49,6 +49,7 @@ Use a variable to heal a model incrementally:
   * Default is FALSE (Boolean)
   * When FALSE, logic will be negated
   * When TRUE, heal logic will apply
+  * Include `heal` in model tags within the config block for inclusion in the `dbt_run_heal_models` workflow, e.g. `tags = 'heal'`
 
   * Usage: `dbt run --vars '{"HEAL_MODEL":True}' -m ...`
 
