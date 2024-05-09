@@ -1,9 +1,10 @@
+-- depends_on: {{ ref('silver__complete_token_prices') }}
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = ['block_number','platform'],
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['reorg','curated']
+    tags = ['reorg','curated','heal']
 ) }}
 
 WITH aave AS (
@@ -30,20 +31,19 @@ WITH aave AS (
     FROM
         {{ ref('silver__aave_borrows') }} A
 
-{% if is_incremental() and 'aave' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'aave' not in var('HEAL_MODELS') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
 {% endif %}
 ),
-granary as (
-
+granary AS (
     SELECT
         tx_hash,
         block_number,
@@ -66,56 +66,54 @@ granary as (
     FROM
         {{ ref('silver__granary_borrows') }} A
 
-{% if is_incremental() and 'granary' not in var('HEAL_CURATED_MODEL') %}
-    WHERE
-        A._inserted_timestamp >= (
-            SELECT
-                MAX(
-                    _inserted_timestamp
-                ) - INTERVAL '36 hours'
-            FROM
-                {{ this }}
-        )
-    {% endif %}
-),
-comp as (
-SELECT
-    tx_hash,
-    block_number,
-    block_timestamp,
-    event_index,
-    origin_from_address,
-    origin_to_address,
-    origin_function_signature,
-    contract_address,
-    borrower,
-    compound_market AS protocol_market,
-    token_address,
-    token_symbol,
-    amount_unadj,
-    amount,
-    compound_version AS platform,
-    'base' AS blockchain,
-    A._LOG_ID,
-    A._INSERTED_TIMESTAMP
-FROM
-    {{ ref('silver__comp_borrows') }}
-    A
-
-{% if is_incremental() and 'comp' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'granary' not in var('HEAL_MODELS') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
 {% endif %}
-
 ),
-sonne as (
+comp AS (
+    SELECT
+        tx_hash,
+        block_number,
+        block_timestamp,
+        event_index,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        contract_address,
+        borrower,
+        compound_market AS protocol_market,
+        token_address,
+        token_symbol,
+        amount_unadj,
+        amount,
+        compound_version AS platform,
+        'base' AS blockchain,
+        A._LOG_ID,
+        A._INSERTED_TIMESTAMP
+    FROM
+        {{ ref('silver__comp_borrows') }} A
+
+{% if is_incremental() and 'comp' not in var('HEAL_MODELS') %}
+WHERE
+    A._inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
+),
+sonne AS (
     SELECT
         tx_hash,
         block_number,
@@ -138,20 +136,19 @@ sonne as (
     FROM
         {{ ref('silver__sonne_borrows') }} A
 
-{% if is_incremental() and 'sonne' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'sonne' not in var('HEAL_MODELS') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
 {% endif %}
 ),
-seamless as (
-
+seamless AS (
     SELECT
         tx_hash,
         block_number,
@@ -174,19 +171,19 @@ seamless as (
     FROM
         {{ ref('silver__seamless_borrows') }} A
 
-{% if is_incremental() and 'seamless' not in var('HEAL_CURATED_MODEL') %}
-    WHERE
-        A._inserted_timestamp >= (
-            SELECT
-                MAX(
-                    _inserted_timestamp
-                ) - INTERVAL '36 hours'
-            FROM
-                {{ this }}
-        )
-    {% endif %}
+{% if is_incremental() and 'seamless' not in var('HEAL_MODELS') %}
+WHERE
+    A._inserted_timestamp >= (
+        SELECT
+            MAX(
+                _inserted_timestamp
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
 ),
-moonwell as (
+moonwell AS (
     SELECT
         tx_hash,
         block_number,
@@ -209,19 +206,19 @@ moonwell as (
     FROM
         {{ ref('silver__moonwell_borrows') }} A
 
-{% if is_incremental() and 'moonwell' not in var('HEAL_CURATED_MODEL') %}
+{% if is_incremental() and 'moonwell' not in var('HEAL_MODELS') %}
 WHERE
     A._inserted_timestamp >= (
         SELECT
             MAX(
                 _inserted_timestamp
-            ) - INTERVAL '36 hours'
+            ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
         FROM
             {{ this }}
     )
 {% endif %}
 ),
-borrow_union as (
+borrow_union AS (
     SELECT
         *
     FROM
@@ -252,7 +249,7 @@ borrow_union as (
     FROM
         moonwell
 ),
-FINAL AS (
+complete_lending_borrows AS (
     SELECT
         tx_hash,
         block_number,
@@ -289,8 +286,107 @@ FINAL AS (
             'hour',
             block_timestamp
         ) = p.hour
-        LEFT JOIN {{ ref('silver__contracts') }} C
-        ON b.token_address = C.contract_address
+),
+
+{% if is_incremental() and var(
+    'HEAL_MODEL'
+) %}
+heal_model AS (
+    SELECT
+        tx_hash,
+        block_number,
+        block_timestamp,
+        event_index,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        t0.contract_address,
+        event_name,
+        borrower,
+        protocol_market,
+        t0.token_address,
+        t0.token_symbol,
+        amount_unadj,
+        amount,
+        ROUND(
+            amount * p.price,
+            2
+        ) AS amount_usd,
+        platform,
+        t0.blockchain,
+        t0._LOG_ID,
+        t0._INSERTED_TIMESTAMP
+    FROM
+        {{ this }}
+        t0
+        LEFT JOIN {{ ref('price__ez_prices_hourly') }}
+        p
+        ON t0.token_address = p.token_address
+        AND DATE_TRUNC(
+            'hour',
+            block_timestamp
+        ) = p.hour
+    WHERE
+        CONCAT(
+            t0.block_number,
+            '-',
+            t0.platform
+        ) IN (
+            SELECT
+                CONCAT(
+                    t1.block_number,
+                    '-',
+                    t1.platform
+                )
+            FROM
+                {{ this }}
+                t1
+            WHERE
+                t1.amount_usd IS NULL
+                AND t1._inserted_timestamp < (
+                    SELECT
+                        MAX(
+                            _inserted_timestamp
+                        ) - INTERVAL '{{ var(' lookback ', ' 4 hours ') }}'
+                    FROM
+                        {{ this }}
+                )
+                AND EXISTS (
+                    SELECT
+                        1
+                    FROM
+                        {{ ref('silver__complete_token_prices') }}
+                        p
+                    WHERE
+                        p._inserted_timestamp > DATEADD('DAY', -14, SYSDATE())
+                        AND p.price IS NOT NULL
+                        AND p.token_address = t1.token_address
+                        AND p.hour = DATE_TRUNC(
+                            'hour',
+                            t1.block_timestamp
+                        )
+                )
+            GROUP BY
+                1
+        )
+),
+{% endif %}
+
+FINAL AS (
+    SELECT
+        *
+    FROM
+        complete_lending_borrows
+
+{% if is_incremental() and var(
+    'HEAL_MODEL'
+) %}
+UNION ALL
+SELECT
+    *
+FROM
+    heal_model
+{% endif %}
 )
 SELECT
     *,

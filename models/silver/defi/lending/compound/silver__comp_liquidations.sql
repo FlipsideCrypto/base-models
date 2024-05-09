@@ -59,6 +59,7 @@ liquidations AS (
     WHERE
         topics [0] = '0x9850ab1af75177e4a9201c65a2cf7976d5d28e40ef63494b44366f86b2f9412e' --AbsorbCollateral
         AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
+        AND tx_status = 'SUCCESS'
 {% if is_incremental() %}
 AND l._inserted_timestamp >= (
     SELECT

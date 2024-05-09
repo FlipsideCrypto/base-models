@@ -59,6 +59,7 @@ repayments AS (
     WHERE
         topics [0] = '0xd1cf3d156d5f8f0d50f6c122ed609cec09d35c9b9fb3fff6ea0959134dae424e' --Supply
         AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND l._inserted_timestamp >= (

@@ -28,6 +28,7 @@ WITH created_pools AS(
     WHERE
         topics [0] = '0x2128d88d14c80cb081c1252a5acff7a264671bf199ce226b53788fb26065005e'
         AND contract_address = '0x420dd381b31aef6683db6b902084cb0ffece40da'
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
