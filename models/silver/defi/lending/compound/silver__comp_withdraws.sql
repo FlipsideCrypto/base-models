@@ -54,6 +54,7 @@ withdraw AS (
     WHERE
         topics [0] = '0xd6d480d5b3068db003533b170d67561494d72e3bf9fa40a266471351ebba9e16' --WithdrawCollateral
         AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND l._inserted_timestamp >= (

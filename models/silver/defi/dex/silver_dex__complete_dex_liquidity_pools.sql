@@ -190,7 +190,7 @@ WHERE
   )
 {% endif %}
 ),
-uni_v3 AS (
+univ3 AS (
   SELECT
     block_number,
     block_timestamp,
@@ -215,7 +215,7 @@ uni_v3 AS (
   FROM
     {{ ref('silver_dex__univ3_pools') }}
 
-{% if is_incremental() and 'uni_v3' not in var('HEAL_MODELS') %}
+{% if is_incremental() and 'univ3' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -225,7 +225,7 @@ WHERE
   )
 {% endif %}
 ),
-uni_v2 AS (
+univ2 AS (
   SELECT
     block_number,
     block_timestamp,
@@ -250,7 +250,7 @@ uni_v2 AS (
   FROM
     {{ ref('silver_dex__univ2_pools') }}
 
-{% if is_incremental() and 'uni_v2' not in var('HEAL_MODELS') %}
+{% if is_incremental() and 'univ2' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -449,7 +449,7 @@ all_pools AS (
   SELECT
     *
   FROM
-    uni_v2
+    univ2
   UNION ALL
   SELECT
     *
@@ -469,7 +469,7 @@ all_pools AS (
   SELECT
     *
   FROM
-    uni_v3
+    univ3
   UNION ALL
   SELECT
     *
