@@ -500,7 +500,8 @@ complete_lps AS (
     pool_address,
     CASE
       WHEN pool_name IS NOT NULL THEN pool_name
-      WHEN platform IN (
+      WHEN pool_name IS NULL
+      AND platform IN (
         'uniswap-v3',
         'sushiswap',
         'dackieswap'
@@ -530,7 +531,8 @@ complete_lps AS (
           WHEN platform = 'dackieswap' THEN ' DLP'
         END
       )
-      WHEN platform IN (
+      WHEN pool_name IS NULL
+      AND platform IN (
         'balancer',
         'curve'
       ) THEN CONCAT(
@@ -676,7 +678,8 @@ heal_model AS (
     pool_address,
     CASE
       WHEN pool_name IS NOT NULL THEN pool_name
-      WHEN platform IN (
+      WHEN pool_name IS NULL
+      AND platform IN (
         'uniswap-v3',
         'sushiswap',
         'dackieswap'
@@ -706,7 +709,8 @@ heal_model AS (
           WHEN platform = 'dackieswap' THEN ' DLP'
         END
       )
-      WHEN platform IN (
+      WHEN pool_name IS NULL
+      AND platform IN (
         'balancer',
         'curve'
       ) THEN CONCAT(
