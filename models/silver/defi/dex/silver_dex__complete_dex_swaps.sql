@@ -4,7 +4,7 @@
   incremental_strategy = 'delete+insert',
   unique_key = ['block_number','platform','version'],
   cluster_by = ['block_timestamp::DATE'],
-  tags = ['curated','reorg','heal']
+  tags = ['curated','reorg']
 ) }}
 
 WITH univ2 AS (
