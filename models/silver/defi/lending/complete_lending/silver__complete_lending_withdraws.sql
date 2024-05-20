@@ -315,7 +315,7 @@ heal_model AS (
         ROUND(
             amount * p.price,
             2
-        ) AS amount_usd,
+        ) AS amount_usd_heal,
         platform,
         t0.blockchain,
         t0._log_id,
@@ -387,7 +387,26 @@ FINAL AS (
 ) %}
 UNION ALL
 SELECT
-    *
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    event_name,
+    protocol_market,
+    depositor,
+    token_address,
+    token_symbol,
+    amount_unadj,
+    amount,
+    amount_usd_heal AS amount_usd,
+    platform,
+    blockchain,
+    _log_id,
+    _inserted_timestamp
 FROM
     heal_model
 {% endif %}
