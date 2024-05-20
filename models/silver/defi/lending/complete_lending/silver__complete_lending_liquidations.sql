@@ -346,7 +346,7 @@ heal_model AS (
         amount_usd,
         2
       )
-    END AS amount_usd,
+    END AS amount_usd_heal,
     debt_token,
     debt_token_symbol,
     platform,
@@ -420,7 +420,29 @@ FINAL AS (
 ) %}
 UNION ALL
 SELECT
-  *
+  tx_hash,
+  block_number,
+  block_timestamp,
+  event_index,
+  origin_from_address,
+  origin_to_address,
+  origin_function_signature,
+  contract_address,
+  event_name,
+  liquidator,
+  borrower,
+  protocol_market,
+  collateral_token,
+  collateral_token_symbol,
+  amount_unadj,
+  amount,
+  amount_usd_heal AS amount_usd,
+  debt_token,
+  debt_token_symbol,
+  platform,
+  blockchain,
+  _LOG_ID,
+  _INSERTED_TIMESTAMP
 FROM
   heal_model
 {% endif %}
