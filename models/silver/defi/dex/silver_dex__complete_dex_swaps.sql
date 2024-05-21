@@ -587,10 +587,7 @@ complete_dex_swaps AS (
       ELSE NULL
     END AS amount_out_usd,
     CASE
-      WHEN s.platform IN (
-        'woofi',
-        'voodoo'
-      ) THEN CONCAT(
+      WHEN lp.pool_name IS NULL THEN CONCAT(
         LEAST(
           COALESCE(
             symbol_in,
