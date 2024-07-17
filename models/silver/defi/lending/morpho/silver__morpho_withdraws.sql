@@ -106,7 +106,7 @@ SELECT
     C.token_symbol,
     C.token_decimals,
     'Morpho Blue' as platform,
-    'ethereum' as blockchain,
+    'base' AS blockchain,
     t._call_id as _id,
     t._inserted_timestamp
 FROM

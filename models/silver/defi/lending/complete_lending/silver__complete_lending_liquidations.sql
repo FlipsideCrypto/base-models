@@ -103,7 +103,7 @@ morpho AS (
     debt_asset,
     debt_asset_symbol,
     platform,
-    'ethereum' AS blockchain,
+    'base' AS blockchain,
     _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM

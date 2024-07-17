@@ -103,7 +103,7 @@ SELECT
     borrower_address,
     t.contract_address as lending_pool_contract,
     'Morpho Blue' AS platform,
-    'ethereum' AS blockchain,
+    'base' AS blockchain,
     _call_id as _id,
     t._inserted_timestamp
 FROM

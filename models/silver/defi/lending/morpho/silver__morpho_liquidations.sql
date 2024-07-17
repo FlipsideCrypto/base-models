@@ -109,7 +109,7 @@ SELECT
         c1.token_decimals
     ) AS amount,
     'Morpho Blue' as platform,
-    'ethereum' as blockchain,
+    'base' AS blockchain,
     l._log_id,
     l._inserted_timestamp
 FROM

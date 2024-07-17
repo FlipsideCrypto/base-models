@@ -95,7 +95,7 @@ morpho AS (
         amount,
         depositor_address,
         platform,
-        'ethereum' AS blockchain,
+        'base' AS blockchain,
         _id AS _LOG_ID,
         _INSERTED_TIMESTAMP
     FROM

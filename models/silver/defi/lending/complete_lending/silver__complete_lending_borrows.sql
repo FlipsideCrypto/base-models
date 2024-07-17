@@ -95,7 +95,7 @@ morpho AS (
         amount_unadj,
         amount,
         platform,
-        'ethereum' AS blockchain,
+        'base' AS blockchain,
         A._ID AS _log_id,
         A._INSERTED_TIMESTAMP
     FROM

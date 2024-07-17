@@ -62,7 +62,7 @@ SELECT
         C.token_decimals
     ) AS flashloan_amount,
     'Morpho Blue' AS platform,
-    'ethereum' AS blockchain,
+    'base' AS blockchain,
     f._log_id,
     f._inserted_timestamp
 FROM

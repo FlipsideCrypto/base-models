@@ -94,7 +94,7 @@ morpho AS (
     payer AS payer_address,
     borrower_address AS borrower,
     platform,
-    'ethereum' AS blockchain,
+    'base' AS blockchain,
     _ID AS _LOG_ID,
     _INSERTED_TIMESTAMP
   FROM
