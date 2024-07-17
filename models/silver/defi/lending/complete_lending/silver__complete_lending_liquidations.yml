@@ -35,8 +35,8 @@ models:
       - name: COLLATERAL_TOKEN
         tests: 
           - not_null
-      - name: COLLATERAL_TOKEN_SYMBOL
-        tests: 
+      - name: COLLATERAL_TOKEN_SYMBOL 
+          - not_null
       - name: AMOUNT_UNADJ
         tests:
           - not_null 
