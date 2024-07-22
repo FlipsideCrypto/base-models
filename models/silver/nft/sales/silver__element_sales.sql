@@ -128,13 +128,6 @@ raw_fees AS (
         LATERAL FLATTEN (
             input => fees_array
         )
-    WHERE
-        block_timestamp > (
-            SELECT
-                end_date
-            FROM
-                settings
-        )
 ),
 raw_fees_agg AS (
     SELECT
@@ -192,13 +185,6 @@ new_base AS (
         LEFT JOIN raw_fees_agg USING (
             tx_hash,
             event_index
-        )
-    WHERE
-        block_timestamp > (
-            SELECT
-                end_date
-            FROM
-                settings
         )
 ),
 tx_data AS (
