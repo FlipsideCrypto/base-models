@@ -5,7 +5,7 @@
     meta={
         'database_tags':{
             'table': {
-                'PROTOCOL': 'SONNE, AAVE, GRANARY, MOONWELL, SEAMLESS, COMPOUND',
+                'PROTOCOL': 'SONNE, AAVE, GRANARY, MOONWELL, MORPHO, SEAMLESS, COMPOUND',
                 'PURPOSE': 'LENDING, WITHDRAWS'
             }
         }

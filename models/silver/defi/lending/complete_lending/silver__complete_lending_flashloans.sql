@@ -81,6 +81,43 @@ WHERE
   )
 {% endif %}
 ),
+morpho AS (
+  SELECT
+    tx_hash,
+    block_number,
+    block_timestamp,
+    event_index,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    contract_address,
+    market AS token_address,
+    contract_address AS protocol_token,
+    flashloan_amount_unadj,
+    flashloan_amount,
+    NULL AS premium_amount_unadj,
+    NULL AS premium_amount,
+    initiator_address,
+    NULL AS target_address,
+    platform,
+    token_symbol,
+    blockchain,
+    _LOG_ID,
+    _INSERTED_TIMESTAMP
+  FROM
+    {{ ref('silver__morpho_flashloans') }}
+
+{% if is_incremental() and 'morpho' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+
 seamless AS (
   SELECT
     tx_hash,
@@ -122,6 +159,11 @@ flashloan_union AS (
     *
   FROM
     aave
+  UNION ALL
+  SELECT
+    *
+  FROM
+    morpho
   UNION ALL
   SELECT
     *
@@ -350,9 +392,7 @@ FROM
 )
 SELECT
   *,
-  {{ dbt_utils.generate_surrogate_key(
-    ['tx_hash','event_index']
-  ) }} AS complete_lending_flashloans_id,
+  {{ dbt_utils.generate_surrogate_key(['_log_id']) }} AS complete_lending_flashloans_id,
   SYSDATE() AS inserted_timestamp,
   SYSDATE() AS modified_timestamp,
   '{{ invocation_id }}' AS _invocation_id
