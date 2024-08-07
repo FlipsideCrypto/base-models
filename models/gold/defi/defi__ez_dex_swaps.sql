@@ -21,9 +21,12 @@ SELECT
     amount_in,
     ROUND(
         CASE
-            WHEN amount_out_usd IS NULL
-            OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_out_usd, 0)) > 0.75
-            OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_in_usd, 0)) > 0.75 THEN NULL
+            WHEN token_in <> '0x4200000000000000000000000000000000000006'
+            AND (
+                amount_out_usd IS NULL
+                OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_out_usd, 0)) > 0.75
+                OR ABS((amount_in_usd - amount_out_usd) / NULLIF(amount_in_usd, 0)) > 0.75
+            ) THEN NULL
             ELSE amount_in_usd
         END,
         2
@@ -32,9 +35,12 @@ SELECT
     amount_out,
     ROUND(
         CASE
-            WHEN amount_in_usd IS NULL
-            OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_in_usd, 0)) > 0.75
-            OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_out_usd, 0)) > 0.75 THEN NULL
+            WHEN token_out <> '0x4200000000000000000000000000000000000006'
+            AND (
+                amount_in_usd IS NULL
+                OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_in_usd, 0)) > 0.75
+                OR ABS((amount_out_usd - amount_in_usd) / NULLIF(amount_out_usd, 0)) > 0.75
+            ) THEN NULL
             ELSE amount_out_usd
         END,
         2
