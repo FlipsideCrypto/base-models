@@ -7,6 +7,7 @@
 ) }}
 
 WITH traces AS (
+
     SELECT
         block_number,
         tx_hash,
@@ -32,7 +33,7 @@ WITH traces AS (
         to_address = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb' --Morpho Blue
         AND function_sig = '0xd8eabcb8'
         AND trace_status = 'SUCCESS'
-        AND tx_status = 'SUCCESS' 
+        AND tx_status = 'SUCCESS'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -46,7 +47,6 @@ AND _inserted_timestamp >= (
 {% endif %}
 ),
 logs AS(
-
     SELECT
         l.tx_hash,
         l.block_number,
@@ -77,7 +77,12 @@ logs AS(
     WHERE
         topics [0] :: STRING = '0xa4946ede45d0c6f06a0f5ce92c9ad3b4751452d2fe0e25010783bcab57a67e41'
         AND l.contract_address = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb'
-        AND tx_hash in (SELECT tx_hash FROM traces)
+        AND tx_hash IN (
+            SELECT
+                tx_hash
+            FROM
+                traces
+        )
 )
 SELECT
     l.tx_hash,
@@ -106,7 +111,7 @@ SELECT
     ) AS amount,
     'Morpho Blue' AS platform,
     'base' AS blockchain,
-    t._call_id as _id,
+    t._call_id AS _id,
     t._inserted_timestamp
 FROM
     traces t
