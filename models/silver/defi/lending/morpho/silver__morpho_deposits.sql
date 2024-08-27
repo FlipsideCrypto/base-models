@@ -50,10 +50,6 @@ WITH traces AS (
         AND function_sig = '0xa99aad89'
         AND trace_status = 'SUCCESS'
         AND tx_status = 'SUCCESS'
-        --filters out illegitimate deposits 
-        AND collateral_token <> '0x0000000000000000000000000000000000000000'
-        AND oracle_address <> '0x0000000000000000000000000000000000000000'
-        AND irm_address <> '0x0000000000000000000000000000000000000000'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
