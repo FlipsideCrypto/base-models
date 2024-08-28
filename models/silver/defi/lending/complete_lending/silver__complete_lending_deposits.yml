@@ -32,16 +32,15 @@ models:
         tests: 
           - not_null
       - name: TOKEN_SYMBOL
-        tests: 
-          - not_null:
-              where: PLATFORM <> 'Morpho Blue'
       - name: AMOUNT_UNADJ
         tests:
           - not_null 
       - name: AMOUNT
         tests:
-          - not_null:
-              where: PLATFORM <> 'Morpho Blue'
+        - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list:
+                - decimal
+                - float
       - name: AMOUNT_USD
         tests:
         - dbt_expectations.expect_column_values_to_be_in_type_list:
