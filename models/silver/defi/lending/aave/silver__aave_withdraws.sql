@@ -28,7 +28,10 @@ WITH withdraw AS(
             WHEN contract_address = LOWER('0xa238dd80c259a72e81d7e4664a9801593f98d1c5') THEN 'Aave V3'
             ELSE 'ERROR'
         END AS aave_version,
-        origin_to_address AS lending_pool_contract,
+        COALESCE(
+            origin_to_address,
+            contract_address
+        ) AS lending_pool_contract,
         _inserted_timestamp,
         _log_id
     FROM
