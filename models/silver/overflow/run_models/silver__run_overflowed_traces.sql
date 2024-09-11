@@ -42,13 +42,6 @@ WITH base AS (
                 'skipped'
             )
         ) AS run_overflow_models,
-        COALESCE(
-            run_overflow_models2,
-            OBJECT_CONSTRUCT(
-                'status',
-                'skipped'
-            )
-        ) AS run_overflow_models2,
         SYSDATE() AS test_timestamp
     FROM
         (
