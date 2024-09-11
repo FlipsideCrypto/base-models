@@ -68,3 +68,8 @@ sources:
     schema: defillama
     tables:
       - name: dim_chains
+  - name: base_silver
+    database: "{{ 'base' if target.database == 'BASE' else 'base_dev' }}"
+    schema: silver
+    tables:
+      - name: overflowed_traces2
