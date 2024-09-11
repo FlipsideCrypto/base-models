@@ -6,7 +6,6 @@
     unique_key = ['block_number','tx_position'],
     cluster_by = ['modified_timestamp::DATE','partition_key'],
     tags = ['overflowed_traces2'],
-    full_refresh = false,
     snowflake_warehouse = warehouse
 ) }}
 
@@ -42,7 +41,11 @@ WITH bronze_overflowed_traces AS (
                 'input',
                 'error',
                 'output',
-                'revertReason'
+                'revertReason',
+                'txHash',
+                'time',
+                'result.txHash',
+                'result.time'
             ),
             'ORIGIN',
             REGEXP_REPLACE(REGEXP_REPLACE(path, '[^0-9]+', '_'), '^_|_$', '')
