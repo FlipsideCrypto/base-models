@@ -25,6 +25,12 @@ WITH traces AS (
         CONCAT('0x', SUBSTR(segmented_input [2] :: STRING, 25)) AS oracle_address,
         CONCAT('0x', SUBSTR(segmented_input [3] :: STRING, 25)) AS irm_address,
         CONCAT('0x', SUBSTR(segmented_input [5] :: STRING, 25)) AS borrower,
+        TRY_TO_NUMBER(
+            utils.udf_hex_to_int(
+                segmented_input [6] :: STRING
+            )
+        ) AS amount,
+        COUNT(*) OVER (PARTITION BY tx_hash) AS tx_hash_count,
         _call_id,
         _inserted_timestamp
     FROM
@@ -123,3 +129,46 @@ FROM
     LEFT JOIN {{ ref('silver__contracts') }}
     c1
     ON c1.contract_address = t.collateral_token
+WHERE t.tx_hash_count = 1
+UNION ALL
+SELECT
+    l.tx_hash,
+    l.block_number,
+    l.block_timestamp,
+    l.event_index,
+    l.origin_from_address,
+    l.origin_to_address,
+    l.origin_function_signature,
+    l.contract_address,
+    l.caller AS liquidator,
+    l.borrower,
+    t.loan_token AS debt_asset,
+    c0.token_symbol AS debt_asset_symbol,
+    l.repay_assets AS repayed_amount_unadj,
+    l.repay_assets / pow(
+        10,
+        c0.token_decimals
+    ) AS repayed_amount,
+    t.collateral_token AS collateral_asset,
+    c1.token_symbol AS collateral_asset_symbol,
+    l.seized_assets AS amount_unadj,
+    l.seized_assets / pow(
+        10,
+        c1.token_decimals
+    ) AS amount,
+    'Morpho Blue' AS platform,
+    'ethereum' AS blockchain,
+    t._call_id AS _id,
+    t._inserted_timestamp
+FROM
+    traces t
+    INNER JOIN logs l
+    ON l.tx_hash = t.tx_hash
+    AND l.seized_assets = t.amount
+    LEFT JOIN {{ ref('silver__contracts') }}
+    c0
+    ON c0.contract_address = t.loan_token
+    LEFT JOIN {{ ref('silver__contracts') }}
+    c1
+    ON c1.contract_address = t.collateral_token
+WHERE t.tx_hash_count >= 2
