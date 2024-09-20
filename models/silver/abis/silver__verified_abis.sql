@@ -3,19 +3,20 @@
     unique_key = "contract_address",
     tags = ['abis']
 ) }}
-
-WITH base AS (
-
-    SELECT
-        contract_address,
-        PARSE_JSON(
-            abi_data :data :result
-        ) AS DATA,
-        _inserted_timestamp
-    FROM
-        {{ ref('bronze_api__contract_abis') }}
-    WHERE
-        abi_data :data :message :: STRING = 'OK'
+{{ fsc_evm.silver_verified_abis (
+    block_explorer = 'basescan'
+) }}
+{# WITH base AS (
+SELECT
+    contract_address,
+    PARSE_JSON(
+        abi_data :data :result
+    ) AS DATA,
+    _inserted_timestamp
+FROM
+    {{ ref('bronze_api__contract_abis') }}
+WHERE
+    abi_data :data :message :: STRING = 'OK'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -102,4 +103,4 @@ SELECT
 FROM
     all_abis qualify(ROW_NUMBER() over(PARTITION BY contract_address
 ORDER BY
-    _INSERTED_TIMESTAMP DESC)) = 1
+    _INSERTED_TIMESTAMP DESC)) = 1 #}

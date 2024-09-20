@@ -5,13 +5,12 @@
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION",
     tags = ['abis']
 ) }}
-
-WITH new_abis AS (
-
-    SELECT
-        DISTINCT contract_address
-    FROM
-        {{ ref('silver__flat_event_abis') }}
+{{ fsc_evm.silver_complete_event_abis () }}
+{# WITH new_abis AS (
+SELECT
+    DISTINCT contract_address
+FROM
+    {{ ref('silver__flat_event_abis') }}
 
 {% if is_incremental() %}
 WHERE
@@ -213,4 +212,4 @@ FROM
         start_block
         ORDER BY
             _inserted_timestamp DESC
-    ) = 1
+    ) = 1 #}

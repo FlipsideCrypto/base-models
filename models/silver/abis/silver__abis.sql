@@ -5,9 +5,11 @@
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(contract_address,abi_hash,bytecode), SUBSTRING(contract_address,abi_hash,bytecode)",
     tags = ['abis']
 ) }}
-
+{{ fsc_evm.silver_abis (
+    block_explorer = 'basescan'
+) }}
+{#
 WITH override_abis AS (
-
     SELECT
         contract_address,
         PARSE_JSON(DATA) AS abi,
@@ -178,4 +180,4 @@ SELECT
 FROM
     priority_abis p
     LEFT JOIN {{ ref('silver__created_contracts') }}
-    ON p.contract_address = created_contract_address
+    ON p.contract_address = created_contract_address #}
