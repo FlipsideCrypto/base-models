@@ -47,7 +47,11 @@ AND l._inserted_timestamp > (
 traces_pull AS (
     SELECT
         t.from_address AS token_address,
-        t.to_address AS underlying_asset
+        t.to_address AS underlying_asset,
+        CASE
+            WHEN identifier = 'STATICCALL_0_2' THEN 1
+            ELSE NULL
+        END AS asset_identifier --case when to bypass search optimization access on traces
     FROM
         {{ ref('silver__traces') }} t
     WHERE
@@ -57,6 +61,7 @@ traces_pull AS (
             FROM
                 log_pull
         )
+    
 ),
 underlying_details AS (
     SELECT
@@ -73,7 +78,8 @@ underlying_details AS (
     FROM
         log_pull l
         LEFT JOIN traces_pull t
-        ON l.contract_address = t.token_address qualify(ROW_NUMBER() over(PARTITION BY l.contract_address
+        ON l.contract_address = t.token_address 
+    WHERE t.asset_identifier = 1 qualify(ROW_NUMBER() over(PARTITION BY l.contract_address
     ORDER BY
         block_timestamp ASC)) = 1
 )
