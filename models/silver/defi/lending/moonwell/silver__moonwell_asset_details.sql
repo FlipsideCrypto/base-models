@@ -52,7 +52,7 @@ traces_pull AS (
         CASE
             WHEN identifier = 'STATICCALL_0_2' THEN 1
             ELSE NULL
-        END AS asset_identifier --case when to bypass search optimization access on traces
+        END AS asset_identifier 
     FROM
         {{ ref('silver__traces') }} t
     WHERE
