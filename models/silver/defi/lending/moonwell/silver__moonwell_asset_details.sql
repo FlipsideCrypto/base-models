@@ -34,11 +34,11 @@ log_pull AS (
         AND C.token_name LIKE '%Moonwell%'
 
 {% if is_incremental() %}
-AND l._inserted_timestamp >= (
+AND l._inserted_timestamp > (
     SELECT
         MAX(
             _inserted_timestamp
-        ) - INTERVAL '12 hours'
+        )
     FROM
         {{ this }}
 )
@@ -46,10 +46,10 @@ AND l._inserted_timestamp >= (
 ),
 traces_pull AS (
     SELECT
-        from_address AS token_address,
-        to_address AS underlying_asset
+        t.from_address AS token_address,
+        t.to_address AS underlying_asset
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('silver__traces') }} t
     WHERE
         tx_hash IN (
             SELECT
@@ -57,13 +57,6 @@ traces_pull AS (
             FROM
                 log_pull
         )
-        AND from_address IN (
-            SELECT
-                contract_address
-            FROM
-                log_pull
-        )
-        AND identifier = 'STATICCALL_0_2'
 ),
 underlying_details AS (
     SELECT
@@ -104,4 +97,3 @@ FROM
     ON C.contract_address = l.underlying_asset
 WHERE
     l.token_name IS NOT NULL
-    AND l.token_name LIKE '%Moonwell%'

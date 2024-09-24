@@ -6,26 +6,39 @@
     tags = ['reorg','curated']
 ) }}
 
-WITH log_pull AS (
+WITH contracts AS (
 
     SELECT
-        tx_hash,
-        block_number,
-        block_timestamp,
-        contract_address,
-        _inserted_timestamp,
-        _log_id
+        *
+    FROM
+        {{ ref('silver__contracts') }}
+),
+log_pull AS (
+    SELECT
+        l.tx_hash,
+        l.block_number,
+        l.block_timestamp,
+        l.contract_address,
+        C.token_name,
+        C.token_symbol,
+        C.token_decimals,
+        l._inserted_timestamp,
+        l._log_id
     FROM
         {{ ref('silver__logs') }}
+        l
+        LEFT JOIN contracts C
+        ON C.contract_address = l.contract_address
     WHERE
         topics [0] :: STRING = '0x7ac369dbd14fa5ea3f473ed67cc9d598964a77501540ba6751eb0b3decf5870d'
-        AND origin_from_address = LOWER('0xFb59Ce8986943163F14C590755b29dB2998F2322')
+        AND C.token_name LIKE '%SonneBase%'
+
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND l._inserted_timestamp > (
     SELECT
         MAX(
             _inserted_timestamp
-        ) - INTERVAL '12 hours'
+        )
     FROM
         {{ this }}
 )
@@ -44,13 +57,6 @@ traces_pull AS (
             FROM
                 log_pull
         )
-        AND identifier = 'STATICCALL_0_2'
-),
-contracts AS (
-    SELECT
-        *
-    FROM
-        {{ ref('silver__contracts') }}
 ),
 contract_pull AS (
     SELECT
