@@ -34,14 +34,15 @@ log_pull AS (
         AND C.token_name LIKE '%Moonwell%'
 
 {% if is_incremental() %}
-AND l._inserted_timestamp > (
+AND l._inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        )
+        ) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
+AND l._inserted_timestamp >= current_date() - INTERVAL '7 day'
 {% endif %}
 ),
 traces_pull AS (
