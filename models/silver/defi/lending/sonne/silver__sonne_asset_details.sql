@@ -42,6 +42,12 @@ AND l._inserted_timestamp >= (
     FROM
         {{ this }}
 )
+AND l.contract_address NOT IN (
+    SELECT
+        token_address
+    FROM
+        {{ this }}
+)
 AND l._inserted_timestamp >= current_date() - INTERVAL '7 day'
 {% endif %}
 ),
@@ -99,4 +105,4 @@ FROM
     LEFT JOIN contracts C
     ON C.contract_address = l.underlying_asset
 WHERE
-     l.token_name IS NOT NULL
+    l.token_name IS NOT NULL
