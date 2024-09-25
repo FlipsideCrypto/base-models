@@ -487,6 +487,52 @@ WHERE
   )
 {% endif %}
 ),
+aerodrome_slipstream AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    pool_address AS contract_address,
+    'Swap' AS event_name,
+    CASE
+      WHEN amount0_unadj > 0 THEN ABS(amount0_unadj)
+      ELSE ABS(amount1_unadj)
+    END AS amount_in_unadj,
+    CASE
+      WHEN amount0_unadj < 0 THEN ABS(amount0_unadj)
+      ELSE ABS(amount1_unadj)
+    END AS amount_out_unadj,
+    CASE
+      WHEN amount0_unadj > 0 THEN token0_address
+      ELSE token1_address
+    END AS token_in,
+    CASE
+      WHEN amount0_unadj < 0 THEN token0_address
+      ELSE token1_address
+    END AS token_out,
+    sender,
+    recipient AS tx_to,
+    event_index,
+    'aerodrome-slipstream' AS platform,
+    'v1' AS version,
+    _log_id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__aerodrome_slipstream_swaps') }}
+
+{% if is_incremental() and 'aerodrome-slipstream' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 all_dex AS (
   SELECT
     *
@@ -542,6 +588,11 @@ all_dex AS (
     *
   FROM
     univ3
+  UNION ALL
+  SELECT
+    *
+  FROM
+    aerodrome_slipstream
   UNION ALL
   SELECT
     *

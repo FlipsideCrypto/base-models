@@ -226,6 +226,41 @@ WHERE
   )
 {% endif %}
 ),
+aerodrome_slipstream AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    NULL AS fee,
+    tick_spacing,
+    token0_address AS token0,
+    token1_address AS token1,
+    NULL AS token2,
+    NULL AS token3,
+    NULL AS token4,
+    NULL AS token5,
+    NULL AS token6,
+    NULL AS token7,
+    'aerodrome-slipstream' AS platform,
+    'v1' AS version,
+    _id,
+    _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__aerodrome_slipstream_pools') }}
+
+{% if is_incremental() and 'aerodrome_slipstream' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 univ2 AS (
   SELECT
     block_number,
@@ -475,6 +510,11 @@ all_pools AS (
   SELECT
     *
   FROM
+    aerodrome_slipstream
+  UNION ALL
+  SELECT
+    *
+  FROM
     sushi
   UNION ALL
   SELECT
@@ -505,7 +545,8 @@ complete_lps AS (
       AND platform IN (
         'uniswap-v3',
         'sushiswap',
-        'dackieswap'
+        'dackieswap',
+        'aerodrome-slipstream'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -530,6 +571,7 @@ complete_lps AS (
           WHEN platform = 'uniswap-v3' THEN ' UNI-V3 LP'
           WHEN platform = 'sushiswap' THEN ' SLP'
           WHEN platform = 'dackieswap' THEN ' DLP'
+          WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
         END
       )
       WHEN pool_name IS NULL
@@ -683,7 +725,8 @@ heal_model AS (
       AND platform IN (
         'uniswap-v3',
         'sushiswap',
-        'dackieswap'
+        'dackieswap',
+        'aerodrome-slipstream'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -708,6 +751,7 @@ heal_model AS (
           WHEN platform = 'uniswap-v3' THEN ' UNI-V3 LP'
           WHEN platform = 'sushiswap' THEN ' SLP'
           WHEN platform = 'dackieswap' THEN ' DLP'
+          WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
         END
       )
       WHEN pool_name IS NULL
