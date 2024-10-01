@@ -84,6 +84,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+and _inserted_timestamp >= dateadd('day', -14, current_date())
 {% endif %}
 ),
 token_transfers_raw AS (
@@ -124,6 +125,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+and _inserted_timestamp >= dateadd('day', -14, current_date())
 {% endif %}
 ),
 logs_token_raw AS (
@@ -187,6 +189,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+and _inserted_timestamp >= dateadd('day', -14, current_date())
 {% endif %}
 ),
 logs_eth_raw AS (
@@ -330,6 +333,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+and _inserted_timestamp >= dateadd('day', -14, current_date())
 {% endif %}
 )
 SELECT
