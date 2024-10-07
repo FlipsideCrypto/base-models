@@ -38,8 +38,8 @@ SELECT
     product_type,
     quote_currency,
     quote_volume,
-    vertex_market_stats_id AS ez_market_stats_id,
-    inserted_timestamp,
+    vertex_market_stats_id as ez_market_stats_id,
+    _inserted_timestamp as inserted_timestamp,
     modified_timestamp
 FROM
     {{ ref('silver__vertex_market_stats') }}

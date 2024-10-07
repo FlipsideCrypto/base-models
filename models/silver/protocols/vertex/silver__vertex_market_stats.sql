@@ -1,7 +1,6 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'merge',
-    full_refresh = false,
     unique_key = ['ticker_id','hour'],
     cluster_by = ['HOUR::DATE'],
     tags = 'curated'
@@ -52,7 +51,7 @@ trade_snapshot AS (
         ) AS HOUR,
         CONCAT(
             symbol,
-            '_USDB'
+            '_USDC'
         ) AS ticker_id,
         symbol,
         product_id,
@@ -69,7 +68,7 @@ trade_snapshot AS (
         {{ ref('silver__vertex_perps') }}
         p
     WHERE
-        block_timestamp > '2024-04-16 00:00:00.000' --start of api pulls
+        block_timestamp > '2024-10-01 00:00:00.000' --start of api pulls
     GROUP BY
         1,
         2,

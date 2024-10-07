@@ -31,7 +31,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND l._inserted_timestamp >= CURRENT_DATE() - INTERVAL '7 day'
+AND _inserted_timestamp >= CURRENT_DATE() - INTERVAL '7 day'
 {% endif %}
 ),
 new_prod AS (
@@ -89,7 +89,7 @@ FINAL AS (
             ELSE 'spot'
         END AS product_type,
         CASE
-            WHEN l.product_id = 0 THEN 'USDB'
+            WHEN l.product_id = 0 THEN 'USDC'
             ELSE p.ticker_id :: STRING
         END AS ticker_id,
         p.symbol :: STRING AS symbol,
