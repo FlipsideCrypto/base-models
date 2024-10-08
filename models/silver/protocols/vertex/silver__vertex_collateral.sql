@@ -70,6 +70,7 @@ product_id_join AS (
         p.symbol,
         CASE
             WHEN p.symbol = 'USDC' THEN '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913'
+            WHEN p.symbol = 'BENJI' THEN '0xbc45647ea894030a4e9801ec03479739fa2485f0'
             WHEN p.symbol = 'WETH' THEN '0x4300000000000000000000000000000000000006'
             WHEN p.symbol = 'ETH' THEN '0x4300000000000000000000000000000000000006'
         END AS token_address,

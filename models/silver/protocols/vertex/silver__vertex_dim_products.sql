@@ -21,7 +21,8 @@ WITH logs_pull AS (
         {{ ref('silver__logs') }}
     WHERE
         topics [0] :: STRING = '0x3286b0394bf1350245290b7226c92ed186bd716f28938e62dbb895298f018172'
-
+    AND
+        block_timestamp::DATE >= '2024-07-01' --LAUNCH MONTH
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT
@@ -120,8 +121,6 @@ FINAL AS (
         new_prod l
         LEFT JOIN product_metadata p
         ON l.product_id = p.product_id
-    WHERE
-        p.ticker_id IS NOT NULL
 )
 SELECT
     *,
