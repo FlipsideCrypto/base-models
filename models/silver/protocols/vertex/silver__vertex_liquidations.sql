@@ -47,7 +47,7 @@ logs_pull_v2 AS (
         'Liquidation' AS event_name,
         event_index,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        arbitrum.utils.udf_hex_to_int(
+        utils.udf_hex_to_int(
             segmented_data [0] :: STRING
         ) :: INT AS product_id,
         topics [1] :: STRING AS digest,
@@ -56,15 +56,15 @@ logs_pull_v2 AS (
             42
         ) AS trader,
         topics [2] :: STRING AS subaccount,
-        arbitrum.utils.udf_hex_to_int(
+        utils.udf_hex_to_int(
             's2c',
             segmented_data [2] :: STRING
         ) :: INT AS amount,
-        arbitrum.utils.udf_hex_to_int(
+        utils.udf_hex_to_int(
             's2c',
             segmented_data [3] :: STRING
         ) :: INT AS amount_quote,
-        arbitrum.utils.udf_hex_to_int(
+        utils.udf_hex_to_int(
             segmented_data [1] :: STRING
         ) AS is_encoded_spread,
         _log_id,
@@ -93,13 +93,13 @@ v2_vertex_decode AS (
         amount,
         amount_quote,
         CASE
-            WHEN is_encoded_spread = 1 THEN arbitrum.utils.udf_int_to_binary(product_id)
+            WHEN is_encoded_spread = 1 THEN utils.udf_int_to_binary(product_id)
             ELSE NULL
         END AS bin_product_ids,
         CASE
             WHEN is_encoded_spread = 1 THEN ARRAY_CONSTRUCT(
-                arbitrum.utils.udf_binary_to_int(SUBSTR(bin_product_ids, -16)),
-                arbitrum.utils.udf_binary_to_int(
+                utils.udf_binary_to_int(SUBSTR(bin_product_ids, -16)),
+                utils.udf_binary_to_int(
                     SUBSTR(
                         bin_product_ids,
                         1,

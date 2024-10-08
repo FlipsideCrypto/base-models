@@ -37,10 +37,17 @@ Time after which the order should automatically be cancelled, as a timestamp in 
 {% docs vertex_order_type %}
 
 Decode from raw expiration number to binary then converted back to int from the most significant two bits: 
-0 ⇒ Default order, where it will attempt to take from the book and then become a resting limit order if there is quantity remaining
-1 ⇒ Immediate-or-cancel order, which is the same as a default order except it doesn’t become a resting limit order
-2 ⇒ Fill-or-kill order, which is the same as an IOC order except either the entire order has to be filled or none of it.
-3 ⇒ Post-only order, where the order is not allowed to take from the book. An error is returned if the order would cross the bid ask spread.
+Value: 0
+Description: Default order, where it will attempt to take from the book and then become a resting limit order if there is quantity remaining
+
+Value: 1
+Description: Immediate-or-cancel order, which is the same as a default order except it doesn’t become a resting limit order
+
+Value: 2
+Description: Fill-or-kill order, which is the same as an IOC order except either the entire order has to be filled or none of it
+
+Value: 3
+Description: Post-only order, where the order is not allowed to take from the book. An error is returned if the order would cross the bid ask spread
 
 {% enddocs %}
 
