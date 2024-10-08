@@ -39,8 +39,8 @@ WITH perp_trades AS (
         amount_usd,
         fee_amount_unadj,
         fee_amount,
-        _delta_amount_unadj,
-        _delta_amount,
+        base_delta_amount_unadj,
+        base_delta_amount,
         quote_delta_amount_unadj,
         quote_delta_amount,
         _log_id,
@@ -55,7 +55,7 @@ WITH perp_trades AS (
 
 {% if is_incremental() %}
 WHERE
-AND _inserted_timestamp >= (
+    _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
