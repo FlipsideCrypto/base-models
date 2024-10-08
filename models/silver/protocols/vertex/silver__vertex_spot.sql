@@ -25,7 +25,26 @@ WITH vertex_products AS (
 ),
 logs AS (
     SELECT
-        *
+        block_number,
+        block_timestamp,
+        tx_hash,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        tx_status,
+        contract_address,
+        block_hash,
+        data,
+        event_index,
+        event_removed,
+        topics,
+        _inserted_timestamp,
+        _log_id,
+        is_pending,
+        logs_id,
+        inserted_timestamp,
+        modified_timestamp,
+        _invocation_id
     FROM
         {{ ref('silver__logs') }}
     WHERE

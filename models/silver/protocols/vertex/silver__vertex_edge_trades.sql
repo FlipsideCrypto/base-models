@@ -9,14 +9,52 @@
 WITH perp_trades AS (
 
     SELECT
-        *
+        block_number,
+        block_timestamp,
+        tx_hash,
+        contract_address,
+        event_name,
+        event_index,
+        origin_function_signature,
+        origin_from_address,
+        origin_to_address,
+        symbol,
+        product_id,
+        digest,
+        trader,
+        subaccount,
+        trade_type,
+        expiration_raw,
+        exp_binary,
+        order_type_raw,
+        order_type,
+        market_reduce_flag,
+        expiration,
+        nonce,
+        is_taker,
+        price_amount_unadj,
+        price_amount,
+        amount_unadj,
+        amount,
+        amount_usd,
+        fee_amount_unadj,
+        fee_amount,
+        _delta_amount_unadj,
+        _delta_amount,
+        quote_delta_amount_unadj,
+        quote_delta_amount,
+        _log_id,
+        _inserted_timestamp,
+        vertex_perps_id,
+        inserted_timestamp,
+        modified_timestamp,
+        _invocation_id
     FROM
         {{ ref('silver__vertex_perps') }}
         p
-    WHERE
-        1 = 1
 
 {% if is_incremental() %}
+WHERE
 AND _inserted_timestamp >= (
     SELECT
         MAX(

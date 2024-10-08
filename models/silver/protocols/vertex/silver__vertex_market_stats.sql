@@ -77,7 +77,24 @@ trade_snapshot AS (
 ),
 products AS (
     SELECT
-        *
+        block_number,
+        block_timestamp,
+        tx_hash,
+        product_id,
+        product_type,
+        ticker_id,
+        symbol,
+        name,
+        health_group,
+        health_group_symbol,
+        taker_fee,
+        maker_fee,
+        _inserted_timestamp,
+        _log_id,
+        vertex_products_id,
+        inserted_timestamp,
+        modified_timestamp,
+        _invocation_id
     FROM
         {{ ref('silver__vertex_dim_products') }}
 ),
