@@ -73,6 +73,8 @@ product_id_join AS (
             WHEN p.symbol = 'BENJI' THEN '0xbc45647ea894030a4e9801ec03479739fa2485f0'
             WHEN p.symbol = 'WETH' THEN '0x4300000000000000000000000000000000000006'
             WHEN p.symbol = 'ETH' THEN '0x4300000000000000000000000000000000000006'
+            WHEN p.symbol = 'TRUMPWIN' THEN '0xe215d028551d1721c6b61675aec501b1224bd0a1'
+            WHEN p.symbol = 'HARRISWIN' THEN '0xfbac82a384178ca5dd6df72965d0e65b1b8a028f'
         END AS token_address,
         amount,
         l._log_id,
