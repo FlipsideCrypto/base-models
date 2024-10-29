@@ -37,7 +37,7 @@ AND _inserted_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
-        ) - INTERVAL '12 hours'
+        ) - INTERVAL '24 hours'
     FROM
         {{ this }}
 )
@@ -47,6 +47,8 @@ AND contract_address NOT IN (
     FROM
         {{ this }}
 )
+AND block_timestamp >= CURRENT_DATE - INTERVAL '7 days'
+
 {% endif %}
 ),
 a_token_step_1 AS (
@@ -64,7 +66,7 @@ a_token_step_1 AS (
     FROM
         DECODE
     WHERE
-        atoken_name LIKE '%Granary%'
+        atoken_name LIKE '%Granary%' OR atoken_name LIKE '%Grain%'
 ),
 debt_tokens AS (
     SELECT
