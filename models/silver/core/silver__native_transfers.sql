@@ -16,19 +16,30 @@ WITH eth_base AS (
         identifier,
         from_address,
         to_address,
-        eth_value,
-        _call_id,
-        _inserted_timestamp,
-        eth_value_precise_raw,
-        eth_value_precise,
-        tx_position,
+        VALUE,
+        concat_ws(
+            '_',
+            block_number,
+            --tx_position,
+            CONCAT(
+                TYPE,
+                '-',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp,
+        value_precise_raw,
+        value_precise,
+        --tx_position,
         trace_index
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
-        eth_value > 0
+        VALUE > 0
         AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS'
+        AND trace_status = 'SUCCESS' -- need to delete
+        {# and tx_succeeded
+        AND trace_succeeded #} -- add in later
         AND TYPE NOT IN (
             'DELEGATECALL',
             'STATICCALL'
@@ -51,7 +62,7 @@ tx_table AS (
         to_address AS origin_to_address,
         origin_function_signature
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         tx_hash IN (
             SELECT
@@ -61,7 +72,7 @@ tx_table AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '72 hours'
     FROM
@@ -79,11 +90,11 @@ SELECT
     origin_function_signature,
     from_address,
     to_address,
-    eth_value AS amount,
-    eth_value_precise_raw AS amount_precise_raw,
-    eth_value_precise AS amount_precise,
+    VALUE AS amount,
+    value_precise_raw AS amount_precise_raw,
+    value_precise AS amount_precise,
     ROUND(
-        eth_value * price,
+        VALUE * price,
         2
     ) AS amount_usd,
     _call_id,
@@ -98,7 +109,8 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id
 FROM
     eth_base A
-    LEFT JOIN {{ ref('silver__complete_token_prices') }} p
+    LEFT JOIN {{ ref('silver__complete_token_prices') }}
+    p
     ON DATE_TRUNC(
         'hour',
         A.block_timestamp
