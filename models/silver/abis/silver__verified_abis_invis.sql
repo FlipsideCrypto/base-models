@@ -1,11 +1,10 @@
-{{ config(
-    materialized = 'incremental',
-    unique_key = "contract_address",
-    tags = ['abis']
+{# {{ config(
+materialized = 'incremental',
+unique_key = "contract_address",
+tags = ['abis']
 ) }}
-{{ fsc_evm.silver_verified_abis (
-    block_explorer = 'basescan'
-) }}
+#}
+{{ fsc_evm.silver_verified_abis () }}
 {# WITH base AS (
 SELECT
     contract_address,
