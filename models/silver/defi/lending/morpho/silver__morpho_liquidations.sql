@@ -25,6 +25,7 @@ WITH traces AS (
         CONCAT('0x', SUBSTR(segmented_input [2] :: STRING, 25)) AS oracle_address,
         CONCAT('0x', SUBSTR(segmented_input [3] :: STRING, 25)) AS irm_address,
         CONCAT('0x', SUBSTR(segmented_input [5] :: STRING, 25)) AS borrower,
+        ROW_NUMBER() OVER (PARTITION BY tx_hash ORDER BY trace_index) AS trace_index_order,
         _call_id,
         _inserted_timestamp
     FROM
@@ -52,6 +53,7 @@ logs AS(
         l.block_number,
         l.block_timestamp,
         l.event_index,
+        ROW_NUMBER() OVER (PARTITION BY l.tx_hash ORDER BY l.event_index) AS event_index_order,
         l.origin_from_address,
         l.origin_to_address,
         l.origin_function_signature,
@@ -117,6 +119,7 @@ FROM
     traces t
     INNER JOIN logs l
     ON l.tx_hash = t.tx_hash
+    AND l.event_index_order = t.trace_index_order
     LEFT JOIN {{ ref('silver__contracts') }}
     c0
     ON c0.contract_address = t.loan_token
