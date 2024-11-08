@@ -11,7 +11,11 @@
 WITH logs AS (
 
     SELECT
-        _log_id,
+        CONCAT(
+            tx_hash,
+            '-',
+            event_index
+        ) AS _log_id,
         block_number,
         tx_hash,
         block_timestamp,
@@ -24,15 +28,15 @@ WITH logs AS (
         utils.udf_hex_to_int(SUBSTR(DATA, 3, 64)) AS raw_amount_precise,
         raw_amount_precise :: FLOAT AS raw_amount,
         event_index,
-        _inserted_timestamp
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
-        topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-        AND tx_status = 'SUCCESS'
+        topics [0] :: STRING = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' {# AND tx_status = 'SUCCESS' #}
+        AND tx_succeeded
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

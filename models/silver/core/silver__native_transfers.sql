@@ -14,13 +14,16 @@ WITH eth_base AS (
         block_number,
         block_timestamp,
         identifier,
+        --deprecate
+        trace_address,
+        --new column
         from_address,
         to_address,
         VALUE,
         concat_ws(
             '_',
             block_number,
-            --tx_position,
+            tx_position,
             CONCAT(
                 TYPE,
                 '-',
@@ -30,25 +33,24 @@ WITH eth_base AS (
         modified_timestamp AS _inserted_timestamp,
         value_precise_raw,
         value_precise,
-        --tx_position,
+        tx_position,
         trace_index
     FROM
         {{ ref('core__fact_traces') }}
     WHERE
-        VALUE > 0
-        AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS' -- need to delete
-        {# and tx_succeeded
-        AND trace_succeeded #} -- add in later
+        VALUE > 0 {# AND tx_status = 'SUCCESS'
+        AND trace_status = 'SUCCESS' -- need to delete #}
+        AND tx_succeeded
+        AND trace_succeeded -- new filters
         AND TYPE NOT IN (
             'DELEGATECALL',
             'STATICCALL'
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) - INTERVAL '72 hours'
+        MAX(_inserted_timestamp) - INTERVAL '72 hours' -- '{{ var("LOOKBACK", "4 hours") }}' add vars??
     FROM
         {{ this }}
 )
@@ -74,7 +76,7 @@ tx_table AS (
 {% if is_incremental() %}
 AND modified_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) - INTERVAL '72 hours'
+        MAX(_inserted_timestamp) - INTERVAL '72 hours' -- '{{ var("LOOKBACK", "4 hours") }}' add vars??
     FROM
         {{ this }}
 )
@@ -85,6 +87,9 @@ SELECT
     block_number AS block_number,
     block_timestamp AS block_timestamp,
     identifier AS identifier,
+    -- needs to be deprecated, and add trace address
+    trace_address,
+    --new column
     origin_from_address,
     origin_to_address,
     origin_function_signature,
@@ -98,7 +103,9 @@ SELECT
         2
     ) AS amount_usd,
     _call_id,
+    -- needs to be deprecated
     _inserted_timestamp,
+    -- needs to be deprecated
     tx_position,
     trace_index,
     {{ dbt_utils.generate_surrogate_key(

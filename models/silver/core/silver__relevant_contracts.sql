@@ -29,15 +29,21 @@ GROUP BY
 ),
 function_calls AS (
     SELECT
-        to_address AS contract_address,
+        IFF(
+            TYPE = 'DELEGATECALL',
+            from_address,
+            to_address
+        ) AS contract_address,
         COUNT(*) AS function_call_count,
         MAX(modified_timestamp) AS max_inserted_timestamp_traces,
         MAX(block_number) AS latest_call_block
     FROM
         {{ ref('core__fact_traces') }}
     WHERE
-        1 = 1 {# tx_succeeded
-        AND trace_succeeded #}
+        {# tx_status = 'SUCCESS'
+        AND trace_status = 'SUCCESS' #}
+        tx_succeeded
+        AND trace_succeeded
         AND to_address IS NOT NULL
         AND input IS NOT NULL
         AND input <> '0x'

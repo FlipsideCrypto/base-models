@@ -31,9 +31,9 @@ SELECT
     END AS tx_succeeded,
     event_name,
     decoded_data AS full_decoded_log,
+    -- full decoded data
     decoded_flat AS decoded_log,
     token_name AS contract_name,
-    tx_status,
     COALESCE (
         decoded_logs_id,
         {{ dbt_utils.generate_surrogate_key(
