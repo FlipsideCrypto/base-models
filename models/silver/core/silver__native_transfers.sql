@@ -14,30 +14,43 @@ WITH eth_base AS (
         block_number,
         block_timestamp,
         identifier,
+        --deprecate
+        trace_address,
+        --new column
         from_address,
         to_address,
-        eth_value,
-        _call_id,
-        _inserted_timestamp,
-        eth_value_precise_raw,
-        eth_value_precise,
+        VALUE,
+        concat_ws(
+            '_',
+            block_number,
+            tx_position,
+            CONCAT(
+                TYPE,
+                '-',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp,
+        value_precise_raw,
+        value_precise,
         tx_position,
         trace_index
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
-        eth_value > 0
-        AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS'
+        VALUE > 0 {# AND tx_status = 'SUCCESS'
+        AND trace_status = 'SUCCESS' -- need to delete #}
+        AND tx_succeeded
+        AND trace_succeeded -- new filters
         AND TYPE NOT IN (
             'DELEGATECALL',
             'STATICCALL'
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) - INTERVAL '72 hours'
+        MAX(_inserted_timestamp) - INTERVAL '72 hours' -- '{{ var("LOOKBACK", "4 hours") }}' add vars??
     FROM
         {{ this }}
 )
@@ -51,7 +64,7 @@ tx_table AS (
         to_address AS origin_to_address,
         origin_function_signature
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         tx_hash IN (
             SELECT
@@ -61,9 +74,9 @@ tx_table AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
-        MAX(_inserted_timestamp) - INTERVAL '72 hours'
+        MAX(_inserted_timestamp) - INTERVAL '72 hours' -- '{{ var("LOOKBACK", "4 hours") }}' add vars??
     FROM
         {{ this }}
 )
@@ -74,20 +87,25 @@ SELECT
     block_number AS block_number,
     block_timestamp AS block_timestamp,
     identifier AS identifier,
+    -- needs to be deprecated, and add trace address
+    trace_address,
+    --new column
     origin_from_address,
     origin_to_address,
     origin_function_signature,
     from_address,
     to_address,
-    eth_value AS amount,
-    eth_value_precise_raw AS amount_precise_raw,
-    eth_value_precise AS amount_precise,
+    VALUE AS amount,
+    value_precise_raw AS amount_precise_raw,
+    value_precise AS amount_precise,
     ROUND(
-        eth_value * price,
+        VALUE * price,
         2
     ) AS amount_usd,
     _call_id,
+    -- needs to be deprecated
     _inserted_timestamp,
+    -- needs to be deprecated
     tx_position,
     trace_index,
     {{ dbt_utils.generate_surrogate_key(
@@ -98,7 +116,8 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id
 FROM
     eth_base A
-    LEFT JOIN {{ ref('silver__complete_token_prices') }} p
+    LEFT JOIN {{ ref('silver__complete_token_prices') }}
+    p
     ON DATE_TRUNC(
         'hour',
         A.block_timestamp

@@ -34,17 +34,17 @@ WITH base_swaps AS (
             segmented_data [4] :: STRING
         ) :: FLOAT AS tick
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
         AND event_removed = 'false'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
-            _inserted_timestamp 
+            _inserted_timestamp
         ) - INTERVAL '12 hours'
     FROM
         {{ this }}
@@ -75,8 +75,12 @@ FINAL AS (
         event_index,
         token0_address,
         token1_address,
-        _log_id,
-        _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp,
         origin_function_signature,
         origin_from_address,
         origin_to_address,

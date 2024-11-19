@@ -6,11 +6,30 @@
 
 SELECT
     tx_hash,
+    -- should we rearrange the order?
     block_number,
     block_timestamp,
     tx_position,
     trace_index,
-    identifier,
+    concat_ws(
+        '-',
+        block_number,
+        tx_position,
+        CONCAT(
+            TYPE,
+            '_',
+            trace_address
+        )
+    ) AS _call_id,
+    --deprecate
+    CONCAT(
+        TYPE,
+        '_',
+        trace_address
+    ) AS identifier,
+    --deprecate
+    trace_address,
+    --new column
     origin_from_address,
     origin_to_address,
     origin_function_signature,

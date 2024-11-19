@@ -18,6 +18,7 @@ SELECT
     raw_amount,
     raw_amount_precise,
     _log_id,
+    -- needs to be deprecated
     COALESCE (
         transfers_id,
         {{ dbt_utils.generate_surrogate_key(
