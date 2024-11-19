@@ -11,7 +11,22 @@ SELECT
     block_timestamp,
     tx_position,
     trace_index,
-    identifier,
+    concat_ws(
+        '-',
+        block_number,
+        tx_position,
+        CONCAT(
+            TYPE,
+            '_',
+            trace_address
+        )
+    ) AS _call_id,
+    --deprecate
+    CONCAT(
+        TYPE,
+        '_',
+        trace_address
+    ) AS identifier,
     --deprecate
     trace_address,
     --new column
