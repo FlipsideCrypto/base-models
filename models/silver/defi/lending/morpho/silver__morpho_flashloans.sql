@@ -6,7 +6,7 @@
     tags = ['reorg','curated']
 ) }}
 
-with flashloan AS(
+WITH flashloan AS(
 
     SELECT
         l.tx_hash,
@@ -20,21 +20,27 @@ with flashloan AS(
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS caller,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS token,
-        try_to_number(
-        utils.udf_hex_to_int(
+        TRY_TO_NUMBER(
+            utils.udf_hex_to_int(
                 segmented_data [0] :: STRING
-         ))
-        AS flashloan_quantity,
-        l._log_id,
-        l._inserted_timestamp
+            )
+        ) AS flashloan_quantity,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }} 
-        l 
+        {{ ref('core__fact_event_logs') }}
+        l
     WHERE
-        topics[0]::STRING = '0xc76f1b4fe4396ac07a9fa55a415d4ca430e72651d37d3401f3bed7cb13fc4f12'
+        topics [0] :: STRING = '0xc76f1b4fe4396ac07a9fa55a415d4ca430e72651d37d3401f3bed7cb13fc4f12'
         AND contract_address = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb'
+        AND tx_succeeded
+
 {% if is_incremental() %}
-AND l._inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -53,8 +59,8 @@ SELECT
     origin_to_address,
     origin_function_signature,
     f.contract_address,
-    caller as initiator_address,
-    token as market,
+    caller AS initiator_address,
+    token AS market,
     C.token_symbol,
     flashloan_quantity AS flashloan_amount_unadj,
     flashloan_quantity / pow(
@@ -67,5 +73,5 @@ SELECT
     f._inserted_timestamp
 FROM
     flashloan f
-    LEFT JOIN {{ ref('silver__contracts') }} c
-    ON  f.token = c.contract_address
+    LEFT JOIN {{ ref('silver__contracts') }} C
+    ON f.token = C.contract_address

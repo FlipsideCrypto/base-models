@@ -8,6 +8,7 @@
 
 WITH --borrows from granary LendingPool contracts
 atoken_meta AS (
+
     SELECT
         atoken_address,
         granary_version_pool,
@@ -26,7 +27,6 @@ atoken_meta AS (
         {{ ref('silver__granary_tokens') }}
 ),
 borrow AS (
-
     SELECT
         tx_hash,
         block_number,
@@ -58,10 +58,14 @@ borrow AS (
             contract_address
         ) AS lending_pool_contract,
         'Granary' AS granary_version,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0xc6a898309e823ee50bac64e45ca8adba6690e99e7841c45d754e2a38e9019d9b'
 
@@ -75,8 +79,13 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-AND contract_address in (SELECT granary_version_pool from atoken_meta)
-AND tx_status = 'SUCCESS' --excludes failed txs
+AND contract_address IN (
+    SELECT
+        granary_version_pool
+    FROM
+        atoken_meta
+)
+AND tx_succeeded
 )
 SELECT
     tx_hash,

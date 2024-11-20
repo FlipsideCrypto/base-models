@@ -15,14 +15,18 @@ WITH logs_pull AS (
         tx_hash,
         block_number,
         block_timestamp,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x3286b0394bf1350245290b7226c92ed186bd716f28938e62dbb895298f018172'
-    AND
-        block_timestamp::DATE >= '2024-07-01' --LAUNCH MONTH
+        AND block_timestamp :: DATE >= '2024-07-01' --LAUNCH MONTH
+
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
     SELECT

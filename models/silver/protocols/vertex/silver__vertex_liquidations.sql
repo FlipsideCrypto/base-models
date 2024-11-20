@@ -25,22 +25,22 @@ logs AS (
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        tx_status,
+        tx_succeeded,
         contract_address,
-        block_hash,
-        data,
+        DATA,
         event_index,
         event_removed,
         topics,
-        _inserted_timestamp,
-        _log_id,
-        is_pending,
-        logs_id,
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
         inserted_timestamp,
-        modified_timestamp,
-        _invocation_id
+        modified_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x494f937f5cc892f798248aa831acfb4ad7c4bf35edd8498c5fb431ce1e38b035'
         AND contract_address = LOWER('0xE46Cb729F92D287F6459bDA6899434E22eCC48AE')
@@ -136,45 +136,45 @@ v2_vertex_decode AS (
             FROM
                 logs_pull_v2
         ),
-FINAL AS (
-    SELECT
-        block_number,
-        block_timestamp,
-        tx_hash,
-        contract_address,
-        event_name,
-        event_index,
-        origin_function_signature,
-        origin_from_address,
-        origin_to_address,
-        digest,
-        trader,
-        subaccount,
-        l.product_id,
-        p.health_group,
-        p.health_group_symbol,
-        amount AS amount_unadj,
-        amount / pow(
-            10,
-            18
-        ) AS amount,
-        amount_quote AS amount_quote_unadj,
-        amount_quote / pow(
-            10,
-            18
-        ) AS amount_quote,
-        CASE
-            WHEN is_encoded_spread = 1 THEN TRUE
-            ELSE FALSE
-        END AS is_encoded_spread,
-        decoded_spread_product_ids AS spread_product_ids,
-        _log_id,
-        _inserted_timestamp
-    FROM
-        v2_vertex_decode l
-        LEFT JOIN health_groups p
-        ON l.product_id = p.product_id
-)
+        FINAL AS (
+            SELECT
+                block_number,
+                block_timestamp,
+                tx_hash,
+                contract_address,
+                event_name,
+                event_index,
+                origin_function_signature,
+                origin_from_address,
+                origin_to_address,
+                digest,
+                trader,
+                subaccount,
+                l.product_id,
+                p.health_group,
+                p.health_group_symbol,
+                amount AS amount_unadj,
+                amount / pow(
+                    10,
+                    18
+                ) AS amount,
+                amount_quote AS amount_quote_unadj,
+                amount_quote / pow(
+                    10,
+                    18
+                ) AS amount_quote,
+                CASE
+                    WHEN is_encoded_spread = 1 THEN TRUE
+                    ELSE FALSE
+                END AS is_encoded_spread,
+                decoded_spread_product_ids AS spread_product_ids,
+                _log_id,
+                _inserted_timestamp
+            FROM
+                v2_vertex_decode l
+                LEFT JOIN health_groups p
+                ON l.product_id = p.product_id
+        )
     SELECT
         *,
         {{ dbt_utils.generate_surrogate_key(['tx_hash','event_index']) }} AS vertex_liquidation_id,

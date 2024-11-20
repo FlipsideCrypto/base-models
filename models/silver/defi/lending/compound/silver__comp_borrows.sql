@@ -6,8 +6,8 @@
     tags = ['non_realtime','reorg']
 ) }}
 
-WITH 
-comp_assets as (
+WITH comp_assets AS (
+
     SELECT
         compound_market_address,
         compound_market_name,
@@ -21,7 +21,6 @@ comp_assets as (
         {{ ref('silver__comp_asset_details') }}
 ),
 borrow AS (
-
     SELECT
         tx_hash,
         block_number,
@@ -46,20 +45,29 @@ borrow AS (
         C.underlying_asset_address,
         C.underlying_asset_symbol,
         'base' AS blockchain,
-        _log_id,
-        l._inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         l
         LEFT JOIN comp_assets C
         ON asset = C.compound_market_address
     WHERE
         topics [0] = '0x9b1bfa7fa9ee420a16e124f794c35ac9f90472acc99140eb2f6447c714cad8eb' --withdrawl
-        AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
-        AND tx_status = 'SUCCESS'
+        AND l.contract_address IN (
+            SELECT
+                DISTINCT(compound_market_address)
+            FROM
+                comp_assets
+        )
+        AND tx_succeeded
 
 {% if is_incremental() %}
-AND l._inserted_timestamp >= (
+AND l.modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp

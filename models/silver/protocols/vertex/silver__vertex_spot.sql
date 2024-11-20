@@ -31,22 +31,24 @@ logs AS (
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        tx_status,
+        tx_succeeded,
         contract_address,
         block_hash,
-        data,
+        DATA,
         event_index,
         event_removed,
         topics,
-        _inserted_timestamp,
-        _log_id,
-        is_pending,
-        logs_id,
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
         inserted_timestamp,
         modified_timestamp,
         _invocation_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x7c57459d6f4f0fb2fc5b1e298c8c0eb238422944964aa1e249eaa78747f0cca9'
         AND contract_address = LOWER('0xd0899a1235771733e89b674633981e422aa45B1A')
@@ -140,7 +142,7 @@ order_fill_format AS (
         trader,
         subaccount,
         expiration AS expiration_raw,
-        UTILS.UDF_INT_TO_BINARY(TRY_TO_NUMBER(expiration)) AS exp_binary,
+        utils.udf_int_to_binary(TRY_TO_NUMBER(expiration)) AS exp_binary,
         utils.udf_binary_to_int(SUBSTR(exp_binary, -2)) AS order_type,
         utils.udf_binary_to_int(SUBSTR(exp_binary, -3, 1)) AS market_reduce_flag,
         CASE
