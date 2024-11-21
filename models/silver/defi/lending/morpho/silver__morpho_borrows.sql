@@ -40,6 +40,11 @@ WITH traces AS (
         ) AS shares,
         CONCAT('0x', SUBSTR(segmented_input [7] :: STRING, 25)) AS on_behalf_address,
         CONCAT('0x', SUBSTR(segmented_input [8] :: STRING, 25)) AS receiver_address,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        origin_from_address AS borrower_address,
+        to_address AS contract_address,
         concat_ws(
             '-',
             block_number,
@@ -70,32 +75,31 @@ AND _inserted_timestamp >= (
         {{ this }}
 )
 {% endif %}
-),
-tx_join AS (
-    SELECT
-        tx.block_number,
-        tx.tx_hash,
-        tx.block_timestamp,
-        tx.from_address AS origin_from_address,
-        tx.to_address AS origin_to_address,
-        tx.origin_function_signature,
-        t.from_address,
-        t.to_address AS contract_address,
-        tx.from_address AS borrower_address,
-        t.loan_token,
-        t.collateral_token,
-        t.amount,
-        t.on_behalf_address,
-        t.receiver_address,
-        t._call_id,
-        t._inserted_timestamp
-    FROM
-        traces t
-        INNER JOIN {{ ref('core__fact_transactions') }}
-        tx
-        ON tx.block_number = t.block_number
-        AND tx.tx_hash = t.tx_hash
-)
+) {# tx_join AS (
+SELECT
+    tx.block_number,
+    tx.tx_hash,
+    tx.block_timestamp,
+    tx.from_address AS origin_from_address,
+    tx.to_address AS origin_to_address,
+    tx.origin_function_signature,
+    t.from_address,
+    t.to_address AS contract_address,
+    tx.from_address AS borrower_address,
+    t.loan_token,
+    t.collateral_token,
+    t.amount,
+    t.on_behalf_address,
+    t.receiver_address,
+    t._call_id,
+    t._inserted_timestamp
+FROM
+    traces t
+    INNER JOIN {{ ref('core__fact_transactions') }}
+    tx
+    ON tx.block_number = t.block_number
+    AND tx.tx_hash = t.tx_hash
+) #}
 SELECT
     tx_hash,
     block_number,
@@ -119,6 +123,6 @@ SELECT
     _call_id AS _id,
     t._inserted_timestamp
 FROM
-    tx_join t
+    traces t
     LEFT JOIN {{ ref('silver__contracts') }} C
     ON C.contract_address = t.loan_token

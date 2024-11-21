@@ -8,7 +8,7 @@ SELECT
     block_number,
     block_timestamp,
     tx_hash,
-    tx_position,
+    1 AS tx_position,
     -- new column
     trace_index,
     from_address,
@@ -16,29 +16,29 @@ SELECT
     input,
     output,
     TYPE,
-    trace_address,
+    '0x' AS trace_address,
     --new column
     sub_traces,
     DATA,
     VALUE,
     value_precise_raw,
     value_precise,
-    value_hex,
+    '0x' AS value_hex,
     --new column
     gas,
     gas_used,
-    origin_from_address,
+    '0x' AS origin_from_address,
     -- new column
-    origin_to_address,
+    '0x' AS origin_to_address,
     -- new column
-    origin_function_signature,
+    '0x' AS origin_function_signature,
     -- new column
-    trace_succeeded,
+    TRUE AS trace_succeeded,
     -- new column
     error_reason,
-    revert_reason,
+    '0x' AS revert_reason,
     -- new column
-    tx_succeeded,
+    TRUE AS tx_succeeded,
     -- new column
     fact_traces_id,
     COALESCE(
