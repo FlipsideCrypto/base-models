@@ -47,7 +47,7 @@ AND contract_address NOT IN (
     FROM
         {{ this }}
 )
-AND block_timestamp >= CURRENT_DATE - INTERVAL '7 days'
+AND block_timestamp >= SYSDATE() - INTERVAL '7 days'
 
 {% endif %}
 ),
