@@ -1,20 +1,34 @@
+{%- if flags.WHICH == 'compile' and execute -%}
+
+    {% set config_log = '\n' %}
+    {% set config_log = config_log ~ '\n=== DBT Model Config ===\n'%}
+    {% set config_log = config_log ~ '\n{{ config (\n' %}
+    {% set config_log = config_log ~ '    materialized = "' ~ config.get('materialized') ~ '",\n' %}
+    {% set config_log = config_log ~ '    tags = ' ~ config.get('tags') | tojson ~ '\n' %}
+    {% set config_log = config_log ~ ') }}\n' %}
+    {{ log(config_log, info=True) }}
+    {{ log("", info=True) }}
+{%- endif -%}
+
 {{ config (
     materialized = "view",
     tags = ['streamline_core_complete']
 ) }}
 
-{% if execute %}
-    {% set height = run_query('SELECT streamline.udf_get_chainhead()') %}
-    {% set block_height = height.columns [0].values() [0] %}
-{% else %}
-    {% set block_height = 0 %}
-{% endif %}
-
 SELECT
-    _id AS block_number
+    _id AS block_number,
+    utils.udf_int_to_hex(_id) AS block_number_hex
 FROM
-    {{ ref("silver__number_sequence") }}
+    {{ ref('silver__number_sequence') }}
 WHERE
-    _id <= {{ block_height }}
+    _id <= (
+        SELECT
+            COALESCE(
+                block_number,
+                0
+            )
+        FROM
+            {{ ref("streamline__get_chainhead") }}
+    )
 ORDER BY
     _id ASC
