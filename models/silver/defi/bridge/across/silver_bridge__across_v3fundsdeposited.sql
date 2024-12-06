@@ -52,7 +52,7 @@ WITH base_evt AS (
         decoded_log :"outputToken" :: STRING AS outputToken,
         decoded_log,
         event_removed,
-        tx_status,
+        tx_succeeded,
         CONCAT(
             tx_hash :: STRING,
             '-',
@@ -86,7 +86,7 @@ SELECT
     topic_0,
     event_name,
     event_removed,
-    tx_status,
+    tx_succeeded,
     contract_address AS bridge_address,
     NAME AS platform,
     depositor AS sender,

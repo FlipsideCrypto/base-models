@@ -34,7 +34,7 @@ WITH base_evt AS (
         decoded_log :"symbol" :: STRING AS symbol,
         decoded_log,
         event_removed,
-        tx_status,
+        tx_succeeded,
         CONCAT(
             tx_hash :: STRING,
             '-',
@@ -86,7 +86,7 @@ native_gas_paid AS (
         decoded_log :"symbol" :: STRING AS symbol,
         decoded_log,
         event_removed,
-        tx_status,
+        tx_succeeded,
         CONCAT(
             tx_hash :: STRING,
             '-',
