@@ -25,7 +25,7 @@ WHERE
 {% endif %}
     order by total_interaction_count desc
     LIMIT
-        50
+        400
 ), all_contracts AS (
     SELECT
         contract_address
@@ -47,7 +47,7 @@ row_nos AS (
     FROM
         all_contracts
 ),
-batched AS ({% for item in range(55) %}
+batched AS ({% for item in range(501) %}
 SELECT
     rn.contract_address, live.udf_api('GET', CONCAT('https://api.basescan.org/api?module=contract&action=getabi&address=', rn.contract_address, '&apikey={key}'),{ 'User-Agent': 'FlipsideStreamline' },{}, 'Vault/prod/block_explorers/base_scan') AS abi_data, SYSDATE() AS _inserted_timestamp
 FROM

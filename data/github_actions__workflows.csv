@@ -1,8 +1,7 @@
 workflow_name,workflow_schedule
-dbt_run_scheduled_non_realtime,"22,52 * * * *"
+dbt_run_scheduled_non_realtime,"22 * * * *"
 dbt_run_streamline_chainhead,"15,45 * * * *"
-dbt_run_streamline_decoder,"0,30 * * * *"
-dbt_run_scheduled_curated,"40 * * * *"
-dbt_test_tasks,"15 * * * *"
+dbt_run_streamline_decoder,"33 * * * *"
+dbt_run_scheduled_curated,"40 */4 * * *"
 dbt_run_streamline_decoded_logs_history,"45 7 * * 6"
-dbt_run_scheduled_decoded_logs_history_user_abis,"39 23 * * *"
+dbt_run_abi_refresh,"32 23 * * *"
