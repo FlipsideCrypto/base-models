@@ -16,8 +16,10 @@
 ) }}
 
 SELECT
-    _id AS block_number,
-    utils.udf_int_to_hex(_id) AS block_number_hex
+    _id,
+    (({{ var('GLOBAL_BLOCKS_PER_HOUR',0) }} / 60) * 3) :: INT AS block_number_delay, --3 minute block delay
+    (_id - block_number_delay) :: INT AS block_number,
+    utils.udf_int_to_hex(block_number) AS block_number_hex
 FROM
     {{ ref('silver__number_sequence') }}
 WHERE
