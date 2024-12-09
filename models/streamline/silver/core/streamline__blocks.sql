@@ -34,5 +34,3 @@ WHERE
         FROM
             {{ ref("streamline__get_chainhead") }}
     )
-ORDER BY
-    _id ASC
