@@ -50,6 +50,6 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id
 FROM
     flattened
-WHERE product_id not in ('121','125')  qualify(ROW_NUMBER() over(PARTITION BY ticker_id, HOUR
+WHERE product_id not in ('123','127')  qualify(ROW_NUMBER() over(PARTITION BY ticker_id, HOUR
 ORDER BY
     inserted_timestamp DESC )) = 1
