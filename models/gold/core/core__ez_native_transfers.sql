@@ -11,6 +11,8 @@ SELECT
     block_timestamp,
     tx_position,
     trace_index,
+    '0x' AS TYPE,
+    '0x' AS trace_address,
     concat_ws(
         '-',
         block_number,
