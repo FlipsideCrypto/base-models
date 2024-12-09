@@ -87,7 +87,7 @@ vars:
   # The keys correspond to dbt profiles and are case sensitive
     dev:
       API_INTEGRATION: AWS_BASE_API_DEV
-      EXTERNAL_FUNCTION_URI: 
+      EXTERNAL_FUNCTION_URI: p2bt501b4d.execute-api.us-east-1.amazonaws.com/stg/
       ROLES:
         - AWS_LAMBDA_BASE_API 
         - INTERNAL_DEV
