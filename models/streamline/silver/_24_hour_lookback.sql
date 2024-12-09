@@ -1,17 +1,18 @@
-{{ config(
-    materialized = 'ephemeral'
+{{ config (
+    materialized = "ephemeral"
 ) }}
 
-    WITH max_time AS (
-        SELECT
-            MAX(block_timestamp) AS max_timestamp
-        FROM
-            {{ ref("core__fact_blocks") }}
-    )
+WITH max_time AS (
+
+    SELECT
+        MAX(block_timestamp) AS max_timestamp
+    FROM
+        {{ ref("silver__blocks") }}
+)
 SELECT
-    COALESCE(MIN(block_number), 0) AS block_number
+    MIN(block_number) AS block_number
 FROM
-    {{ ref("core__fact_blocks") }}
+    {{ ref("silver__blocks") }}
     JOIN max_time
     ON block_timestamp BETWEEN DATEADD(
         'hour',
@@ -22,4 +23,4 @@ FROM
         'hour',
         -24,
         max_timestamp
-        )
+    )
