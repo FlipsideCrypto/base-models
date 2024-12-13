@@ -32,3 +32,4 @@ WHERE
     AND (
         r._inserted_timestamp >= DATEADD('hour', -84, SYSDATE())
         OR r._inserted_timestamp IS NULL)
+        AND t.tx_hash <> '0x13b126388e78adc0fff1b40888b2cd87e6ec0d6c3c9838ee26119b81173bcf25'
