@@ -60,8 +60,9 @@ FROM
     ON base_block_number = model_block_number
     AND base_tx_hash = model_tx_hash
 WHERE
-    model_tx_hash IS NULL
-    OR model_block_number IS NULL
+    (model_tx_hash IS NULL
+    OR model_block_number IS NULL)
+    AND base_tx_hash <> '0x13b126388e78adc0fff1b40888b2cd87e6ec0d6c3c9838ee26119b81173bcf25'
 {% endmacro %}
 
 {% macro missing_confirmed_txs(

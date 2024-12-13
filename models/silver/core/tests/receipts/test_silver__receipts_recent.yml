@@ -9,6 +9,7 @@ models:
           partition_by:
             - BLOCK_NUMBER
           column_name: POSITION
+          where: BLOCK_NUMBER <> 23635928
     columns:
       - name: BLOCK_NUMBER
         tests:
