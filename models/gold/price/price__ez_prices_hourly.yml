@@ -10,6 +10,8 @@ models:
         description: '{{ doc("prices_token_address_evm") }}'
       - name: SYMBOL
         description: '{{ doc("prices_symbol") }}'
+      - name: NAME
+        description: '{{ doc("prices_name") }}'
       - name: BLOCKCHAIN
         description: '{{ doc("prices_blockchain") }}'
       - name: DECIMALS
