@@ -36,13 +36,13 @@ The unique identifier representing the asset.
 
 {% docs prices_name %}
 
-The name of asset.
+The name of the asset.
 
 {% enddocs %}
 
 {% docs prices_symbol %}
 
-The symbol of asset.
+The symbol of the asset.
 
 {% enddocs %}
 
