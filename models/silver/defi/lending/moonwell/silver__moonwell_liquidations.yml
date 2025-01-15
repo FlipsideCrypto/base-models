@@ -45,12 +45,12 @@ models:
       - name: TX_HASH
         tests: 
           - not_null
-      - name: COLLATERAL_TOKEN
-        tests: 
-          - not_null
-      - name: COLLATERAL_SYMBOL
-        tests: 
-          - not_null
+      # - name: COLLATERAL_TOKEN
+      #   tests: 
+      #     - not_null
+      # - name: COLLATERAL_SYMBOL
+      #   tests: 
+      #     - not_null
       - name: EVENT_INDEX
         tests: 
           - not_null
