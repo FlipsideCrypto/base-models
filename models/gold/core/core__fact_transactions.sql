@@ -51,12 +51,20 @@ SELECT
     r,
     s,
     v,
-    transactions_id AS fact_transactions_id,
-    {# GREATEST(COALESCE(A.inserted_timestamp, '2000-01-01'), COALESCE(b.inserted_timestamp, '2000-01-01')) AS inserted_timestamp,
-    GREATEST(COALESCE(A.modified_timestamp, '2000-01-01'), COALESCE(b.modified_timestamp, '2000-01-01')) AS modified_timestamp,
-    #}
-    A.inserted_timestamp,
-    A.modified_timestamp,
+    COALESCE (
+        transactions_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_hash']
+        ) }}
+    ) AS fact_transactions_id,
+    COALESCE(
+        A.inserted_timestamp,
+        '2000-01-01'
+    ) AS inserted_timestamp,
+    COALESCE(
+        A.modified_timestamp,
+        '2000-01-01'
+    ) AS modified_timestamp,
     tx_status AS status,
     --deprecate
     POSITION,

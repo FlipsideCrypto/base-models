@@ -53,7 +53,7 @@ SELECT
             '2000-01-01'
         )
     ) AS modified_timestamp,
-    'blast' AS blockchain,
+    'base' AS blockchain,
     --deprecate
     HASH,
     --deprecate ,

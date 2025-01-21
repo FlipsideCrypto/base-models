@@ -5,42 +5,26 @@
 ) }}
 
 SELECT
-    tx_hash,
-    -- should we rearrange the order?
     block_number,
     block_timestamp,
+    tx_hash,
     tx_position,
     trace_index,
-    '0x' AS TYPE,
-    '0x' AS trace_address,
-    concat_ws(
-        '-',
-        block_number,
-        tx_position,
-        CONCAT(
-            TYPE,
-            '_',
-            trace_address
-        )
-    ) AS _call_id,
-    --deprecate
-    CONCAT(
-        TYPE,
-        '_',
-        trace_address
-    ) AS identifier,
+    identifier,
     --deprecate
     trace_address,
     --new column
-    origin_from_address,
-    origin_to_address,
-    origin_function_signature,
+    TYPE,
+    --new column
     from_address,
     to_address,
     amount,
     amount_precise_raw,
     amount_precise,
     amount_usd,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
     COALESCE (
         native_transfers_id,
         {{ dbt_utils.generate_surrogate_key(

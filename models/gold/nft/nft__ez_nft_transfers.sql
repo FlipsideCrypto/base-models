@@ -2,21 +2,23 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' } } }
-) }} 
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'NFT' }} }
+) }}
 
 SELECT
     block_timestamp,
     block_number,
     tx_hash,
-    1 AS tx_position,
+    tx_position,
     -- new
     event_index,
     intra_event_index,
+    token_transfer_type,
+    -- new
     event_type,
     --deprecate
     IFF(
-        event_type = 'mint',
+        from_address = '0x0000000000000000000000000000000000000000',
         TRUE,
         FALSE
     ) AS is_mint,
@@ -43,20 +45,13 @@ SELECT
     -- new
     erc1155_value,
     -- deprecate
-    erc1155_value AS quantity,
+    COALESCE(erc1155_value, '1') ::STRING AS quantity, -- new 
+    IFF(erc1155_value IS NULL, 'erc721', 'erc1155') AS token_standard,
     -- new
-    IFF(
-        erc1155_value IS NOT NULL,
-        'erc721',
-        'erc1155'
-    ) AS token_standard,
-    -- new
-    '0x' AS origin_function_signature,
-    --new
-    '0x' AS origin_from_address,
-    --new
-    '0x' AS origin_to_address,
-    --new
+    -- origin_function_signature,
+    -- origin_from_address,
+    -- origin_to_address,
+    -- added later 
     COALESCE (
         nft_transfers_id,
         {{ dbt_utils.generate_surrogate_key(

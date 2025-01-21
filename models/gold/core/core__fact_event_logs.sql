@@ -29,6 +29,7 @@ SELECT
         WHEN tx_status = 'SUCCESS' THEN TRUE
         ELSE FALSE
     END AS tx_succeeded,
+    -- new column
     logs_id AS fact_event_logs_id,
     inserted_timestamp,
     modified_timestamp,

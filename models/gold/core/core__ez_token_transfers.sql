@@ -26,7 +26,7 @@ SELECT
     has_decimal,
     has_price,
     _log_id,
-    -- needs to be deprecated
+    -- deprecate
     _inserted_timestamp,
     COALESCE (
         transfers_id,
