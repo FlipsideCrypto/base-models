@@ -13,10 +13,19 @@ WITH base_contracts AS (
         block_timestamp,
         from_address,
         to_address AS contract_address,
-        _call_id,
-        _inserted_timestamp
+        concat_ws(
+            '-',
+            block_number,
+            tx_position,
+            CONCAT(
+                TYPE,
+                '_',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
         from_address = '0xaf5191b0de278c7286d6c7cc6ab6bb8a73ba2cd6' --Factory
         AND TYPE ILIKE 'create%'

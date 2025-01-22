@@ -60,7 +60,7 @@ traces_pull AS (
             ELSE NULL
         END AS asset_identifier
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
         t
     WHERE
         tx_hash IN (

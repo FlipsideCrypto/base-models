@@ -84,9 +84,8 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-and _inserted_timestamp >= dateadd('day', -14, current_date())
-{% endif %}
-),
+AND _inserted_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+{% endif %}),
 token_transfers_raw AS (
     SELECT
         tx_hash,
@@ -125,9 +124,8 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-and _inserted_timestamp >= dateadd('day', -14, current_date())
-{% endif %}
-),
+AND _inserted_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+{% endif %}),
 logs_token_raw AS (
     SELECT
         *,
@@ -155,7 +153,7 @@ eth_transfers_raw AS (
     SELECT
         tx_hash,
         to_address AS seller_address,
-        eth_value,
+        VALUE AS eth_value,
         trace_index AS transfers_index,
         ROW_NUMBER() over (
             PARTITION BY tx_hash,
@@ -164,7 +162,7 @@ eth_transfers_raw AS (
                 trace_index ASC
         ) AS intra_tx_index
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
         block_timestamp :: DATE >= '2023-08-01'
         AND tx_hash IN (
@@ -178,10 +176,10 @@ eth_transfers_raw AS (
         AND identifier != 'CALL_ORIGIN'
         AND from_address = '0xdef1c0ded9bec7f1a1670819833240f027b25eff'
         AND trace_status = 'SUCCESS'
-        AND eth_value > 0
+        AND VALUE > 0
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -189,9 +187,8 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-and _inserted_timestamp >= dateadd('day', -14, current_date())
-{% endif %}
-),
+AND modified_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+{% endif %}),
 logs_eth_raw AS (
     SELECT
         *,
@@ -333,9 +330,8 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-and _inserted_timestamp >= dateadd('day', -14, current_date())
-{% endif %}
-)
+AND _inserted_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+{% endif %})
 SELECT
     block_number,
     block_timestamp,

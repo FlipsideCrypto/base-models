@@ -25,11 +25,24 @@ WITH traces AS (
         CONCAT('0x', SUBSTR(segmented_input [2] :: STRING, 25)) AS oracle_address,
         CONCAT('0x', SUBSTR(segmented_input [3] :: STRING, 25)) AS irm_address,
         CONCAT('0x', SUBSTR(segmented_input [5] :: STRING, 25)) AS borrower,
-        ROW_NUMBER() OVER (PARTITION BY tx_hash ORDER BY trace_index) AS trace_index_order,
-        _call_id,
-        _inserted_timestamp
+        ROW_NUMBER() over (
+            PARTITION BY tx_hash
+            ORDER BY
+                trace_index
+        ) AS trace_index_order,
+        concat_ws(
+            '-',
+            block_number,
+            tx_position,
+            CONCAT(
+                TYPE,
+                '_',
+                trace_address
+            )
+        ) AS _call_id,
+        modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__traces') }}
+        {{ ref('core__fact_traces') }}
     WHERE
         to_address = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb' --Morpho Blue
         AND function_sig = '0xd8eabcb8'
@@ -52,7 +65,11 @@ logs AS(
         l.block_number,
         l.block_timestamp,
         l.event_index,
-        ROW_NUMBER() OVER (PARTITION BY l.tx_hash ORDER BY l.event_index) AS event_index_order,
+        ROW_NUMBER() over (
+            PARTITION BY l.tx_hash
+            ORDER BY
+                l.event_index
+        ) AS event_index_order,
         l.origin_from_address,
         l.origin_to_address,
         l.origin_function_signature,
