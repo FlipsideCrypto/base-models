@@ -49,11 +49,6 @@ sources:
     schema: crosschain
     tables:
       - name: node_mapping
-  - name: base_silver
-    database: base
-    schema: silver
-    tables:
-      - name: verified_abis
   - name: base_bronze_api
     database: base
     schema: bronze_api
@@ -74,3 +69,5 @@ sources:
     schema: silver
     tables:
       - name: overflowed_traces2
+      - name: verified_abis
+      - name: traces
