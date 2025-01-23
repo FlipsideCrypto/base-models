@@ -82,8 +82,8 @@ broken_blocks AS (
         {{ ref("silver__transactions") }}
         tx
         LEFT JOIN {{ source(
-            "base_silver",
-            "traces"
+            "base_gold",
+            "fact_traces"
         ) }}
         tr USING (
             block_number,

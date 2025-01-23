@@ -39,8 +39,8 @@ missing_txs AS (
     FROM
         all_txs txs
         LEFT JOIN {{ source(
-            'base_silver',
-            'traces'
+            'base_gold',
+            'fact_traces'
         ) }}
         tr2 USING (
             block_number,

@@ -70,4 +70,8 @@ sources:
     tables:
       - name: overflowed_traces2
       - name: verified_abis
-      - name: traces
+  - name: base_gold
+    database: "{{ 'base' if target.database == 'BASE' else 'base_dev' }}"
+    schema: core
+    tables:
+      - name: fact_traces
