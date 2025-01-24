@@ -1,11 +1,11 @@
--- depends_on: {{ ref('bronze__overflowed_traces2') }}
+-- depends_on: {{ ref('bronze__overflowed_traces') }}
 {% set warehouse = 'DBT_SNOWPARK' if var('OVERFLOWED_TRACES') else target.warehouse %}
 {{ config (
     materialized = "incremental",
     incremental_strategy = 'delete+insert',
     unique_key = ['block_number','tx_position'],
     cluster_by = ['modified_timestamp::DATE','partition_key'],
-    tags = ['overflowed_traces2'],
+    tags = ['overflowed_traces'],
     snowflake_warehouse = warehouse
 ) }}
 
@@ -73,7 +73,7 @@ WITH bronze_overflowed_traces AS (
             '_'
         ) AS trace_address_array
     FROM
-        {{ ref("bronze__overflowed_traces2") }}
+        {{ ref("bronze__overflowed_traces") }}
     GROUP BY
         block_number,
         tx_position,

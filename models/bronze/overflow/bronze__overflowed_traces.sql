@@ -1,6 +1,6 @@
 {{ config (
     materialized = "view",
-    tags = ['overflowed_traces2']
+    tags = ['overflowed_traces']
 ) }}
 
 {% for item in range(
@@ -47,7 +47,7 @@
                                     index_cols
                                 ) AS index_vals
                             FROM
-                                {{ ref("bronze__potential_overflowed_traces2") }}
+                                {{ ref("bronze__potential_overflowed_traces") }}
                             WHERE
                                 row_no = {{ item }}
                         ),

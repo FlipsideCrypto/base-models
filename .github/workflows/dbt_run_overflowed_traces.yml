@@ -1,11 +1,11 @@
-name: dbt_run_overflowed_traces2
-run-name: dbt_run_overflowed_traces2
+name: dbt_run_overflowed_traces
+run-name: dbt_run_overflowed_traces
 
 on:
   workflow_dispatch:
     branches:
       - "main"
-    
+
 env:
   DBT_PROFILES_DIR: ./
 
@@ -21,12 +21,10 @@ env:
 concurrency:
   group: ${{ github.workflow }}
 
-
-
 jobs:
   run_dbt_jobs:
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: workflow_prod
 
     steps:
@@ -43,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -m "base_models,tag:overflowed_traces2" --vars '{"OVERFLOWED_TRACES":True}'
+          dbt run -m "base_models,tag:overflowed_traces" --vars '{"OVERFLOWED_TRACES":True}'

@@ -68,7 +68,7 @@ sources:
     database: "{{ 'base' if target.database == 'BASE' else 'base_dev' }}"
     schema: silver
     tables:
-      - name: overflowed_traces2
+      - name: overflowed_traces
       - name: verified_abis
   - name: base_gold
     database: "{{ 'base' if target.database == 'BASE' else 'base_dev' }}"
