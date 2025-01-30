@@ -1,11 +1,10 @@
-name: dbt_run_traces_fix
-run-name: dbt_run_traces_fix
+name: dbt_run_overflowed_traces
+run-name: dbt_run_overflowed_traces
 
 on:
   workflow_dispatch:
-  schedule:
-    # every 30 minutes (see https://crontab.guru)
-    - cron: "*/30 * * * *"
+    branches:
+      - "main"
 
 env:
   DBT_PROFILES_DIR: ./
@@ -26,7 +25,7 @@ jobs:
   run_dbt_jobs:
     runs-on: ubuntu-latest
     environment:
-      name: workflow_prod_2xl
+      name: workflow_prod
 
     steps:
       - uses: actions/checkout@v3
@@ -40,7 +39,6 @@ jobs:
         run: |
           pip install -r requirements.txt
           dbt deps
-
-      - name: run traces fix model
+      - name: Run DBT Jobs
         run: |
-          dbt run -m "base_models,tag:traces_fix"
+          dbt run -m "base_models,tag:overflowed_traces" --vars '{"OVERFLOWED_TRACES":True}'

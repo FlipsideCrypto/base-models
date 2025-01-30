@@ -1,6 +1,6 @@
 {{ config (
     materialized = "view",
-    tags = ['overflowed_traces2']
+    tags = ['overflowed_traces']
 ) }}
 
 WITH impacted_blocks AS (
@@ -38,7 +38,10 @@ missing_txs AS (
         file_name
     FROM
         all_txs txs
-        LEFT JOIN {{ ref("silver__traces2") }}
+        LEFT JOIN {{ source(
+            'base_gold',
+            'fact_traces'
+        ) }}
         tr2 USING (
             block_number,
             tx_position
@@ -46,7 +49,7 @@ missing_txs AS (
         JOIN {{ ref("streamline__traces_complete") }} USING (block_number)
         LEFT JOIN {{ source(
             'base_silver',
-            'overflowed_traces2'
+            'overflowed_traces'
         ) }}
         ot USING (
             block_number,
