@@ -5,22 +5,60 @@
 ) }}
 
 SELECT
-    A.block_number AS block_number,
+    block_number,
+    HASH AS block_hash,
+    --new column
     block_timestamp,
     'mainnet' AS network,
-    'base' AS blockchain,
     tx_count,
+    SIZE,
+    miner,
+    --new
+    extra_data,
+    parent_hash,
+    gas_used,
+    gas_limit,
     difficulty,
     total_difficulty,
-    extra_data,
-    gas_limit,
-    gas_used,
-    HASH,
-    parent_hash,
-    receipts_root,
     sha3_uncles,
-    SIZE,
     uncles AS uncle_blocks,
+    nonce,
+    -- new column
+    receipts_root,
+    -- new column
+    state_root,
+    -- new column
+    transactions_root,
+    -- new column
+    logs_bloom,
+    -- new column
+    withdrawals_root,
+    COALESCE (
+        blocks_id,
+        {{ dbt_utils.generate_surrogate_key(
+            ['a.block_number']
+        ) }}
+    ) AS fact_blocks_id,
+    GREATEST(
+        COALESCE(
+            A.inserted_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            d.inserted_timestamp,
+            '2000-01-01'
+        )
+    ) AS inserted_timestamp,
+    GREATEST(
+        COALESCE(
+            A.modified_timestamp,
+            '2000-01-01'
+        ),
+        COALESCE(
+            d.modified_timestamp,
+            '2000-01-01'
+        )
+    ) AS modified_timestamp,
     OBJECT_CONSTRUCT(
         'baseFeePerGas',
         base_fee_per_gas,
@@ -61,35 +99,11 @@ SELECT
         'uncles',
         uncles
     ) AS block_header_json,
-    COALESCE (
-        blocks_id,
-        {{ dbt_utils.generate_surrogate_key(
-            ['a.block_number']
-        ) }}
-    ) AS fact_blocks_id,
-    GREATEST(
-        COALESCE(
-            A.inserted_timestamp,
-            '2000-01-01'
-        ),
-        COALESCE(
-            d.inserted_timestamp,
-            '2000-01-01'
-        )
-    ) AS inserted_timestamp,
-    GREATEST(
-        COALESCE(
-            A.modified_timestamp,
-            '2000-01-01'
-        ),
-        COALESCE(
-            d.modified_timestamp,
-            '2000-01-01'
-        )
-    ) AS modified_timestamp,
-    withdrawals_root
+    -- deprecate
+    HASH,
+    --deprecate
+    'base' AS blockchain,
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__tx_count') }}
-    d
-    ON A.block_number = d.block_number
+    d USING (block_number)
