@@ -75,7 +75,7 @@ native_transfers AS (
         to_address = '0x25ab3efd52e6470681ce037cd546dc60726948d3'
 
 {% if is_incremental() %}
-AND et._inserted_timestamp >= (
+AND _inserted_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM

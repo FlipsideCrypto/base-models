@@ -40,8 +40,8 @@ WITH contract_deployments AS (
             '0x3093f9b57a428f3eb6285a589cb35bea6e78c336',
             '0x5ef72230578b3e399e6c6f4f6360edf95e83bbfd'
         )
-        AND tx_status = 'SUCCESS'
-        AND trace_status = 'SUCCESS'
+        AND tx_succeeded
+        AND trace_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
