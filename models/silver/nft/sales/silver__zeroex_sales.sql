@@ -17,31 +17,35 @@ WITH raw_logs AS (
         origin_from_address,
         origin_to_address,
         origin_function_signature,
-        _log_id,
-        _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        modified_timestamp AS _inserted_timestamp,
         event_index,
-        decoded_flat,
-        decoded_flat :direction AS direction,
-        decoded_flat :erc20Token :: STRING AS currency_address,
+        decoded_log,
+        decoded_log :direction AS direction,
+        decoded_log :erc20Token :: STRING AS currency_address,
         COALESCE(
-            decoded_flat :erc20TokenAmount,
-            decoded_flat :erc20FillAmount
+            decoded_log :erc20TokenAmount,
+            decoded_log :erc20FillAmount
         ) :: INT AS total_price_raw,
         COALESCE(
-            decoded_flat :erc721Token,
-            decoded_flat :erc1155Token
+            decoded_log :erc721Token,
+            decoded_log :erc1155Token
         ) :: STRING AS nft_address,
         COALESCE(
-            decoded_flat :erc721TokenId,
-            decoded_flat :erc1155TokenId
+            decoded_log :erc721TokenId,
+            decoded_log :erc1155TokenId
         ) :: STRING AS tokenId,
         COALESCE(
-            decoded_flat :erc1155FillAmount,
+            decoded_log :erc1155FillAmount,
             NULL
         ) :: STRING AS erc1155_value,
-        decoded_flat :maker :: STRING AS maker,
-        decoded_flat :matcher :: STRING AS matcher,
-        decoded_flat :taker :: STRING AS taker,
+        decoded_log :maker :: STRING AS maker,
+        decoded_log :matcher :: STRING AS matcher,
+        decoded_log :taker :: STRING AS taker,
         IFF(
             direction = 0,
             maker,
@@ -66,7 +70,7 @@ WITH raw_logs AS (
                 event_index ASC
         ) AS intra_tx_grouping
     FROM
-        {{ ref('silver__decoded_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2023-08-01'
         AND contract_address = '0xdef1c0ded9bec7f1a1670819833240f027b25eff'
@@ -103,7 +107,7 @@ token_transfers_raw AS (
                 event_index ASC
         ) AS intra_tx_index
     FROM
-        {{ ref('silver__transfers') }}
+        {{ ref('core__ez_token_transfers') }}
     WHERE
         block_timestamp :: DATE >= '2023-08-01'
         AND tx_hash IN (
@@ -116,7 +120,7 @@ token_transfers_raw AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -124,7 +128,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND _inserted_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+AND modified_timestamp >= DATEADD('day', -14, CURRENT_DATE())
 {% endif %}),
 logs_token_raw AS (
     SELECT
@@ -173,9 +177,9 @@ eth_transfers_raw AS (
             WHERE
                 currency_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
         )
-        AND identifier != 'CALL_ORIGIN'
+        AND trace_address != 'ORIGIN'
         AND from_address = '0xdef1c0ded9bec7f1a1670819833240f027b25eff'
-        AND trace_status = 'SUCCESS'
+        AND trace_succeeded
         AND VALUE > 0
 
 {% if is_incremental() %}
@@ -311,7 +315,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('silver__transactions') }}
+        {{ ref('core__fact_transactions') }}
     WHERE
         block_timestamp :: DATE >= '2023-08-01'
         AND tx_hash IN (
@@ -322,7 +326,7 @@ tx_data AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -330,7 +334,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND _inserted_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+AND modified_timestamp >= DATEADD('day', -14, CURRENT_DATE())
 {% endif %})
 SELECT
     block_number,

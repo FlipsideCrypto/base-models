@@ -74,7 +74,7 @@ AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 ),
 tx_join AS (
     SELECT
-        tx.block_number,
+        block_number,
         tx_hash,
         block_timestamp,
         origin_from_address,
@@ -91,7 +91,7 @@ tx_join AS (
         _call_id,
         _inserted_timestamp
     FROM
-        traces t
+        traces
 )
 SELECT
     tx_hash,

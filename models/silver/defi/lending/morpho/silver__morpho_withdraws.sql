@@ -50,10 +50,12 @@ WITH traces AS (
                 trace_address
             )
         ) AS _call_id,
-        modified_timestamp AS _inserted_timestamp
+        modified_timestamp AS _inserted_timestamp,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature
     FROM
         {{ ref('core__fact_traces') }}
-        t
     WHERE
         to_address = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb' --Morpho Blue
         AND function_sig = '0x5c2bea49'
