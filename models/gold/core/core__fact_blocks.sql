@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    block_number,
+    A.block_number,
     HASH AS block_hash,
     --new column
     block_timestamp,

@@ -6,9 +6,8 @@
     tags = ['reorg','curated']
 ) }}
 
+WITH comp_assets AS (
 
-WITH 
-comp_assets as (
     SELECT
         compound_market_address,
         compound_market_name,
@@ -22,7 +21,6 @@ comp_assets as (
         {{ ref('silver__comp_asset_details') }}
 ),
 withdraw AS (
-
     SELECT
         tx_hash,
         block_number,
@@ -44,26 +42,35 @@ withdraw AS (
         C.token_symbol,
         C.token_decimals,
         'base' AS blockchain,
-        _log_id,
-        l._inserted_timestamp
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id,
+        l.modified_timestamp AS _inserted_timestamp
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         l
         LEFT JOIN {{ ref('silver__contracts') }} C
         ON token_address = C.contract_address
     WHERE
         topics [0] = '0xd6d480d5b3068db003533b170d67561494d72e3bf9fa40a266471351ebba9e16' --WithdrawCollateral
-        AND l.contract_address IN (SELECT DISTINCT(compound_market_address) FROM comp_assets)
-        AND tx_status = 'SUCCESS'
+        AND l.contract_address IN (
+            SELECT
+                DISTINCT(compound_market_address)
+            FROM
+                comp_assets
+        )
+        AND tx_succeeded
 
 {% if is_incremental() %}
-AND l._inserted_timestamp >= (
+AND l.modified_timestamp >= (
     SELECT
         MAX(_inserted_timestamp) - INTERVAL '12 hours'
     FROM
         {{ this }}
 )
-AND l._inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND l.modified_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 )
 SELECT

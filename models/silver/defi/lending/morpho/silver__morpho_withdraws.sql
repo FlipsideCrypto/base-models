@@ -57,8 +57,8 @@ WITH traces AS (
     WHERE
         to_address = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb' --Morpho Blue
         AND function_sig = '0x5c2bea49'
-        AND trace_status = 'SUCCESS'
-        AND tx_status = 'SUCCESS'
+        AND trace_succeeded
+        AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -72,28 +72,24 @@ AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 ),
 tx_join AS (
     SELECT
-        tx.block_number,
-        tx.tx_hash,
-        tx.block_timestamp,
-        tx.from_address AS origin_from_address,
-        tx.to_address AS origin_to_address,
-        tx.origin_function_signature,
-        t.from_address,
-        t.to_address AS contract_address,
-        tx.from_address AS depositor_address,
-        t.loan_token,
-        t.collateral_token,
-        t.amount,
-        t.on_behalf_address,
-        t.receiver_address,
-        t._call_id,
-        t._inserted_timestamp
+        block_number,
+        tx_hash,
+        block_timestamp,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        from_address,
+        to_address AS contract_address,
+        origin_from_address AS depositor_address,
+        loan_token,
+        collateral_token,
+        amount,
+        on_behalf_address,
+        receiver_address,
+        _call_id,
+        _inserted_timestamp
     FROM
-        traces t
-        INNER JOIN {{ ref('silver__transactions') }}
-        tx
-        ON tx.block_number = t.block_number
-        AND tx.tx_hash = t.tx_hash
+        traces
 )
 SELECT
     tx_hash,

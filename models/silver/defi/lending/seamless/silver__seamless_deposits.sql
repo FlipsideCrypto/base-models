@@ -6,8 +6,8 @@
     tags = ['reorg','curated']
 ) }}
 
-WITH 
-atoken_meta AS (
+WITH atoken_meta AS (
+
     SELECT
         atoken_address,
         seamless_version_pool,
@@ -26,7 +26,6 @@ atoken_meta AS (
         {{ ref('silver__seamless_tokens') }}
 ),
 deposits AS(
-
     SELECT
         tx_hash,
         block_number,
@@ -52,10 +51,14 @@ deposits AS(
             origin_to_address,
             contract_address
         ) AS lending_pool_contract,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] :: STRING = '0x2b627736bca15cd5381dcf80b0bf11fd197d01a037c52b927a881a10fb73ba61'
 
@@ -68,10 +71,14 @@ AND _inserted_timestamp >= (
 )
 AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
-AND contract_address in (SELECT seamless_version_pool from atoken_meta)
-AND tx_status = 'SUCCESS' --excludes failed txs
+AND contract_address IN (
+    SELECT
+        seamless_version_pool
+    FROM
+        atoken_meta
 )
-
+AND tx_succeeded
+)
 SELECT
     tx_hash,
     block_number,

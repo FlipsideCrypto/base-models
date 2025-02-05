@@ -44,7 +44,7 @@ blocks AS (
                     SELECT
                         MAX(block_number) AS max_block
                     FROM
-                        {{ ref ('silver__blocks') }}
+                        {{ ref ('core__fact_blocks') }}
                 )
             )
         )
@@ -71,7 +71,6 @@ FROM
     blocks
     INNER JOIN base
     ON block_number BETWEEN state_min_block
-    AND state_max_block QUALIFY(ROW_NUMBER() over(PARTITION BY block_number
-    ORDER BY
+    AND state_max_block qualify(ROW_NUMBER() over(PARTITION BY block_number
+ORDER BY
     state_block_timestamp DESC)) = 1
-

@@ -43,10 +43,14 @@ sonne_borrows AS (
     ) :: INTEGER AS totalBorrows,
     contract_address AS token,
     'Sonne' AS platform,
-    _inserted_timestamp,
-    _log_id
+    modified_timestamp AS _inserted_timestamp,
+    CONCAT(
+      tx_hash :: STRING,
+      '-',
+      event_index :: STRING
+    ) AS _log_id
   FROM
-    {{ ref('silver__logs') }}
+    {{ ref('core__fact_event_logs') }}
   WHERE
     contract_address IN (
       SELECT
@@ -55,7 +59,7 @@ sonne_borrows AS (
         asset_details
     )
     AND topics [0] :: STRING = '0x13ed6866d4e1ee6da46f845c46d7e54120883d75c5ea9a2dacc1c4ca8984ab80'
-    AND tx_status = 'SUCCESS'
+    AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -105,7 +109,7 @@ SELECT
   borrower,
   borrows_contract_address,
   borrows_contract_symbol,
-  token as token_address,
+  token AS token_address,
   token_symbol,
   loan_amount_raw AS amount_unadj,
   loan_amount_raw / pow(
