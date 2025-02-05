@@ -25,7 +25,6 @@ SELECT
     nonce,
     -- new column
     receipts_root,
-    -- new column
     state_root,
     -- new column
     transactions_root,
