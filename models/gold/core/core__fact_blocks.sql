@@ -18,6 +18,8 @@ SELECT
     parent_hash,
     gas_used,
     gas_limit,
+    base_fee_per_gas,
+    -- new
     difficulty,
     total_difficulty,
     sha3_uncles,
@@ -58,6 +60,10 @@ SELECT
             '2000-01-01'
         )
     ) AS modified_timestamp,
+    'base' AS blockchain,
+    -- deprecate
+    HASH,
+    --deprecate
     OBJECT_CONSTRUCT(
         'baseFeePerGas',
         base_fee_per_gas,
@@ -97,11 +103,7 @@ SELECT
         transactions_root,
         'uncles',
         uncles
-    ) AS block_header_json,
-    -- deprecate
-    HASH,
-    --deprecate
-    'base' AS blockchain,
+    ) AS block_header_json -- deprecate
 FROM
     {{ ref('silver__blocks') }} A
     LEFT JOIN {{ ref('silver__tx_count') }}

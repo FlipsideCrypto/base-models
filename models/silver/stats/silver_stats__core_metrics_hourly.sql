@@ -45,7 +45,7 @@ SELECT
     ) AS transaction_count_success,
     COUNT(
         DISTINCT CASE
-            WHEN NOT tx_success THEN tx_hash
+            WHEN NOT tx_succeeded THEN tx_hash
         END
     ) AS transaction_count_failed,
     COUNT(

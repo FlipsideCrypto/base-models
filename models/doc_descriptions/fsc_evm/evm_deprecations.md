@@ -201,9 +201,3 @@ This column is being deprecated for standardization purposes. Please update your
 This column is being deprecated for standardization purposes. Please update your queries to use the `to_address` column instead by February 28, 2025.
 
 {% enddocs %}
-
-{%docs evm_column_deprecation_notice_l1_submission_details %}
-
-This column is being deprecated for standardization purposes. Please remove from your queries by February 28, 2025.
-
-{% enddocs %}

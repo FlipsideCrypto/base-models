@@ -74,7 +74,7 @@ AND contract_address IN (
     FROM
         atoken_meta
 )
-AND tx_status = 'SUCCESS' --excludes failed txs
+AND tx_succeeded
 )
 SELECT
     tx_hash,
