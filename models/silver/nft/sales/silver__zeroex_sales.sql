@@ -88,7 +88,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND _inserted_timestamp >= DATEADD('day', -14, CURRENT_DATE())
+AND block_timestamp >= DATEADD('day', -14, CURRENT_DATE())
 {% endif %}),
 token_transfers_raw AS (
     SELECT

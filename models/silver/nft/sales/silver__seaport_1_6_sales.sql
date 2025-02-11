@@ -40,7 +40,7 @@ AND modified_timestamp >= (
     FROM
         {{ this }}
 )
-AND modified_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND block_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 raw_logs AS (
