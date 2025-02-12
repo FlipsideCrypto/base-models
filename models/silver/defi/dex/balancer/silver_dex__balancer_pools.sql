@@ -82,6 +82,16 @@ tokens_registered AS (
                 pools_registered
         )
         AND tx_succeeded
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp) - INTERVAL '12 hours'
+    FROM
+        {{ this }}
+)
+AND block_timestamp >= SYSDATE() - INTERVAL '7 day'
+{% endif %}
 ),
 function_sigs AS (
     SELECT
