@@ -1,7 +1,11 @@
-{{ config(
-    materialized = 'view',
-    persist_docs ={ "relation": true,
-    "columns": true }
+{{ config (
+    materialized = "incremental",
+    unique_key = "ez_decoded_event_logs_id",
+    incremental_strategy = 'delete+insert',
+    cluster_by = "block_timestamp::date",
+    incremental_predicates = [standard_predicate()],
+    post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(ez_decoded_event_logs_id, contract_name, contract_address)",
+    tags = ['decoded_logs']
 ) }}
 
 SELECT
@@ -39,10 +43,25 @@ SELECT
             ['tx_hash', 'event_index']
         ) }}
     ) AS ez_decoded_event_logs_id,
-    GREATEST(COALESCE(l.inserted_timestamp, '2000-01-01'), COALESCE(C.inserted_timestamp, '2000-01-01')) AS inserted_timestamp,
-    GREATEST(COALESCE(l.modified_timestamp, '2000-01-01'), COALESCE(C.modified_timestamp, '2000-01-01')) AS modified_timestamp,
-    tx_status -- deprecate
+
+{% if is_incremental() %}
+SYSDATE() AS inserted_timestamp,
+SYSDATE() AS modified_timestamp,
+{% else %}
+    GREATEST(block_timestamp, DATEADD('day', -10, SYSDATE())) AS inserted_timestamp,
+    GREATEST(block_timestamp, DATEADD('day', -10, SYSDATE())) AS modified_timestamp,
+{% endif %}
+
+tx_status -- deprecate
 FROM
     {{ ref('silver__decoded_logs') }}
     l
     LEFT JOIN {{ ref('silver__contracts') }} C USING (contract_address)
+
+{% if is_incremental() %}
+AND l.modified_timestamp > (
+    SELECT
+        COALESCE(MAX(modified_timestamp), '2000-01-01' :: TIMESTAMP)
+    FROM
+        {{ this }})
+    {% endif %}
