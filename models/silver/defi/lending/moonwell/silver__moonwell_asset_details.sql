@@ -22,10 +22,14 @@ log_pull AS (
         C.token_name,
         C.token_symbol,
         C.token_decimals,
-        l._inserted_timestamp,
-        l._log_id
+        l.modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         l
         LEFT JOIN contracts C
         ON C.contract_address = l.contract_address
@@ -34,7 +38,7 @@ log_pull AS (
         AND C.token_name LIKE '%Moonwell%'
 
 {% if is_incremental() %}
-AND l._inserted_timestamp >= (
+AND l.modified_timestamp >= (
     SELECT
         MAX(
             _inserted_timestamp
@@ -48,7 +52,7 @@ AND l.contract_address NOT IN (
     FROM
         {{ this }}
 )
-AND l._inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND l.modified_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 traces_pull AS (
@@ -56,7 +60,8 @@ traces_pull AS (
         t.from_address AS token_address,
         t.to_address AS underlying_asset,
         CASE
-            WHEN identifier = 'STATICCALL_0_2' THEN 1
+            WHEN TYPE = 'STATICCALL'
+            AND trace_address = '0_2' THEN 1
             ELSE NULL
         END AS asset_identifier
     FROM
