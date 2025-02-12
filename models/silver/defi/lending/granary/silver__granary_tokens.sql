@@ -24,10 +24,14 @@ WITH DECODE AS (
         utils.udf_hex_to_string (
             segmented_data [9] :: STRING
         ) :: STRING AS atoken_symbol,
-        l._inserted_timestamp,
-        l._log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
         l
     WHERE
         topics [0] = '0xb19e051f8af41150ccccb3fc2c2d8d15f4a4cf434f32a559ba75fe73d6eea20b'
@@ -48,7 +52,6 @@ AND contract_address NOT IN (
         {{ this }}
 )
 AND block_timestamp >= SYSDATE() - INTERVAL '7 days'
-
 {% endif %}
 ),
 a_token_step_1 AS (
@@ -66,7 +69,8 @@ a_token_step_1 AS (
     FROM
         DECODE
     WHERE
-        atoken_name LIKE '%Granary%' OR atoken_name LIKE '%Grain%'
+        atoken_name LIKE '%Granary%'
+        OR atoken_name LIKE '%Grain%'
 ),
 debt_tokens AS (
     SELECT
@@ -77,10 +81,14 @@ debt_tokens AS (
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS atoken_address,
         CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 27, 40)) :: STRING AS atoken_stable_debt_address,
         CONCAT('0x', SUBSTR(segmented_data [1] :: STRING, 27, 40)) :: STRING AS atoken_variable_debt_address,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         topics [0] = '0x3a0ca721fc364424566385a1aa271ed508cc2c0949c2272575fb3013a163a45f'
         AND CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) IN (
@@ -129,4 +137,4 @@ FROM
     INNER JOIN {{ ref('silver__contracts') }} C
     ON contract_address = A.underlying_asset qualify(ROW_NUMBER() over(PARTITION BY atoken_address
 ORDER BY
-    a.atoken_created_block DESC)) = 1
+    A.atoken_created_block DESC)) = 1

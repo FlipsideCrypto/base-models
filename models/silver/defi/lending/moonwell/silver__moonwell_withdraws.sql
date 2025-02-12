@@ -40,10 +40,14 @@ moonwell_redemptions AS (
         ) :: INTEGER AS redeemed_token_raw,
         CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS redeemer,
         'Moonwell' AS platform,
-        _inserted_timestamp,
-        _log_id
+        modified_timestamp AS _inserted_timestamp,
+        CONCAT(
+            tx_hash :: STRING,
+            '-',
+            event_index :: STRING
+        ) AS _log_id
     FROM
-        {{ ref('silver__logs') }}
+        {{ ref('core__fact_event_logs') }}
     WHERE
         contract_address IN (
             SELECT
@@ -52,7 +56,7 @@ moonwell_redemptions AS (
                 asset_details
         )
         AND topics [0] :: STRING = '0xe5b754fb1abb7f01b499791d0b820ae3b6af3424ac1c59768edb53f4ec31a929'
-        AND tx_status = 'SUCCESS'
+        AND tx_succeeded
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -100,7 +104,7 @@ SELECT
     origin_to_address,
     origin_function_signature,
     contract_address,
-    token as token_address,
+    token AS token_address,
     token_symbol,
     received_amount_raw AS amount_unadj,
     received_amount_raw / pow(
