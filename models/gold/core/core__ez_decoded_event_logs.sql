@@ -59,9 +59,10 @@ FROM
     LEFT JOIN {{ ref('silver__contracts') }} C USING (contract_address)
 
 {% if is_incremental() %}
-AND l.modified_timestamp > (
-    SELECT
-        COALESCE(MAX(modified_timestamp), '2000-01-01' :: TIMESTAMP)
-    FROM
-        {{ this }})
-    {% endif %}
+WHERE
+    l.modified_timestamp > (
+        SELECT
+            COALESCE(MAX(modified_timestamp), '2000-01-01' :: TIMESTAMP)
+        FROM
+            {{ this }})
+        {% endif %}
