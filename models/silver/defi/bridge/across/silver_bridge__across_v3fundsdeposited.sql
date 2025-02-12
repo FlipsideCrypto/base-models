@@ -18,6 +18,7 @@ WITH base_evt AS (
         contract_address,
         'across-v3' AS NAME,
         event_index,
+        topic_0,
         CASE
             WHEN topic_0 = '0x32ed1a409ef04c7b0227189c3a103dc5ac10e775a15b785dcc510201f7c25ad3' THEN 'FundsDeposited'
             WHEN topic_0 = '0xa123dc29aebf7d0c3322c8eeb5b999e859f39937950ed31056532713d0de396f' THEN 'V3FundsDeposited'
@@ -52,12 +53,12 @@ WITH base_evt AS (
             utils.udf_hex_to_int(
                 segmented_data [4] :: STRING
             )
-        ) AS quoteTimestamp,
+        ) AS quote_timestamp,
         TRY_TO_TIMESTAMP(
             utils.udf_hex_to_int(
                 segmented_data [5] :: STRING
             )
-        ) AS fillDeadline,
+        ) AS fill_deadline,
         TRY_TO_NUMBER(
             utils.udf_hex_to_int(
                 segmented_data [6] :: STRING
@@ -109,7 +110,6 @@ SELECT
     topic_0,
     event_name,
     event_removed,
-    tx_status,
     contract_address AS bridge_address,
     NAME AS platform,
     depositor AS sender,
