@@ -12,7 +12,7 @@ WITH base AS (
         MIN(modified_timestamp) AS _inserted_timestamp,
         COUNT(*) AS tx_count
     FROM
-        {{ ref('core__fact_transactions') }}
+        {{ ref('silver__transactions') }}
 
 {% if is_incremental() %}
 WHERE

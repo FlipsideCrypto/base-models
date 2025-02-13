@@ -1870,7 +1870,7 @@ tx_data AS (
         tx_fee,
         input_data
     FROM
-        {{ ref('core__fact_transactions') }}
+        {{ ref('silver__transactions') }}
     WHERE
         block_timestamp :: DATE >= '2023-07-01'
         AND tx_hash IN (
