@@ -43,7 +43,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND block_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 tokens_registered AS (
@@ -90,7 +90,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
-AND block_timestamp >= SYSDATE() - INTERVAL '7 day'
+AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 {% endif %}
 ),
 function_sigs AS (
