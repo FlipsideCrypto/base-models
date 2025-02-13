@@ -58,7 +58,7 @@ WITH token_transfers AS (
     FROM
         {{ ref('core__ez_token_transfers') }}
         tr
-        INNER JOIN {{ ref('core__fact_transactions') }}
+        INNER JOIN {{ ref('silver__transactions') }}
         tx
         ON tr.block_number = tx.block_number
         AND tr.tx_hash = tx.tx_hash
@@ -125,7 +125,7 @@ native_transfers AS (
     FROM
         {{ ref('core__ez_native_transfers') }}
         et
-        INNER JOIN {{ ref('core__fact_transactions') }}
+        INNER JOIN {{ ref('silver__transactions') }}
         tx
         ON et.block_number = tx.block_number
         AND et.tx_hash = tx.tx_hash

@@ -14,7 +14,7 @@
 SELECT
     MIN(DATE_TRUNC('hour', block_timestamp)) block_timestamp_hour
 FROM
-    {{ ref('core__fact_transactions') }}
+    {{ ref('silver__transactions') }}
 WHERE
     modified_timestamp >= (
         SELECT
@@ -40,12 +40,12 @@ SELECT
     ) AS transaction_count,
     COUNT(
         DISTINCT CASE
-            WHEN tx_succeeded THEN tx_hash
+            WHEN tx_status = 'SUCCESS' THEN tx_hash
         END
     ) AS transaction_count_success,
     COUNT(
         DISTINCT CASE
-            WHEN NOT tx_succeeded THEN tx_hash
+            WHEN tx_status != 'SUCCESS' THEN tx_hash
         END
     ) AS transaction_count_failed,
     COUNT(
@@ -63,7 +63,7 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    {{ ref('core__fact_transactions') }}
+    {{ ref('silver__transactions') }}
 WHERE
     block_timestamp_hour < DATE_TRUNC(
         'hour',
