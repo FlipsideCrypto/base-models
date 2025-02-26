@@ -49,7 +49,7 @@ AND (
                     LATERAL FLATTEN(
                         input => blocks_impacted_array
                     )
-                    HAVING block_number <> 23411110
+                    HAVING block_number NOT IN (23411110, 23635928,23635927)
             )
     ) {% if var('OBSERV_FULL_TEST') %}
         OR block_number >= 0
