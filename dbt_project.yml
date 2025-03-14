@@ -17,6 +17,8 @@ test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
+docs-paths:
+  ["dbt_packages/fsc_evm/doc_descriptions", "models/doc_descriptions", "models"]
 
 target-path: "target" # directory which will store compiled SQL files
 clean-targets: # directories to be removed by `dbt clean`
@@ -49,11 +51,53 @@ query-comment:
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
 models:
-  +copy_grants: true
-  +persist_docs:
-    relation: true
-    columns: true
-  +on_schema_change: "append_new_columns"
+  base_models: # replace with the name of the chain
+    +copy_grants: true
+    +persist_docs:
+      relation: true
+      columns: true
+    +on_schema_change: "append_new_columns"
+  livequery_models:
+    +materialized: ephemeral
+  fsc_evm:
+    +enabled: false # disable fsc_evm package by default
+    +copy_grants: true
+    +persist_docs:
+      relation: true
+      columns: true
+    +on_schema_change: "append_new_columns"
+    main_package:
+      +enabled: false # disable main_package by default, enabled other packages as needed
+      core:
+        +enabled: true # enable subpackages, as needed
+        bronze:
+          +enabled: false
+          streamline:
+            +enabled: false
+          token_reads:
+            +enabled: true
+      github_actions:
+        +enabled: true
+      labels:
+        +enabled: true
+      observability:
+        +enabled: true
+      prices:
+        +enabled: true
+      utils:
+        +enabled: true
+      variables:
+        +enabled: true
+    decoder_package:
+      +enabled: false
+      abis:
+        +enabled: true
+      decoded_logs:
+        +enabled: true
+    curated_package:
+      +enabled: false
+    scores_package:
+      +enabled: true
   
 # In this example config, we tell dbt to build all models in the example/ directory
 # as tables. These settings can be overridden in the individual model files
@@ -103,37 +147,7 @@ vars:
 #### STREAMLINE 2.0 END ####
 
 #### FSC_EVM BEGIN ####
-# Visit https://github.com/FlipsideCrypto/fsc-evm/wiki for more information on required and optional variables
-
-  ### GLOBAL VARIABLES BEGIN ###
-  ## REQUIRED
-  GLOBAL_PROD_DB_NAME: 'base' 
-  GLOBAL_NODE_SECRET_PATH: 'Vault/prod/base/quicknode/base_mainnet'
-  GLOBAL_BLOCKS_PER_HOUR: 1800 
-  GLOBAL_USES_STREAMLINE_V1: True
-  GLOBAL_USES_SINGLE_FLIGHT_METHOD: True
-
-  ### GLOBAL VARIABLES END ###
-
-  ### MAIN_PACKAGE VARIABLES BEGIN ###
-
-  ### CORE ###
-  ## REQUIRED
-
-  ## OPTIONAL
-  TRACES_REALTIME_SQL_LIMIT: 3600
-  TRACES_REALTIME_PRODUCER_BATCH_SIZE: 900
-  TRACES_REALTIME_WORKER_BATCH_SIZE: 450
-  # GOLD_FULL_REFRESH: True
-  # SILVER_FULL_REFRESH: True
-
-  ### MAIN_PACKAGE VARIABLES END ###
-
-  ### DECODER_PACKAGE VARIABLES BEGIN ###
-
-  ## REQUIRED
-
-  ## OPTIONAL
-  ### DECODER_PACKAGE VARIABLES END ###
+  GLOBAL_USES_STREAMLINE_V1: True #hardcode in bronze then delete
+  GLOBAL_USES_SINGLE_FLIGHT_METHOD: True #hardcode in bronze then delete
 
 #### FSC_EVM END ####
