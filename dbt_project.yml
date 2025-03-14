@@ -147,9 +147,3 @@ vars:
         - DBT_CLOUD_BASE
 
 #### STREAMLINE 2.0 END ####
-
-#### FSC_EVM BEGIN ####
-  GLOBAL_USES_STREAMLINE_V1: True #hardcode in bronze then delete
-  GLOBAL_USES_SINGLE_FLIGHT_METHOD: True #hardcode in bronze then delete
-
-#### FSC_EVM END ####
