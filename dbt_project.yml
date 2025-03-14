@@ -94,6 +94,8 @@ models:
         +enabled: true
       decoded_logs:
         +enabled: true
+        bronze:
+          +enabled: false
     curated_package:
       +enabled: false
     scores_package:
