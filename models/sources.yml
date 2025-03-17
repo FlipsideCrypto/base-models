@@ -3,8 +3,7 @@ version: 2
 sources:
   - name: bronze_streamline
     database: streamline
-    schema: |
-      {{ target.database.upper() ~ ('_DEV' if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", false) else '') }}
+    schema: "{{ target.database }}"
     tables:
       - name: receipts
       - name: blocks
