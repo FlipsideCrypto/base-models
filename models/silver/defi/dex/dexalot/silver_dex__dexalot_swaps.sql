@@ -9,6 +9,7 @@
 WITH base_swaps AS (
 
     SELECT
+        'dexalot-simpleswap' AS platform,
         block_number,
         origin_function_signature,
         origin_from_address,
@@ -17,30 +18,21 @@ WITH base_swaps AS (
         tx_hash,
         event_index,
         contract_address,
-        regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
-        topics [1] :: STRING AS nouceAndMeta,
-        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS taker,
-        CONCAT('0x', SUBSTR(segmented_data [1] :: STRING, 25, 40)) AS destTrader,
+        decoded_log,
         TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                's2c',
-                segmented_data [2] :: STRING
-            )
-        ) AS destChainId,
-        CONCAT('0x', SUBSTR(segmented_data [3] :: STRING, 25, 40)) AS destAsset,
-        CONCAT('0x', SUBSTR(segmented_data [4] :: STRING, 25, 40)) AS srcAsset,
-        TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                's2c',
-                segmented_data [5] :: STRING
-            )
-        ) AS srcAmount,
-        TRY_TO_NUMBER(
-            utils.udf_hex_to_int(
-                's2c',
-                segmented_data [6] :: STRING
-            )
+            decoded_log :destAmount :: STRING
         ) AS destAmount,
+        decoded_log :destAsset :: STRING AS destAsset,
+        TRY_TO_NUMBER(
+            decoded_log :destChainId :: STRING
+        ) AS destChainId,
+        decoded_log :destTrader :: STRING AS destTrader,
+        decoded_log :nonceAndMeta :: STRING AS nouceAndMeta,
+        TRY_TO_NUMBER(
+            decoded_log :srcAmount :: STRING
+        ) AS srcAmount,
+        decoded_log :srcAsset :: STRING AS srcAsset,
+        decoded_log :taker :: STRING AS taker,
         CONCAT(
             tx_hash,
             '-',
@@ -48,7 +40,7 @@ WITH base_swaps AS (
         ) AS _log_id,
         modified_timestamp
     FROM
-        {{ ref('core__fact_event_logs') }}
+        {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         contract_address = '0x1fd108cf42a59c635bd4703b8dbc8a741ff834be'
         AND topic_0 = '0x68eb6d948c037c94e470f9a5b288dd93debbcd9342635408e66cb0211686f7f7'
