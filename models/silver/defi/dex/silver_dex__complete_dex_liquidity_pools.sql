@@ -191,41 +191,6 @@ WHERE
   )
 {% endif %}
 ),
-sushi_v3 AS (
-  SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    contract_address,
-    pool_address,
-    NULL AS pool_name,
-    fee,
-    tick_spacing,
-    token0_address AS token0,
-    token1_address AS token1,
-    NULL AS token2,
-    NULL AS token3,
-    NULL AS token4,
-    NULL AS token5,
-    NULL AS token6,
-    NULL AS token7,
-    'sushiswap-v3' AS platform,
-    'v3' AS version,
-    _log_id AS _id,
-    modified_timestamp AS _inserted_timestamp
-  FROM
-    {{ ref('silver_dex__sushi_pools_v3') }}
-
-{% if is_incremental() and 'sushi_v3' not in var('HEAL_MODELS') %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
 univ3 AS (
   SELECT
     block_number,
@@ -671,11 +636,6 @@ all_pools AS (
   SELECT
     *
   FROM
-    sushi_v3  
-  UNION ALL
-  SELECT
-    *
-  FROM
     dackieswap
   UNION ALL
   SELECT
@@ -709,7 +669,6 @@ complete_lps AS (
         'dackieswap',
         'aerodrome-slipstream',
         'pancakeswap-v3',
-        'sushiswap-v3',
         'maverick-v2'
       ) THEN CONCAT(
         COALESCE(
@@ -737,7 +696,6 @@ complete_lps AS (
           WHEN platform = 'dackieswap' THEN ' DLP'
           WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
           WHEN platform = 'pancakeswap-v3' THEN 'PCS-V3 LP'
-          WHEN platform = 'sushiswap-v3' THEN 'SUSHI-V3 LP'
           WHEN platform = 'maverick-v2' THEN 'MPv2 LP'
         END
       )
@@ -895,7 +853,6 @@ heal_model AS (
         'dackieswap',
         'aerodrome-slipstream',
         'pancakeswap-v3',
-        'sushiswap-v3',
         'maverick-v2'
       ) THEN CONCAT(
         COALESCE(
@@ -923,7 +880,6 @@ heal_model AS (
           WHEN platform = 'dackieswap' THEN ' DLP'
           WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
           WHEN platform = 'pancakeswap-v3' THEN 'PCS-V3 LP'
-          WHEN platform = 'sushiswap-v3' THEN 'SUSHI-V3 LP'
           WHEN platform = 'maverick-v2' THEN 'MPv2 LP'
         END
       )

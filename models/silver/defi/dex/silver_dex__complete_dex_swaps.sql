@@ -475,40 +475,6 @@ WHERE
   )
 {% endif %}
 ),
-sushi_v3 AS (
-  SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    origin_function_signature,
-    origin_from_address,
-    origin_to_address,
-    contract_address,
-    'Swap' AS event_name,
-    amount_in_unadj,
-    amount_out_unadj,
-    token_in,
-    token_out,
-    sender,
-    tx_to,
-    event_index,
-    'sushiswap-v3' AS platform,
-    'v3' AS version,
-    _log_id,
-    modified_timestamp AS _inserted_timestamp
-  FROM
-    {{ ref('silver_dex__sushi_swaps_v3') }}
-
-{% if is_incremental() and 'sushi_v3' not in var('HEAL_MODELS') %}
-WHERE
-  _inserted_timestamp >= (
-    SELECT
-      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
-    FROM
-      {{ this }}
-  )
-{% endif %}
-),
 dackie AS (
   SELECT
     block_number,
@@ -790,11 +756,6 @@ all_dex AS (
     *
   FROM
     sushi
-  UNION ALL
-  SELECT
-    *
-  FROM
-    sushi_v3
   UNION ALL
   SELECT
     *
