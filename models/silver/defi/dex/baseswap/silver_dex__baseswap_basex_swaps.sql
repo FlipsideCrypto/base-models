@@ -50,10 +50,11 @@ base_swaps AS (
             's2c',
             segmented_data [4] :: STRING
         ) :: FLOAT AS tick,
-        CASE
-            WHEN tx_status = 'SUCCESS' THEN TRUE
-            ELSE FALSE
-        END AS tx_succeeded,
+        pool_address,
+        token0_address,
+        token1_address,
+        fee,
+        tick_spacing,
         CONCAT(
             tx_hash,
             '-',
@@ -63,6 +64,8 @@ base_swaps AS (
     FROM
         {{ ref('core__fact_event_logs') }}
         l
+        INNER JOIN pools
+        ON pools.pool_address = l.contract_address
     WHERE
         block_timestamp :: DATE >= '2023-08-01'
         AND topic_0 = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'
@@ -87,7 +90,7 @@ SELECT
     block_timestamp,
     tx_hash,
     contract_address,
-    contract_address as pool_address,
+    pool_address,
     recipient,
     sender,
     fee,
@@ -106,8 +109,6 @@ SELECT
     amount0_unadj,
     amount1_unadj
 FROM
-    base_swaps
-    INNER JOIN pools
-    ON pools.pool_address = base_swaps.contract_address qualify(ROW_NUMBER() over(PARTITION BY _log_id
+    base_swaps qualify(ROW_NUMBER() over(PARTITION BY _log_id
 ORDER BY
     modified_timestamp DESC)) = 1
