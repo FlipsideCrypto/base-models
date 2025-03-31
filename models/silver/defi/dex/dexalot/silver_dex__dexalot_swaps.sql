@@ -9,7 +9,6 @@
 WITH base_swaps AS (
 
     SELECT
-        'dexalot-simpleswap' AS platform,
         block_number,
         origin_function_signature,
         origin_from_address,

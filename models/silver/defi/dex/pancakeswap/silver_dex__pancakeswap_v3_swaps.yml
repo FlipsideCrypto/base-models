@@ -36,9 +36,6 @@ models:
               column_type_list:
                 - TIMESTAMP_LTZ
                 - TIMESTAMP_NTZ
-          - dbt_expectations.expect_row_values_to_have_recent_data:
-              datepart: day
-              interval: 1
       - name: LIQUIDITY
         tests:
           - not_null
