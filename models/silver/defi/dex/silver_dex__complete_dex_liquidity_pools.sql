@@ -669,7 +669,8 @@ complete_lps AS (
         'dackieswap',
         'aerodrome-slipstream',
         'pancakeswap-v3',
-        'maverick-v2'
+        'maverick-v2',
+        'baseswap-basex'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -697,6 +698,7 @@ complete_lps AS (
           WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
           WHEN platform = 'pancakeswap-v3' THEN 'PCS-V3 LP'
           WHEN platform = 'maverick-v2' THEN 'MPv2 LP'
+          WHEN platform = 'baseswap-basex' THEN 'BSWAP-V3 LP'
         END
       )
       WHEN pool_name IS NULL
@@ -853,7 +855,8 @@ heal_model AS (
         'dackieswap',
         'aerodrome-slipstream',
         'pancakeswap-v3',
-        'maverick-v2'
+        'maverick-v2',
+        'baseswap-basex'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -881,6 +884,7 @@ heal_model AS (
           WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
           WHEN platform = 'pancakeswap-v3' THEN 'PCS-V3 LP'
           WHEN platform = 'maverick-v2' THEN 'MPv2 LP'
+          WHEN platform = 'baseswap-basex' THEN 'BSWAP-V3 LP'
         END
       )
       WHEN pool_name IS NULL
