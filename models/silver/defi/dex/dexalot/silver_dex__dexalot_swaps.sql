@@ -45,7 +45,7 @@ WITH base_swaps AS (
         AND topic_0 = '0x68eb6d948c037c94e470f9a5b288dd93debbcd9342635408e66cb0211686f7f7'
         AND destChainId = 8453
         AND tx_succeeded
-        AND event_removed = 'false'
+        AND event_removed = FALSE
 
 {% if is_incremental() %}
 AND modified_timestamp >= (

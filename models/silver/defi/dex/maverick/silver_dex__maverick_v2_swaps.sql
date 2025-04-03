@@ -90,7 +90,7 @@ swaps_base AS (
     WHERE
         l.topic_0 = '0x103ed084e94a44c8f5f6ba8e3011507c41063177e29949083c439777d8d63f60' --Swap
         AND tx_succeeded
-        AND event_removed = 'false'
+        AND event_removed = FALSE
 
 {% if is_incremental() %}
 AND modified_timestamp >= (

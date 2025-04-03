@@ -41,7 +41,7 @@ WITH created_pools AS (
         AND contract_address = LOWER('0x38015D05f4fEC8AFe15D7cc0386a126574e8077B') -- BASEX V3 FACTORY
         AND topic_0 = '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118'
         AND tx_succeeded
-        AND event_removed = 'false'
+        AND event_removed = FALSE
 
 {% if is_incremental() %}
 AND modified_timestamp >= (
@@ -78,7 +78,7 @@ initial_info AS (
         )
         AND topic_0 = '0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95'
         AND tx_succeeded
-        AND event_removed = 'false'
+        AND event_removed = FALSE
 
 {% if is_incremental() %}
 AND modified_timestamp >= (

@@ -108,7 +108,7 @@ base_swaps AS (
         block_timestamp :: DATE > '2023-08-01'
         AND topic_0 = '0x19b47279256b2a23a1665c810c8d55a1758940ee09377d4f8d26497a3577dc83' --swap
         AND tx_succeeded
-        AND event_removed = 'false'
+        AND event_removed = FALSE
 
 {% if is_incremental() %}
 AND modified_timestamp >= (
