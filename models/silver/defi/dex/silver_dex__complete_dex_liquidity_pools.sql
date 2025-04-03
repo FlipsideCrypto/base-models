@@ -366,6 +366,42 @@ WHERE
   )
 {% endif %}
 ),
+maverick_v2 AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    NULL AS fee,
+    -- passing null as maverick uses feeA and feeB
+    tick_spacing,
+    tokenA AS token0,
+    tokenB AS token1,
+    NULL AS token2,
+    NULL AS token3,
+    NULL AS token4,
+    NULL AS token5,
+    NULL AS token6,
+    NULL AS token7,
+    'maverick-v2' AS platform,
+    'v2' AS version,
+    _log_id AS _id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__maverick_v2_pools') }}
+
+{% if is_incremental() and 'maverick_v2' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 swapbased AS (
   SELECT
     block_number,
@@ -471,11 +507,86 @@ WHERE
   )
 {% endif %}
 ),
+baseswap_basex AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    fee,
+    tick_spacing,
+    token0_address as token0,
+    token1_address as token1,
+    NULL AS token2,
+    NULL AS token3,
+    NULL AS token4,
+    NULL AS token5,
+    NULL AS token6,
+    NULL AS token7,
+    'baseswap-basex' AS platform,
+    'v3' AS version,
+    _log_id AS _id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__baseswap_basex_pools') }}
+
+{% if is_incremental() and 'baseswap_basex' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+pancakeswap_v3 AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    contract_address,
+    pool_address,
+    NULL AS pool_name,
+    fee,
+    tick_spacing,
+    token0_address AS token0,
+    token1_address AS token1,
+    NULL AS token2,
+    NULL AS token3,
+    NULL AS token4,
+    NULL AS token5,
+    NULL AS token6,
+    NULL AS token7,
+    'pancakeswap-v3' AS platform,
+    'v3' AS version,
+    _log_id AS _id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__pancakeswap_v3_pools') }}
+
+{% if is_incremental() and 'pancakeswap_v3' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 all_pools AS (
   SELECT
     *
   FROM
     baseswap
+  UNION ALL
+  SELECT
+    *
+  FROM
+    baseswap_basex
   UNION ALL
   SELECT
     *
@@ -496,6 +607,11 @@ all_pools AS (
     *
   FROM
     maverick
+  UNION ALL
+  SELECT
+    *
+  FROM
+    maverick_v2
   UNION ALL
   SELECT
     *
@@ -530,7 +646,12 @@ all_pools AS (
   SELECT
     *
   FROM
-    curve
+    curve  
+  UNION ALL
+  SELECT
+    *
+  FROM
+    pancakeswap_v3
 ),
 complete_lps AS (
   SELECT
@@ -546,7 +667,10 @@ complete_lps AS (
         'uniswap-v3',
         'sushiswap',
         'dackieswap',
-        'aerodrome-slipstream'
+        'aerodrome-slipstream',
+        'pancakeswap-v3',
+        'maverick-v2',
+        'baseswap-basex'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -572,6 +696,9 @@ complete_lps AS (
           WHEN platform = 'sushiswap' THEN ' SLP'
           WHEN platform = 'dackieswap' THEN ' DLP'
           WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
+          WHEN platform = 'pancakeswap-v3' THEN 'PCS-V3 LP'
+          WHEN platform = 'maverick-v2' THEN 'MPv2 LP'
+          WHEN platform = 'baseswap-basex' THEN 'BSWAP-V3 LP'
         END
       )
       WHEN pool_name IS NULL
@@ -726,7 +853,10 @@ heal_model AS (
         'uniswap-v3',
         'sushiswap',
         'dackieswap',
-        'aerodrome-slipstream'
+        'aerodrome-slipstream',
+        'pancakeswap-v3',
+        'maverick-v2',
+        'baseswap-basex'
       ) THEN CONCAT(
         COALESCE(
           c0.token_symbol,
@@ -752,6 +882,9 @@ heal_model AS (
           WHEN platform = 'sushiswap' THEN ' SLP'
           WHEN platform = 'dackieswap' THEN ' DLP'
           WHEN platform = 'aerodrome-slipstream' THEN ' ASLP'
+          WHEN platform = 'pancakeswap-v3' THEN 'PCS-V3 LP'
+          WHEN platform = 'maverick-v2' THEN 'MPv2 LP'
+          WHEN platform = 'baseswap-basex' THEN 'BSWAP-V3 LP'
         END
       )
       WHEN pool_name IS NULL
