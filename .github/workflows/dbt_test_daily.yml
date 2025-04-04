@@ -44,7 +44,7 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt test --exclude "base_models,tag:full_test" "base_models,tag:recent_test" "base_models,tag:base_goerli" "base_models,tag:gha_tasks" livequery_models
+          dbt test --exclude "fsc_evm,tag:full_test" "fsc_evm,tag:recent_test" "fsc_evm,tag:gha_tasks" livequery_models
   
 
 
