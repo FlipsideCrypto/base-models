@@ -3,7 +3,7 @@
 
 {{ config (
     materialized = 'view',
-    tags = ['bronze_core']
+    tags = ['bronze','core','confirm_blocks','phase_1']
 ) }}
 
 SELECT

@@ -4,7 +4,7 @@
 {# Set up dbt configuration #}
 {{ config (
     materialized = 'view',
-    tags = ['bronze_core_streamline_v1']
+    tags = ['bronze','core','streamline_v1','confirm_blocks','phase_1']
 ) }}
 
 {# Main query starts here #}

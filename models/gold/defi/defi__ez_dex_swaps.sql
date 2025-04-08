@@ -4,7 +4,8 @@
     "columns": true },
     meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAP, MAVERICK, DACKIE, WOOFI, AERODROME, CURVE, VOODOO, PANCAKESWAP, RAMSES, DEXALOT',
     'PURPOSE': 'DEX, SWAPS',
-    } } }
+    } } },
+    tags = ['gold','defi','dex','curated','ez']
 ) }}
 
 SELECT
