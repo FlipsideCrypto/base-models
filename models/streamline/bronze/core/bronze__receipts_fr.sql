@@ -1,6 +1,9 @@
+{# Log configuration details #}
+{{ fsc_evm.log_model_details() }}
+
 {{ config (
     materialized = 'view',
-    tags = ['bronze_receipts']
+    tags = ['bronze','core','receipts','phase_1']
 ) }}
 
 SELECT
@@ -14,7 +17,6 @@ SELECT
     _inserted_timestamp
 FROM
     {{ ref('bronze__receipts_fr_v2') }}
-{% if var('GLOBAL_USES_STREAMLINE_V1', false) %}
 UNION ALL
 SELECT
     _partition_by_block_id AS partition_key,
@@ -27,4 +29,3 @@ SELECT
     _inserted_timestamp
 FROM
    {{ ref('bronze__receipts_fr_v1') }}
-{% endif %}
