@@ -67,13 +67,13 @@ models:
       columns: true
     +on_schema_change: "append_new_columns"
     main_package:
-      +enabled: false # disable main_package by default, enabled other packages as needed
+      +enabled: false # disable top level package by default, enabled subpackages as needed
+      admin:
+        +enabled: true
       core:
         +enabled: true # enable subpackages, as needed
         bronze:
           +enabled: false
-          streamline:
-            +enabled: false
           token_reads:
             +enabled: true
       github_actions:
@@ -86,18 +86,22 @@ models:
         +enabled: true
       utils:
         +enabled: true
-      variables:
-        +enabled: true
     decoder_package:
       +enabled: false
       abis:
         +enabled: true
       decoded_logs:
-        +enabled: true
-        bronze:
-          +enabled: false
+        +enabled: false
+        gold:
+          +enabled: true
+        silver:
+          +enabled: true
+        streamline:
+          +enabled: true
     curated_package:
       +enabled: false
+      stats:
+        +enabled: true
     scores_package:
       +enabled: true
   
@@ -108,19 +112,13 @@ models:
 vars:
   "dbt_date:time_zone": GMT
   STREAMLINE_INVOKE_STREAMS: False
-  STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES: False
   UPDATE_UDFS_AND_SPS: False
   UPDATE_SNOWFLAKE_TAGS: True
-  OBSERV_FULL_TEST: False
   OVERFLOWED_TRACES: False
   WAIT: 0
   HEAL_MODEL: False
   HEAL_MODELS: []
   START_GHA_TASKS: False
-  API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] if var("config")[target.name] else var("config")["dev"]["API_INTEGRATION"] }}' 
-  EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] if var("config")[target.name] else var("config")["dev"]["EXTERNAL_FUNCTION_URI"] }}'
-  ROLES: |
-      ["INTERNAL_DEV"]
 
 #### STREAMLINE 2.0 BEGIN ####
 

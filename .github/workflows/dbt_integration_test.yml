@@ -1,0 +1,17 @@
+name: dbt_run_integration_test
+run-name: ${{ github.event.inputs.branch }}
+
+on:
+  workflow_dispatch:
+    branches:
+      - "main"
+
+concurrency: ${{ github.workflow }}
+
+jobs:
+  called_workflow_template:
+    uses: FlipsideCrypto/fsc-evm/.github/workflows/dbt_run_template_integration_test.yml@pre-release/v4-beta
+    with:
+      command: |
+        dbt test --selector 'integration_tests'
+    secrets: inherit
