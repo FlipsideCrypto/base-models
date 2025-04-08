@@ -2,7 +2,7 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAP, MAVERICK, DACKIE, WOOFI, AERODROME, CURVE, VOODOO',
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'SUSHI, UNISWAP, BALANCER, SWAPBASED, BASESWAP, MAVERICK, DACKIE, WOOFI, AERODROME, CURVE, VOODOO, PANCAKESWAP, RAMSES, DEXALOT',
     'PURPOSE': 'DEX, SWAPS',
     } } }
 ) }}

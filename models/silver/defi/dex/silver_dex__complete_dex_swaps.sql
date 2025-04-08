@@ -111,6 +111,40 @@ WHERE
   )
 {% endif %}
 ),
+maverick_v2 AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    event_name,
+    amount_in_unadj,
+    amount_out_unadj,
+    token_in,
+    token_out,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    'v2' AS version,
+    _log_id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__maverick_v2_swaps') }}
+
+{% if is_incremental() and 'maverick_v2' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 woofi AS (
   SELECT
     block_number,
@@ -204,6 +238,52 @@ baseswap AS (
     {{ ref('silver_dex__baseswap_swaps') }}
 
 {% if is_incremental() and 'baseswap' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+baseswap_basex AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    pool_address AS contract_address,
+    event_name,
+    CASE
+      WHEN amount0_unadj > 0 THEN ABS(amount0_unadj)
+      ELSE ABS(amount1_unadj)
+    END AS amount_in_unadj,
+    CASE
+      WHEN amount0_unadj < 0 THEN ABS(amount0_unadj)
+      ELSE ABS(amount1_unadj)
+    END AS amount_out_unadj,
+    CASE
+      WHEN amount0_unadj > 0 THEN token0_address
+      ELSE token1_address
+    END AS token_in,
+    CASE
+      WHEN amount0_unadj < 0 THEN token0_address
+      ELSE token1_address
+    END AS token_out,
+    sender,
+    recipient AS tx_to,
+    event_index,
+    platform,
+    'v3' AS version,
+    _log_id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__baseswap_basex_swaps') }}
+
+{% if is_incremental() and 'baseswap_basex' not in var('HEAL_MODELS') %}
 WHERE
   _inserted_timestamp >= (
     SELECT
@@ -533,6 +613,74 @@ WHERE
   )
 {% endif %}
 ),
+pancakeswap_v3 AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    event_name,
+    amount_in_unadj,
+    amount_out_unadj,
+    token_in,
+    token_out,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    'v3' AS version,
+    _log_id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__pancakeswap_v3_swaps') }}
+
+{% if is_incremental() and 'pancakeswap_v3' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
+dexalot AS (
+  SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    origin_function_signature,
+    origin_from_address,
+    origin_to_address,
+    contract_address,
+    event_name,
+    amount_in_unadj,
+    amount_out_unadj,
+    token_in,
+    token_out,
+    sender,
+    tx_to,
+    event_index,
+    platform,
+    'v1' AS version,
+    _log_id,
+    modified_timestamp AS _inserted_timestamp
+  FROM
+    {{ ref('silver_dex__dexalot_swaps') }}
+
+{% if is_incremental() and 'dexalot' not in var('HEAL_MODELS') %}
+WHERE
+  _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp) - INTERVAL '{{ var("LOOKBACK", "4 hours") }}'
+    FROM
+      {{ this }}
+  )
+{% endif %}
+),
 all_dex AS (
   SELECT
     *
@@ -562,12 +710,22 @@ all_dex AS (
   SELECT
     *
   FROM
+    baseswap_basex
+  UNION ALL
+  SELECT
+    *
+  FROM
     woofi
   UNION ALL
   SELECT
     *
   FROM
     maverick
+  UNION ALL
+  SELECT
+    *
+  FROM
+    maverick_v2
   UNION ALL
   SELECT
     *
@@ -603,6 +761,16 @@ all_dex AS (
     *
   FROM
     dackie
+  UNION ALL
+  SELECT
+    *
+  FROM
+    pancakeswap_v3
+  UNION ALL
+  SELECT
+    *
+  FROM
+    dexalot
 ),
 complete_dex_swaps AS (
   SELECT
