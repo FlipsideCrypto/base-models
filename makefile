@@ -17,6 +17,7 @@ deploy_chain_phase_1:
 	dbt run -m livequery_models.deploy.core --vars '{UPDATE_UDFS_AND_SPS: true}' -t $(DBT_TARGET)
 	dbt run-operation fsc_evm.livequery_grants -t $(DBT_TARGET)
 	dbt run-operation fsc_evm.create_evm_streamline_udfs --vars '{UPDATE_UDFS_AND_SPS: true}' -t $(DBT_TARGET)
+	dbt run-operation fsc_evm.call_sample_rpc_node -t $(DBT_TARGET)
 	dbt run -m "fsc_evm,tag:phase_1" --full-refresh --vars '{"GLOBAL_STREAMLINE_FR_ENABLED": true}' -t $(DBT_TARGET)
 	# kick chainhead workflow
 	# wait ~10 minutes
