@@ -197,7 +197,7 @@ base_near AS (
         addr_encoded
     FROM
         {{ source(
-            'silver_crosschain',
+            'crosschain_silver',
             'near_address_encoded'
         ) }}
 )
