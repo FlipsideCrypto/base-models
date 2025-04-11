@@ -4,7 +4,7 @@ sources:
   - name: bronze_streamline
     database: streamline
     schema: |
-      {{ "BASE_DEV" if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else "BASE" }}
+      {{ target.database.upper() | replace('_DEV', '') ~ '_DEV' if var("STREAMLINE_USE_DEV_FOR_EXTERNAL_TABLES", False) else target.database.upper() | replace('_DEV', '') }}
     tables:
       - name: receipts
       - name: blocks
@@ -19,12 +19,6 @@ sources:
       - name: confirm_blocks_v2
       - name: decoded_logs_v2
       - name: contract_abis
-  - name: crosschain
-    database: >-
-      {{ 'CROSSCHAIN_DEV' if '_DEV' in target.database.upper() else 'CROSSCHAIN' }}
-    schema: core
-    tables:
-      - name: dim_labels
   - name: crosschain_silver
     database: >-
       {{ 'CROSSCHAIN_DEV' if '_DEV' in target.database.upper() else 'CROSSCHAIN' }}
@@ -53,11 +47,6 @@ sources:
     schema: streamline
     tables:
       - name: complete_contract_abis
-  - name: base_bronze_api
-    database: base
-    schema: bronze_api
-    tables:
-      - name: contract_abis
   - name: github_actions
     database: "{{ target.database }}"
     schema: github_actions
@@ -68,16 +57,6 @@ sources:
     schema: defillama
     tables:
       - name: dim_chains
-  - name: base_silver
-    database: "{{ 'base' if target.database == 'BASE' else 'base_dev' }}"
-    schema: silver
-    tables:
-      - name: overflowed_traces
-  - name: base_gold
-    database: "{{ 'base' if target.database == 'BASE' else 'base_dev' }}"
-    schema: core
-    tables:
-      - name: fact_traces
   - name: abis_silver
     database: "{{ target.database }}"
     schema: silver
