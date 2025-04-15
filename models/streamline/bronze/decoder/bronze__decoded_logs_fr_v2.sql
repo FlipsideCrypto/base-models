@@ -8,7 +8,7 @@
 ) }}
 
 {# Main query starts here #}
-{{ fsc_evm.streamline_external_table_query_decoder(
+{{ fsc_evm.streamline_external_table_query_decoder_fr(
     source_name = 'decoded_logs',
     source_version = 'v2'
 ) }}
