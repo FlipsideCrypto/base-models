@@ -2,7 +2,7 @@
     materialized = 'view',
     persist_docs ={ "relation": true,
     "columns": true },
-    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'ACROSS, AXELAR, CELER, CBRIDGE, DLN, DEBRIDGE, HOP, MESON, STARGATE, SYMBIOSIS, SYNAPSE, WORMHOLE, CCTP',
+    meta ={ 'database_tags':{ 'table':{ 'PROTOCOL': 'ACROSS, AXELAR, CELER, CBRIDGE, DLN, DEBRIDGE, HOP, MESON, STARGATE, SYMBIOSIS, SYNAPSE, WORMHOLE, CCTP, CCIP',
     'PURPOSE': 'BRIDGE' } } },
     tags = ['gold','defi','bridge','curated','ez']
 ) }}
