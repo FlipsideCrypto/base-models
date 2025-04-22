@@ -3,32 +3,15 @@ run-name: ${{ github.event.inputs.branch }}
 
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        required: true
-        type: string
+    branches:
+      - "main"
 
 concurrency: ${{ github.workflow }}
 
 jobs:
-  prepare_vars:
-    runs-on: ubuntu-latest
-    environment: 
-      name: ${{ inputs.environment }}  
-    outputs:  
-      warehouse: ${{ steps.set_outputs.outputs.warehouse }}
-    steps:
-      - name: Set warehouse output
-        id: set_outputs
-        run: |
-          echo "warehouse=${{ vars.WAREHOUSE }}" >> $GITHUB_OUTPUT  
-
   called_workflow_template:
-    needs: prepare_vars
-    uses: FlipsideCrypto/analytics-workflow-templates/.github/workflows/dbt.yml@main
+    uses: FlipsideCrypto/fsc-evm/.github/workflows/dbt_run_template_integration_test.yml@pre-release/v4-beta
     with:
-      command: >
+      command: |
         dbt test --selector 'integration_tests'
-      environment: ${{ inputs.environment }}
-      warehouse: ${{ needs.prepare_vars.outputs.warehouse }}  
     secrets: inherit

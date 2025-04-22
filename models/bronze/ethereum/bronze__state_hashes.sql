@@ -2,7 +2,7 @@
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
     unique_key = "state_block_number",
-    tags = ['ethereum','non_realtime']
+    tags = ['bronze','ethereum']
 ) }}
 
 SELECT

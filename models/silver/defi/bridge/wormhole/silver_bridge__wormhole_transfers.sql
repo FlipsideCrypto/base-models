@@ -3,7 +3,7 @@
     incremental_strategy = 'delete+insert',
     unique_key = "block_number",
     cluster_by = ['block_timestamp::DATE'],
-    tags = ['curated','reorg']
+    tags = ['silver_bridge','defi','bridge','curated']
 ) }}
 
 WITH token_transfers AS (
@@ -58,7 +58,7 @@ WITH token_transfers AS (
     FROM
         {{ ref('core__ez_token_transfers') }}
         tr
-        INNER JOIN {{ ref('silver__transactions') }}
+        INNER JOIN {{ ref('core__fact_transactions') }}
         tx
         ON tr.block_number = tx.block_number
         AND tr.tx_hash = tx.tx_hash
@@ -125,7 +125,7 @@ native_transfers AS (
     FROM
         {{ ref('core__ez_native_transfers') }}
         et
-        INNER JOIN {{ ref('silver__transactions') }}
+        INNER JOIN {{ ref('core__fact_transactions') }}
         tx
         ON et.block_number = tx.block_number
         AND et.tx_hash = tx.tx_hash
@@ -197,7 +197,7 @@ base_near AS (
         addr_encoded
     FROM
         {{ source(
-            'silver_crosschain',
+            'crosschain_silver',
             'near_address_encoded'
         ) }}
 )
