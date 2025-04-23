@@ -17,5 +17,5 @@ logs/
 .env
 dbt-env/
 
-package-lock.yml
+/package-lock.yml
 .user.yml
