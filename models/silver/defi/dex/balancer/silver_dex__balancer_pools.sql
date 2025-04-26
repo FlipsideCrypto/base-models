@@ -144,46 +144,31 @@ build_rpc_requests AS (
         inputs_pools
         LEFT JOIN pools_registered USING(pool_address)
 ),
-pool_token_reads AS ({% for item in range(10) %}
-    (
-SELECT
-    live.udf_api('POST', CONCAT('{service}', '/', '{Authentication}'),{}, batch_rpc_request, 'Vault/prod/base/quicknode/mainnet') AS read_output, SYSDATE() AS _inserted_timestamp
-FROM
-    (
-SELECT
-    ARRAY_AGG(rpc_request) batch_rpc_request
-FROM
+pool_token_reads AS (
+    SELECT
+        live.udf_api(
+            'POST', 
+            CONCAT('{service}', '/', '{Authentication}'),
+            {}, 
+            rpc_request, 
+            'Vault/prod/base/quicknode/mainnet'
+        ) AS read_output, 
+    SYSDATE() AS _inserted_timestamp,
+    pool_address,
+    block_number,
+    function_sig    
+FROM 
     build_rpc_requests
-WHERE
-    batch_no = {{ item }} + 1
-    AND batch_no IN (
-SELECT
-    DISTINCT batch_no
-FROM
-    build_rpc_requests))) {% if not loop.last %}
-    UNION ALL
-    {% endif %}
-{% endfor %}),
+),
 reads_adjusted AS (
     SELECT
-        VALUE :id :: STRING AS read_id,
-        VALUE :result :: STRING AS read_result,
-        SPLIT(
-            read_id,
-            '-'
-        ) AS read_id_object,
-        read_id_object [0] :: STRING AS pool_address,
-        LEFT(
-            read_id_object [1] :: STRING,
-            10
-        ) AS function_sig,
-        read_id_object [2] :: STRING AS block_number,
+        read_output:data:result :: STRING AS read_result,
+        pool_address,
+        function_sig,
+        block_number,
         _inserted_timestamp
     FROM
-        pool_token_reads,
-        LATERAL FLATTEN(
-            input => read_output :data
-        )
+        pool_token_reads
 ),
 pool_details AS (
     SELECT
