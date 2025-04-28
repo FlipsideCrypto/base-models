@@ -4,17 +4,33 @@ cleanup_time:
 	@set -e; \
 	rm -f package-lock.yml && dbt clean && dbt deps
 
-deploy_github_actions:
+deploy_gha_workflows_table:
 	@set -e; \
+	echo "Collecting workflow names..." ; \
+	WORKFLOW_VALUES="" ; \
+	for file in $$(find .github/workflows -name "*.yml" -type f); do \
+		filename=$$(basename "$$file" .yml) ; \
+		if [ -z "$$WORKFLOW_VALUES" ]; then \
+			WORKFLOW_VALUES="('$$filename')" ; \
+		else \
+			WORKFLOW_VALUES="$$WORKFLOW_VALUES,('$$filename')" ; \
+		fi ; \
+	done ; \
+	echo "Found workflows: $$WORKFLOW_VALUES" ; \
+	dbt run-operation create_workflow_table --args "{\"workflow_values\": \"$$WORKFLOW_VALUES\"}" -t $(DBT_TARGET)
+
+deploy_gha_tasks:
+	@set -e; \
+	make deploy_gha_workflows_table DBT_TARGET=$(DBT_TARGET); \
 	dbt run -s livequery_base.deploy.marketplace.github --vars '{"UPDATE_UDFS_AND_SPS":True}' -t $(DBT_TARGET); \
 	dbt run -m "fsc_evm,tag:gha_tasks" --full-refresh -t $(DBT_TARGET); \
-	dbt run-operation fsc_evm.create_gha_tasks --vars '{"START_GHA_TASKS":False}' -t $(DBT_TARGET)
+	dbt run-operation fsc_evm.create_gha_tasks --vars '{"RESUME_GHA_TASKS":True}' -t $(DBT_TARGET)
 
-deploy_new_github_action:
+deploy_new_gha_tasks:
 	@set -e; \
-	dbt run-operation fsc_evm.drop_github_actions_schema -t $(DBT_TARGET); \
+	make deploy_gha_workflows_table DBT_TARGET=$(DBT_TARGET); \
 	dbt run -m "fsc_evm,tag:gha_tasks" --full-refresh -t $(DBT_TARGET); \
-	dbt run-operation fsc_evm.create_gha_tasks --vars '{"START_GHA_TASKS":False}' -t $(DBT_TARGET)
+	dbt run-operation fsc_evm.create_gha_tasks --vars '{"RESUME_GHA_TASKS":True}' -t $(DBT_TARGET)
 
 deploy_livequery:
 	@set -e; \
@@ -61,10 +77,8 @@ deploy_chain_phase_2:
 	else \
 		dbt run -m "fsc_evm,tag:phase_2" --full-refresh --vars '{"GLOBAL_STREAMLINE_FR_ENABLED": true, "GLOBAL_BRONZE_FR_ENABLED": true, "GLOBAL_SILVER_FR_ENABLED": true, "GLOBAL_GOLD_FR_ENABLED": true, "GLOBAL_NEW_BUILD_ENABLED": true}' -t $(DBT_TARGET); \
 		dbt run -m "fsc_evm,tag:streamline,tag:abis,tag:realtime" "fsc_evm,tag:streamline,tag:abis,tag:complete" --vars '{"STREAMLINE_INVOKE_STREAMS":True, "DECODER_SL_NEW_BUILD_ENABLED": true}' -t $(DBT_TARGET); \
-		make deploy_github_actions DBT_TARGET=$(DBT_TARGET); \
+		make deploy_gha_tasks DBT_TARGET=$(DBT_TARGET); \
 	fi; \
-	echo "# tasks set to SUSPEND by default"; \
-	echo "# kick dbt_alter_gha_task or dbt_alter_all_gha_tasks workflow to RESUME tasks, where applicable"; \
 	echo "# wait ~10 minutes"; \
 	echo "# run deploy_chain_phase_3"
 
@@ -93,7 +107,5 @@ deploy_chain_phase_4:
 		dbt run -m "fsc_evm,tag:phase_3" -t $(DBT_TARGET); \
 		dbt run -m "fsc_evm,tag:phase_4" --full-refresh -t $(DBT_TARGET); \
 	fi; \
-	echo "# tasks set to SUSPEND by default"; \
-	echo "# kick dbt_alter_gha_task or dbt_alter_all_gha_tasks workflow to RESUME tasks, where applicable"
 
-.PHONY: deploy_github_actions cleanup_time deploy_new_github_action deploy_chain_phase_1 deploy_chain_phase_2 deploy_chain_phase_3 deploy_livequery deploy_chain_phase_4
+.PHONY: cleanup_time deploy_gha_workflows_table deploy_gha_tasks deploy_new_gha_tasks deploy_livequery deploy_chain_phase_1 deploy_chain_phase_2 deploy_chain_phase_3 deploy_chain_phase_4

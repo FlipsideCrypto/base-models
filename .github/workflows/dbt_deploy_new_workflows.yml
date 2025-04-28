@@ -15,5 +15,5 @@ jobs:
     with:
       command_name: Deploy New Github Actions
       command: |
-        make deploy_new_github_action DBT_TARGET=prod
+        make deploy_new_gha_tasks DBT_TARGET=prod
     secrets: inherit
