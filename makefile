@@ -93,8 +93,6 @@ deploy_chain_phase_3:
 		dbt run -m "fsc_evm,tag:phase_3" --full-refresh --vars '{"GLOBAL_STREAMLINE_FR_ENABLED": true, "GLOBAL_SILVER_FR_ENABLED": true, "GLOBAL_GOLD_FR_ENABLED": true, "GLOBAL_NEW_BUILD_ENABLED": true}' -t $(DBT_TARGET); \
 		dbt run -m "fsc_evm,tag:silver,tag:abis" "fsc_evm,tag:streamline,tag:decoded_logs,tag:realtime" "fsc_evm,tag:streamline,tag:decoded_logs,tag:complete" --vars '{"STREAMLINE_INVOKE_STREAMS":True}' -t $(DBT_TARGET); \
 	fi; \
-	echo "# tasks set to SUSPEND by default"; \
-	echo "# kick dbt_alter_gha_task or dbt_alter_all_gha_tasks workflow to RESUME tasks, where applicable"; \
 	echo "# wait ~10 minutes"; \
 	echo "# run deploy_chain_phase_4"
 
