@@ -19,57 +19,58 @@ There is more information on how to use dbt docs in the last section of this doc
 ### Core Tables
 
 **Dimensional Tables**
-- [dim_contracts](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__dim_contracts)
-- [dim_labels](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__dim_labels)
+- [dim_contracts](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__dim_contracts)
+- [dim_contract_abis](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__dim_contract_abis)
+- [dim_labels](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__dim_labels)
 
 **Fact Tables:**
-- [fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_blocks)
-- [fact_transactions](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_transactions)
-- [fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_event_logs)
-- [fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__fact_traces)
+- [fact_blocks](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__fact_blocks)
+- [fact_transactions](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__fact_transactions)
+- [fact_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__fact_event_logs)
+- [fact_traces](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__fact_traces)
 
 **Convenience Tables:**
-- [ez_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_decoded_event_logs)
-- [ez_native_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_native_transfers)
-- [ez_token_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.core__ez_token_transfers)
+- [ez_decoded_event_logs](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__ez_decoded_event_logs)
+- [ez_native_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__ez_native_transfers)
+- [ez_token_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.core__ez_token_transfers)
 
 ### Price Tables (base.price)
-- [dim_asset_metadata](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.price__dim_asset_metadata)
-- [fact_prices_ohlc_hourly](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.price__fact_prices_ohlc_hourly)
-- [ez_asset_metadata](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.price__ez_asset_metadata)
-- [ez_prices_hourly](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.price__ez_prices_hourly)
+- [dim_asset_metadata](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.price__dim_asset_metadata)
+- [fact_prices_ohlc_hourly](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.price__fact_prices_ohlc_hourly)
+- [ez_asset_metadata](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.price__ez_asset_metadata)
+- [ez_prices_hourly](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.price__ez_prices_hourly)
 
 ### DeFi Tables (base.defi)
-- [ez_bridge_activity](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_bridge_activity)
-- [ez_dex_swaps](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_dex_swaps)
-- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__dim_dex_liquidity_pools)
-- [ez_lending_borrows](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_borrows) 
-- [ez_lending_deposits](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_deposits)
-- [ez_lending_flashloans](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_flashloans)
-- [ez_lending_liquidations](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_liquidations)
-- [ez_lending_repayments](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_repayments)
-- [ez_lending_withdraws](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_withdraws)
+- [ez_bridge_activity](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_bridge_activity)
+- [ez_dex_swaps](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_dex_swaps)
+- [dim_dex_liquidity_pools](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__dim_dex_liquidity_pools)
+- [ez_lending_borrows](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_lending_borrows) 
+- [ez_lending_deposits](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_lending_deposits)
+- [ez_lending_flashloans](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_lending_flashloans)
+- [ez_lending_liquidations](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_lending_liquidations)
+- [ez_lending_repayments](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_lending_repayments)
+- [ez_lending_withdraws](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.defi__ez_lending_withdraws)
 
 ### Flipside Partner Tables (arbitrum.partner_name)
 
 **Vertex Tables:**
-- [dim_products](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__dim_products)
-- [ez_clearing_house_events](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_clearing_house_events)
-- [ez_liquidations](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_liquidations)
-- [ez_perp_trades](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_perp_trades)
-- [ez_spot_trades](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_spot_trades)
-- [ez_account_stats](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_account_stats)
-- [ez_edge_trades](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_edge_trades)
-- [ez_market_depth_stats](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_market_depth_stats)
-- [ez_market_stats](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_market_stats)
-- [ez_money_markets](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.vertex__ez_money_markets)
+- [dim_products](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__dim_products)
+- [ez_clearing_house_events](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_clearing_house_events)
+- [ez_liquidations](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_liquidations)
+- [ez_perp_trades](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_perp_trades)
+- [ez_spot_trades](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_spot_trades)
+- [ez_account_stats](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_account_stats)
+- [ez_edge_trades](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_edge_trades)
+- [ez_market_depth_stats](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_market_depth_stats)
+- [ez_market_stats](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_market_stats)
+- [ez_money_markets](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__ez_money_markets)
 
 ### NFT Tables (base.nft)
-- [ez_nft_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.nft__ez_nft_transfers)
-- [ez_nft_sales](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.nft__ez_nft_sales)
+- [ez_nft_transfers](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.nft__ez_nft_transfers)
+- [ez_nft_sales](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.nft__ez_nft_sales)
 
 ### Stats Tables (base.stats)
-- [ez_core_metrics_hourly](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.stats__ez_core_metrics_hourly)
+- [ez_core_metrics_hourly](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.stats__ez_core_metrics_hourly)
 
 ## **Helpful User-Defined Functions (UDFs)**
 
