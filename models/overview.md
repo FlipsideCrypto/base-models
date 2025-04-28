@@ -51,7 +51,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_lending_repayments](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_repayments)
 - [ez_lending_withdraws](https://flipsidecrypto.github.io/base-models/#!/model/model.base_models.defi__ez_lending_withdraws)
 
-### Flipside Partner Tables (arbitrum.partner_name)
+### Flipside Partner Tables (base.partner_name)
 
 **Vertex Tables:**
 - [dim_products](https://flipsidecrypto.github.io/base-models/#!/model/model.fsc_evm.vertex__dim_products)
