@@ -57,7 +57,7 @@ models:
       relation: true
       columns: true
     +on_schema_change: "append_new_columns"
-  livequery_base:
+  livequery_models:
     +materialized: ephemeral
   fsc_evm:
     +enabled: false # disable fsc_evm package by default
