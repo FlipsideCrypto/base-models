@@ -14,11 +14,8 @@ jobs:
     uses: FlipsideCrypto/fsc-evm/.github/workflows/dbt_run_template.yml@pre-release/v4-beta
     with:
       target: test
-      command_name: Build Recent Testing Views
+      command_name: Run Observability & Recent Tests
       command: |
-        dbt run -m "fsc_evm,tag:recent_test"
-      command_name_2: Run Observability & Recent Tests
-      command_2: |
         dbt run -m "fsc_evm,tag:observability"
         dbt test -m "fsc_evm,tag:recent_test"
     secrets: inherit
