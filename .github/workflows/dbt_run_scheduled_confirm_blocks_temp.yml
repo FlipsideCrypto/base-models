@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
     branches:
       - "main"
+  schedule:
+    - cron: '0 * * * *'
 
 concurrency:
   group: ${{ github.workflow }}
