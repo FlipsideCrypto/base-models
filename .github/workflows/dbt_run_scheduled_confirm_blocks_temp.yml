@@ -1,5 +1,5 @@
-name: dbt_run_scheduled_main
-run-name: dbt_run_scheduled_main
+name: dbt_run_scheduled_confirm_blocks_temp
+run-name: dbt_run_scheduled_confirm_blocks_temp
 
 on:
   workflow_dispatch:
