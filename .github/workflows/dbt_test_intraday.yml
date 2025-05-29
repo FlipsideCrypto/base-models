@@ -17,5 +17,5 @@ jobs:
       command_name: Run Observability & Recent Tests
       command: |
         dbt run -m "fsc_evm,tag:observability"
-        dbt test -m "fsc_evm,tag:recent_test" --exclude "fsc_evm,tag:test_silver,tag:confirm_blocks"
+        dbt test -m "fsc_evm,tag:recent_test"
     secrets: inherit
