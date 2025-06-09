@@ -11,6 +11,7 @@ WITH DECODE AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS underlying_asset,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS granary_version_pool,
+        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS treasury_address,
         utils.udf_hex_to_int(
             SUBSTR(
                 segmented_data [2] :: STRING,
@@ -61,6 +62,7 @@ a_token_step_1 AS (
         segmented_data,
         underlying_asset,
         granary_version_pool,
+        treasury_address,
         atoken_decimals,
         atoken_name,
         atoken_symbol,
@@ -69,8 +71,7 @@ a_token_step_1 AS (
     FROM
         DECODE
     WHERE
-        atoken_name LIKE '%Granary%'
-        OR atoken_name LIKE '%Grain%'
+        treasury_address = '0xd93e25a8b1d645b15f8c736e1419b4819ff9e6ef'
 ),
 debt_tokens AS (
     SELECT
@@ -105,6 +106,7 @@ a_token_step_2 AS (
         segmented_data,
         underlying_asset,
         granary_version_pool,
+        treasury_address,
         atoken_decimals,
         atoken_name,
         atoken_symbol,
@@ -117,6 +119,7 @@ a_token_step_2 AS (
 SELECT
     A.atoken_created_block,
     granary_version_pool,
+    A.treasury_address,
     A.atoken_symbol AS atoken_symbol,
     A.a_token_address AS atoken_address,
     b.atoken_stable_debt_address,
