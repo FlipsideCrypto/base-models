@@ -8,6 +8,7 @@
 WITH logs AS (
 
     SELECT
+        block_number,
         block_timestamp,
         tx_hash,
         event_index,
@@ -16,6 +17,7 @@ WITH logs AS (
         topic_1,
         topic_2,
         topic_3,
+        DATA,
         regexp_substr_all(SUBSTR(DATA, 3), '.{64}') AS part
     FROM
         {{ ref('core__fact_event_logs') }}
@@ -85,10 +87,12 @@ bus_raw AS (
             323,
             passenger_length
         ) AS passenger_final,
-        SUBSTR(
-            passenger_final,
-            1,
-            4
+        utils.udf_hex_to_int(
+            SUBSTR(
+                passenger_final,
+                1,
+                4
+            )
         ) AS asset_id,
         '0x' || SUBSTR(SUBSTR(passenger_final, 5, 64), 25) AS dst_receiver_address,
         utils.udf_hex_to_int(SUBSTR(passenger_final, 69, 16)) AS amount_transferred,
