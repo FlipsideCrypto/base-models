@@ -6,10 +6,8 @@
 WITH DECODE AS (
 
     SELECT
-        tx_hash,
         block_number AS atoken_created_block,
         contract_address AS a_token_address,
-        origin_from_address,
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS underlying_asset,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS aave_version_pool,
@@ -58,10 +56,8 @@ AND _inserted_timestamp >= SYSDATE() - INTERVAL '7 day'
 ),
 a_token_step_1 AS (
     SELECT
-        tx_hash,
         atoken_created_block,
         a_token_address,
-        origin_from_address,
         segmented_data,
         underlying_asset,
         aave_version_pool,
