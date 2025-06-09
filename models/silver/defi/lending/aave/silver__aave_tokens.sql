@@ -1,5 +1,6 @@
 {{ config(
     materialized = 'incremental',
+    unique_key = ['atoken_address',
     tags = ['silver','defi','lending','curated']
 ) }}
 
@@ -71,8 +72,7 @@ a_token_step_1 AS (
         DECODE
     WHERE
         treasury_address = '0xba9424d650a4f5c80a0da641254d1acce2a37057'
-)
-,
+),
 
 debt_tokens AS (
     SELECT
