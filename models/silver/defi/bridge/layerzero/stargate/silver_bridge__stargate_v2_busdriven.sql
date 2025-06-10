@@ -53,7 +53,6 @@ bus_driven AS (
         r.dst_id,
         start_ticket_id,
         num_passengers,
-        end_ticket_id,
         b.ticket_id,
         asset_id,
         asset_name,
