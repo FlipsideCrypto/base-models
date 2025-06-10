@@ -19,19 +19,29 @@ WITH bus_driven_raw AS (
             3
         ) AS guid,
         decoded_log :numPassengers :: INT AS num_passengers,
-        decoded_log :startTicketId :: INT AS start_ticket_id,
-        ROW_NUMBER() over (
-            PARTITION BY tx_hash
-            ORDER BY
-                event_index ASC
-        ) AS rn,
-        start_ticket_id + num_passengers - 1 AS end_ticket_id
+        decoded_log :startTicketId :: INT AS start_ticket_id
     FROM
         {{ ref('core__ez_decoded_event_logs') }}
     WHERE
         contract_address = '0x5634c4a5fed09819e3c46d86a965dd9447d86e47'
         AND event_name = 'BusDriven'
         AND block_timestamp :: DATE >= '2024-01-01'
+),
+bus_driven_array AS (
+    SELECT
+        *,
+        VALUE :: INT AS ticket_id
+    FROM
+        bus_driven_raw,
+        LATERAL FLATTEN (
+            input =>(
+                array_generate_range(
+                    start_ticket_id,
+                    start_ticket_id + num_passengers,
+                    1
+                )
+            )
+        )
 ),
 bus_driven AS (
     SELECT
@@ -52,13 +62,12 @@ bus_driven AS (
         amount_transferred,
         r.guid
     FROM
-        bus_driven_raw r
+        bus_driven_array r
         INNER JOIN {{ ref('silver_bridge__stargate_v2_busrode') }}
-        -- join with busRode
-        b
-        ON r.dst_id = b.dst_id
-        AND b.ticket_id >= start_ticket_id
-        AND b.ticket_id <= end_ticket_id
+        b USING (
+            dst_id,
+            ticket_id
+        )
 ),
 layerzero AS (
     SELECT
@@ -87,7 +96,6 @@ SELECT
     dst_id,
     start_ticket_id,
     num_passengers,
-    end_ticket_id,
     ticket_id,
     asset_id,
     asset_name,
