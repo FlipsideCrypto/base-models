@@ -14,11 +14,12 @@ WITH decoded_logs AS (
         contract_address,
         event_name,
         decoded_log,
-        tx_hash
+        tx_hash,
+        origin_from_address
     FROM
         {{ ref('core__ez_decoded_event_logs') }}
     WHERE
-        block_timestamp :: DATE >= '2024-01-01'
+        block_timestamp :: DATE >= '2025-03-01'
         AND (
             (
                 event_name = 'PacketSent'
@@ -32,8 +33,10 @@ WITH decoded_logs AS (
 ),
 layerzero AS (
     SELECT
+        block_number,
         block_timestamp,
         tx_hash,
+        contract_address,
         event_index,
         SUBSTR(
             decoded_log :encodedPayload :: STRING,
@@ -74,6 +77,7 @@ FROM
 WHERE
     event_name = 'PacketSent'
     AND contract_address = LOWER('0x1a44076050125825900e736c501f859c50fE728c') -- layerzero endpoint v2
+    AND sender_ca = '0x5634c4a5fed09819e3c46d86a965dd9447d86e47' -- stargate token messaging. Ensures adapter sends
 ),
 bus_driven_raw AS (
     SELECT
@@ -93,7 +97,8 @@ bus_driven_raw AS (
             ORDER BY
                 event_index ASC
         ) AS rn,
-        start_ticket_id + num_passengers - 1 AS end_ticket_id
+        start_ticket_id + num_passengers - 1 AS end_ticket_id,
+        origin_from_address
     FROM
         decoded_logs
     WHERE
@@ -114,10 +119,12 @@ bus_driven AS (
         asset_id,
         dst_receiver_address,
         amount_transferred,
-        guid
+        r.guid,
+        origin_from_address
     FROM
-        bus_driven r
-        INNER JOIN {{ ref('silver_bridge__stargate_v2_bus') }}
+        bus_driven_raw r
+        INNER JOIN {{ ref('silver_bridge__stargate_v2_busrode') }}
+        -- join with busRode
         b
         ON r.dst_id = b.dst_id
         AND b.ticket_id >= start_ticket_id
@@ -125,17 +132,19 @@ bus_driven AS (
 ),
 final_bus_driven AS (
     SELECT
-        block_timestamp,
-        tx_hash,
+        b.block_timestamp,
+        b.tx_hash,
         guid,
-        event_index,
-        contract_address,
+        b.event_index,
+        b.contract_address,
         dst_id,
         start_ticket_id,
         num_passengers,
         end_ticket_id,
         ticket_id,
         asset_id,
+        asset AS asset_symbol,
+        -- from the list
         dst_receiver_address,
         amount_transferred,
         payload,
@@ -146,12 +155,17 @@ final_bus_driven AS (
         dst_chain_hex,
         receiver_ca,
         message_type,
-        message_type
+        origin_from_address
     FROM
         bus_driven b
-        LEFT JOIN layerzero l
-        ON b.tx_hash = l.tx_hash
-        AND b.guid = l.guid
+        INNER JOIN layerzero l USING (
+            tx_hash,
+            guid
+        )
+        LEFT JOIN {{ ref('silver_bridge__stargate_asset_id') }}
+        s
+        ON asset_id = s.id
+        AND s.chain = 'Base'
 ),
 oft_raw AS (
     SELECT
@@ -164,7 +178,6 @@ oft_raw AS (
         topic_1,
         topic_2,
         topic_3,
-        contract_address,
         contract_address AS stargate_adapter_address,
         DATA,
         regexp_substr_all(SUBSTR(DATA, 3), '.{64}') AS part,
@@ -186,16 +199,17 @@ oft_raw AS (
     FROM
         {{ ref('core__fact_event_logs') }}
     WHERE
-        block_timestamp :: DATE >= '2024-01-01'
+        block_timestamp :: DATE >= '2025-03-01'
         AND topic_0 = '0x85496b760a4b7f8d66384b9df21b381f5d1b1e79f229a47aaf4c232edc2fe59a' --OFTSent
 ),
 final_oft AS (
     SELECT
-        block_number,
-        block_timestamp,
+        l.block_number,
+        l.block_timestamp,
         tx_hash,
         l.event_index,
-        contract_address,
+        l.contract_address,
+        stargate_adapter_address,
         guid,
         from_address,
         -- src sender
@@ -218,9 +232,10 @@ final_oft AS (
         '0x' || SUBSTR(SUBSTR(payload, 233, 64), 25) AS dst_chain_receiver
     FROM
         oft_raw o
-        INNER JOIN layerzero l
-        ON o.tx_hash = l.tx_hash
-        AND o.guid = l.guid
+        INNER JOIN layerzero l USING (
+            tx_hash,
+            guid
+        )
 )
 SELECT
     block_timestamp,
@@ -235,6 +250,7 @@ SELECT
     --end_ticket_id,
     --ticket_id,
     asset_id,
+    origin_from_address AS from_address,
     dst_receiver_address,
     amount_transferred,
     payload,
@@ -245,18 +261,23 @@ SELECT
     dst_chain_hex,
     receiver_ca,
     message_type,
-    message_type
+    'bus' AS bridge_type
 FROM
     final_bus_driven
 UNION ALL
 SELECT
+    block_timestamp,
     tx_hash,
-    l.event_index,
-    contract_address,
     guid,
+    event_index,
+    stargate_adapter_address,
+    -- adapter address, the CA of the adapter
+    dst_id,
+    stargate_adapter_address AS asset_id,
+    -- this supposed to be asset id
     from_address,
     -- src sender
-    dst_id,
+    dst_chain_receiver AS dst_receiver_address,
     amount_sent,
     payload,
     TYPE,
@@ -267,11 +288,6 @@ SELECT
     dst_chain_hex,
     receiver_ca,
     message_type,
-    SUBSTR(
-        payload,
-        229,
-        4
-    ) AS message_type_2,
-    '0x' || SUBSTR(SUBSTR(payload, 233, 64), 25) AS dst_chain_receiver
+    'oft' AS bridge_type
 FROM
     final_oft

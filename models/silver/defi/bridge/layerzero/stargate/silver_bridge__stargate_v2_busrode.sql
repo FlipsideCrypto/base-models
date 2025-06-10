@@ -51,7 +51,6 @@ oft_sent AS (
             topic_2,
             27
         ) AS from_address,
-        -- src sender
         utils.udf_hex_to_int(
             part [0] :: STRING
         ) AS dst_id,
@@ -114,12 +113,12 @@ SELECT
     stargate_adapter_address,
     guid,
     from_address,
-    -- might need to use the origin from address as sender instead. because this address is the address taht sent to the token messaging contract
     dst_id,
     amount_sent,
     bus_dst_id,
     ticket_id,
     asset_id,
+    A.asset AS asset_name,
     dst_receiver_address,
     amount_transferred,
     is_native_drop
@@ -132,3 +131,6 @@ FROM
         o.oft_sent_index < b.next_bus_rode_index
         OR b.next_bus_rode_index IS NULL
     )
+    LEFT JOIN {{ ref('silver_bridge__stargate_asset_id') }} A
+    ON asset_id = id
+    AND A.chain = 'Base'
