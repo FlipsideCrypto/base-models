@@ -1,4 +1,4 @@
-Chain,Asset,ID,lpTokenSymbol 
+chain,asset,id,lpTokenSymbol
 Ethereum,USDC,1,S*USDC
 Ethereum,USDT,2,S*USDT
 Ethereum,ETH,13,S*ETH

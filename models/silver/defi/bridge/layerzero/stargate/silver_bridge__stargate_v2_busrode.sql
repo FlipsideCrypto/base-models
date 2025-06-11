@@ -18,7 +18,12 @@ WITH logs AS (
         topic_2,
         topic_3,
         DATA,
-        regexp_substr_all(SUBSTR(DATA, 3), '.{64}') AS part
+        regexp_substr_all(SUBSTR(DATA, 3), '.{64}') AS part,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        inserted_timestamp,
+        modified_timestamp
     FROM
         {{ ref('core__fact_event_logs') }}
     WHERE
@@ -30,6 +35,16 @@ WITH logs AS (
             )
             OR topic_0 = '0x85496b760a4b7f8d66384b9df21b381f5d1b1e79f229a47aaf4c232edc2fe59a' --OFTSent
         )
+
+{% if is_incremental() %}
+WHERE
+    modified_date >= (
+        SELECT
+            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
 ),
 oft_sent AS (
     SELECT
@@ -53,14 +68,20 @@ oft_sent AS (
         ) AS from_address,
         utils.udf_hex_to_int(
             part [0] :: STRING
-        ) AS dst_id,
+        ) :: INT AS dst_id,
         utils.udf_hex_to_int(
             part [1] :: STRING
-        ) AS amount_sent
+        ) :: INT AS amount_sent,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        inserted_timestamp,
+        modified_timestamp
     FROM
         logs
     WHERE
         topic_0 = '0x85496b760a4b7f8d66384b9df21b381f5d1b1e79f229a47aaf4c232edc2fe59a'
+        AND guid = '0000000000000000000000000000000000000000000000000000000000000000'
 ),
 bus_raw AS (
     SELECT
@@ -73,10 +94,10 @@ bus_raw AS (
         ) AS next_bus_rode_index,
         utils.udf_hex_to_int(
             part [0] :: STRING
-        ) AS bus_dst_id,
+        ) :: INT AS bus_dst_id,
         utils.udf_hex_to_int(
             part [1] :: STRING
-        ) AS ticket_id,
+        ) :: INT AS ticket_id,
         regexp_substr_all(SUBSTR(DATA, 195), '.{64}') AS passenger_raw,
         utils.udf_hex_to_int(
             passenger_raw [1] :: STRING
@@ -93,8 +114,12 @@ bus_raw AS (
                 4
             )
         ) AS asset_id,
+        SUBSTR(
+            passenger_final,
+            5,
+            64
+        ) AS dst_receiver_address_raw,
         '0x' || SUBSTR(SUBSTR(passenger_final, 5, 64), 25) AS dst_receiver_address,
-        utils.udf_hex_to_int(SUBSTR(passenger_final, 69, 16)) AS amount_transferred,
         SUBSTR(
             passenger_final,
             85,
@@ -119,9 +144,14 @@ SELECT
     ticket_id,
     asset_id,
     A.asset AS asset_name,
+    A.address AS asset_address,
     dst_receiver_address,
-    amount_transferred,
-    is_native_drop
+    is_native_drop,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    inserted_timestamp,
+    modified_timestamp
 FROM
     oft_sent o
     INNER JOIN bus_raw b
@@ -131,6 +161,6 @@ FROM
         o.oft_sent_index < b.next_bus_rode_index
         OR b.next_bus_rode_index IS NULL
     )
-    LEFT JOIN {{ ref('silver_bridge__stargate_asset_id') }} A
+    LEFT JOIN {{ ref('silver_bridge__stargate_asset_id_seed') }} A
     ON asset_id = id
     AND A.chain = 'Base'

@@ -31,6 +31,16 @@ WITH layerzero AS (
         {{ ref('silver_bridge__layerzero_v2_packet') }}
     WHERE
         sender_contract_address = LOWER('0x5634c4a5fed09819e3c46d86a965dd9447d86e47') -- token messaging arbitrum
+
+{% if is_incremental() %}
+WHERE
+    modified_date >= (
+        SELECT
+            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
 ),
 oft_raw AS (
     SELECT
@@ -55,15 +65,30 @@ oft_raw AS (
         ) AS from_address,
         utils.udf_hex_to_int(
             part [0] :: STRING
-        ) AS dst_chain_id_oft,
+        ) :: INT AS dst_chain_id_oft,
         utils.udf_hex_to_int(
             part [1] :: STRING
-        ) AS amount_sent
+        ) :: INT AS amount_sent,
+        origin_from_address,
+        origin_to_address,
+        origin_function_signature,
+        inserted_timestamp,
+        modified_timestamp
     FROM
         {{ ref('core__fact_event_logs') }}
     WHERE
         block_timestamp :: DATE >= '2024-01-01'
         AND topic_0 = '0x85496b760a4b7f8d66384b9df21b381f5d1b1e79f229a47aaf4c232edc2fe59a' --OFTSent
+
+{% if is_incremental() %}
+WHERE
+    modified_date >= (
+        SELECT
+            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
 )
 SELECT
     block_number,
@@ -71,8 +96,9 @@ SELECT
     tx_hash,
     guid,
     event_index,
+    'OFTSent' AS event_name,
     stargate_oft_address,
-    -- need a reads model to read the token func (0xfc0c546a)
+    stargate_oft_address AS contract_address,
     from_address,
     to_address,
     src_chain_id,
@@ -87,7 +113,12 @@ SELECT
     sender_contract_address,
     receiver_contract_address,
     message_type,
-    message_type_2
+    message_type_2,
+    origin_from_address,
+    origin_to_address,
+    origin_function_signature,
+    inserted_timestamp,
+    modified_timestamp
 FROM
     oft_raw o
     INNER JOIN layerzero l USING (
