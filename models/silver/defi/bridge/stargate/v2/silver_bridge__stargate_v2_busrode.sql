@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     incremental_strategy = 'delete+insert',
-    unique_key = "contract_address",
+    unique_key = "block_number",
     tags = ['silver_bridge','defi','bridge','curated']
 ) }}
 

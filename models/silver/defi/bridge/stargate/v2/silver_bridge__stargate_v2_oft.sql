@@ -99,6 +99,9 @@ SELECT
     'OFTSent' AS event_name,
     stargate_oft_address,
     stargate_oft_address AS contract_address,
+    A.address AS token_address,
+    A.id AS asset_id,
+    A.asset AS asset_name,
     from_address,
     to_address,
     src_chain_id,
@@ -125,3 +128,6 @@ FROM
         tx_hash,
         guid
     )
+    LEFT JOIN {{ ref('silver_bridge__stargate_asset_id_seed') }} A
+    ON o.stargate_oft_address = A.oftaddress
+    AND A.chain = 'Base'
