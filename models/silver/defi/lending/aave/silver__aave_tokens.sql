@@ -1,5 +1,6 @@
 {{ config(
     materialized = 'incremental',
+    unique_key = ['atoken_address',
     tags = ['silver','defi','lending','curated']
 ) }}
 
@@ -11,6 +12,7 @@ WITH DECODE AS (
         regexp_substr_all(SUBSTR(DATA, 3, len(DATA)), '.{64}') AS segmented_data,
         CONCAT('0x', SUBSTR(topics [1] :: STRING, 27, 40)) AS underlying_asset,
         CONCAT('0x', SUBSTR(topics [2] :: STRING, 27, 40)) AS aave_version_pool,
+        CONCAT('0x', SUBSTR(segmented_data [0] :: STRING, 25, 40)) AS treasury_address,
         utils.udf_hex_to_int(
             SUBSTR(
                 segmented_data [2] :: STRING,
@@ -60,6 +62,7 @@ a_token_step_1 AS (
         segmented_data,
         underlying_asset,
         aave_version_pool,
+        treasury_address,
         atoken_decimals,
         atoken_name,
         atoken_symbol,
@@ -68,8 +71,9 @@ a_token_step_1 AS (
     FROM
         DECODE
     WHERE
-        atoken_name LIKE '%Aave%'
+        treasury_address = '0xba9424d650a4f5c80a0da641254d1acce2a37057'
 ),
+
 debt_tokens AS (
     SELECT
         block_number AS atoken_created_block,
@@ -102,6 +106,7 @@ a_token_step_2 AS (
         a_token_address,
         segmented_data,
         underlying_asset,
+        treasury_address,
         aave_version_pool,
         atoken_decimals,
         atoken_name,
@@ -115,6 +120,7 @@ a_token_step_2 AS (
 SELECT
     A.atoken_created_block,
     A.aave_version_pool,
+    A.treasury_address,
     A.atoken_symbol AS atoken_symbol,
     A.a_token_address AS atoken_address,
     b.atoken_stable_debt_address,
