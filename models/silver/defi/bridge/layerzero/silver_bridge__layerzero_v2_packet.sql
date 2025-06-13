@@ -28,7 +28,6 @@ WITH raw AS (
         ) AS nonce,
         utils.udf_hex_to_int(SUBSTR(payload, 19, 8)) AS src_chain_id,
         '0x' || SUBSTR(SUBSTR(payload, 27, 64), 25) AS sender_contract_address,
-        -- token messaging for stargate in arbitrum
         utils.udf_hex_to_int(SUBSTR(payload, 91, 8)) AS dst_chain_id,
         '0x' || SUBSTR(SUBSTR(payload, 99, 64), 25) AS receiver_contract_address,
         SUBSTR(
@@ -52,9 +51,9 @@ WITH raw AS (
 
 {% if is_incremental() %}
 WHERE
-    modified_date >= (
+    modified_timestamp >= (
         SELECT
-            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
+            MAX(modified_timestamp)
         FROM
             {{ this }}
     )
@@ -72,7 +71,6 @@ SELECT
         c1.chain
     ) AS src_chain,
     sender_contract_address,
-    -- token messaging for stargate in arbitrum
     dst_chain_id,
     LOWER(
         c2.chain

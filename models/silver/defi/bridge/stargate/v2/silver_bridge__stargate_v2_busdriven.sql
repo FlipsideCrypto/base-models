@@ -34,13 +34,12 @@ WITH bus_driven_raw AS (
         AND block_timestamp :: DATE >= '2024-01-01'
 
 {% if is_incremental() %}
-WHERE
-    modified_date >= (
-        SELECT
-            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
-        FROM
-            {{ this }}
-    )
+AND modified_timestamp >= (
+    SELECT
+        MAX(modified_timestamp)
+    FROM
+        {{ this }}
+)
 {% endif %}
 ),
 bus_driven_array AS (
@@ -105,6 +104,16 @@ bus_driven AS (
             dst_id,
             ticket_id
         )
+
+{% if is_incremental() %}
+WHERE
+    b.modified_timestamp >= (
+        SELECT
+            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
+        FROM
+            {{ this }}
+    )
+{% endif %}
 ),
 layerzero AS (
     SELECT
@@ -125,9 +134,9 @@ layerzero AS (
 
 {% if is_incremental() %}
 WHERE
-    modified_date >= (
+    modified_timestamp >= (
         SELECT
-            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
+            MAX(modified_timestamp)
         FROM
             {{ this }}
     )

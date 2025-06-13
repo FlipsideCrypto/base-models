@@ -37,13 +37,12 @@ WITH logs AS (
         )
 
 {% if is_incremental() %}
-WHERE
-    modified_date >= (
-        SELECT
-            MAX(modified_timestamp) - INTERVAL '{{ var("LOOKBACK", "12 hours") }}'
-        FROM
-            {{ this }}
-    )
+AND modified_timestamp >= (
+    SELECT
+        MAX(modified_timestamp)
+    FROM
+        {{ this }}
+)
 {% endif %}
 ),
 oft_sent AS (
