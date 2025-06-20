@@ -50,8 +50,12 @@ SELECT
     tx_to,
     event_index,
     platform,
+    protocol,
+    protocol_version,
     token_in,
+    token_in_is_verified,
     token_out,
+    token_out_is_verified,
     symbol_in,
     symbol_out,
     COALESCE (
