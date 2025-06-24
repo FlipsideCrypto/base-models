@@ -1229,7 +1229,7 @@ SELECT
   event_index,
   platform,
   protocol,
-  version as protocol_version,
+  version,
   token_in,
   token_in_is_verified,
   token_out,
